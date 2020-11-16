@@ -2,24 +2,24 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-from faker import Faker
+# from faker import Faker
 
-fake = Faker()
+# fake = Faker()
 
 app = Flask(__name__)
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///medi.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 migrate = Migrate(app, db)
 
-print(fake.name())
-print('------------------------------')
-print(fake.email())
-print('------------------------------')
-print(fake.address())
-print('------------------------------')
+# print(fake.name())
+# print('------------------------------')
+# print(fake.email())
+# print('------------------------------')
+# print(fake.address())
+# print('------------------------------')
 
 class Role(db.Model):
     __tablename__ = 'roles'
@@ -29,9 +29,9 @@ class Role(db.Model):
     users = db.relationship('User', backref='role', lazy='dynamic')
 
 
-# def __init__(self, name, persmissions):
-#         self.name = fake.name()
-#         self.permissions = fake.random_int(min=10, max=19)
+def __init__(self, name, persmissions):
+        self.name = fake.name()
+        self.permissions = fake.random_int(min=10, max=19)
 
 
 class User(db.Model):
@@ -110,3 +110,23 @@ class PastHistory(db.Model):
     past_history_particular_observation = db.Column(db.String(255), nullable=False)
     past_history_year = db.Column(db.Date, nullable=False)
     past_history_owner_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    #  def __init__(self, name, description, price, qty):
+    #     self.name = name
+    #     self.description = description
+    #     self.price = price
+    #     self.qty = qty
