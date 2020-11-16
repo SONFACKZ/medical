@@ -1,3 +1,6 @@
+/* Custom Fonts */
+@import url("https://fonts.googleapis.com/css?family=Open+Sans&display=swap");
+
 .App {
   text-align: center;
 }
@@ -36,3 +39,68 @@
     transform: rotate(360deg);
   }
 }
+
+.text
+{
+  font-size: 21px;
+  font-weight: 500;
+  color: #fff;
+  margin-right: 3em;
+  margin-left: 3em;
+}
+
+
+
+
+
+
+
+
+.right-side
+{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 90%;
+  background-color: #3498db;
+  width: 100%;
+  position: absolute;
+  right: -34%;
+  border-radius: 6px;
+  z-index: 1;
+  transition: all 400ms ease-in-out;
+  cursor: pointer;
+  box-shadow: 0px 0px 12px  2px rgba(15, 15, 15, 0)
+}
+
+  &.right
+  {
+    right: -40%;
+    align-items: flex-end;
+  }
+    &:hover
+    {
+      right: 45%;
+    }
+
+
+
+.btn
+{
+  font-size: 21px;
+  padding: 5px 20px;
+  border: 0;
+  background-color: #3498db;
+  color: #fff;
+  border-radius: 3px;
+  transition: all 250ms ease-in-out;
+  cursor: pointer;
+}
+  &:hover
+  {
+    background-color: #2386c8;
+  }
+  &:focus
+  {
+    outline: none;
+  }
