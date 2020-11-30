@@ -1,7 +1,7 @@
 import React from 'react';
 import loginImg from "../../login.svg";
 
-export class Login extends React.Component {
+class Login extends React.Component {
     constructor(props) {
         super(props);
     }
@@ -12,7 +12,7 @@ export class Login extends React.Component {
                 <div className="header">Login</div>
                 <div className="content">
                     <div className="image">
-                        <img src={loginImg} />
+                        <img alt = "another test" src={loginImg} />
                     </div>
                     <div className="form">
                         <div className="form-group">
@@ -34,3 +34,5 @@ export class Login extends React.Component {
         );
     }
 }
+
+export default Login;

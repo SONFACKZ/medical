@@ -1,18 +1,15 @@
 import React from 'react';
 import loginImg from "../../login.svg";
 
-export class Register extends React.Component {
-    constructor(props) {
-        super(props);
-    }
+class RegisterDoctor extends React.Component {
 
     render() {
         return (
             <div className="base-container">
-                <div className="header">Register</div>
+                <div className="header">Register as a doctor</div>
                 <div className="content">
                     <div className="image">
-                        <img src={loginImg} />
+                        <img alt = "just a test" src={loginImg} />
                     </div>
                     <div className="form">
                         <div className="form-group">
@@ -38,3 +35,5 @@ export class Register extends React.Component {
         );
     }
 }
+
+export default RegisterDoctor
