@@ -167,148 +167,133 @@ class RegisterPatient extends React.Component {
              })
     }
 
-
-   
-    
-        // const handleFormSubmit = () =>{
-        //     fetch('/register/patient', {
-        //         method: 'POST',
-        //         body: JSON.stringify({
-        //             fullname: addPatient,
-        //             email: addPatient,
-        //             residence: addPatient,
-        //             sex: addPatient,
-        //             contact_phone: addPatient,
-        //             blood_group: addPatient,
-        //             occupation: addPatient,
-        //             date_birth: addPatient,
-        //             password: addPatient,
-        //             person_to_contact_phone: addPatient,
-        //             person_to_contact_name: addPatient
-        //         }),
-        //         headers: {
-        //             "Content-type": "application/json; charset=UTF-8",
-        //             "Accept": "application/json"
-        //         }
-        //     }).then(response => response.json())
-        //     .then(message => console.log(message))
-        // }
-
     render() {
         const{ fullname,email, residence, sex, contact_phone, blood_group, occupation, date_birth,
                 password, person_to_contact_phone, person_to_contact_name } = this.state
         return (
-            <form onSubmit = {this.handleSubmit}>
-                <div className = "from-group">
-                    <label>Fullname</label>
-                    <input type = "text" name = "fullname" value = {fullname} placeholder = "Names"
-                    onChange = {this.handleFullnameChange} required />
-                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.fullnameError}</span>
-                </div>
-                <div>
-                    <label>Email</label>
-                    <input type = "email" name = "email" value = {email} placeholder = "Email"
-                    onChange = {this.handleEmailChange} required />
-                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.emailError}</span>
-                </div>
-                <div>
-                    <label>Residence</label>
-                    <input type = "text" name = "residence" value = {residence} placeholder = "Quater, Town"
-                    onChange = {this.handleResidenceChange} required />
-                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.residenceError}</span>
-                </div>
-                <div>
-                    <label>Sex</label>
-                    <select name = "sex" value = {sex} onChange = {this.handleSexChange} required>
-                        <option value = "">Choose your Sex</option>
-                        <option value = "F">Female</option>
-                        <option value = "M">Male</option>
-                    </select>
-                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.sexError}</span>
-                </div>
-                <div>
-                    <label>Contact Phone</label>
-                    <input type = "tel" name = "phone_contact" value = {contact_phone} placeholder = "Ex: 123 456 789"
-                    onChange = {this.handleContactphoneChange} pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" required />
-                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.contact_phoneError}</span>
-                </div>
-                <div>
-                    <label>Blood Group</label>
-                    <select value = {blood_group} name = "blood_gooup" onChange = {this.handleBloodgroupChange} required>
-                        <option value = "">Choose your Blood Group</option>
-                        <option value = "A+">A RhD positive (A+)</option>
-                        <option value = "A-">A RhD negative (A-)</option>
-                        <option value = "B+">B RhD positive (B+)</option>
-                        <option value = "B-">B RhD negative (B-)</option>
-                        <option value = "O+">O RhD positive (O+)</option>
-                        <option value = "O-">O RhD negative (O-)</option>
-                        <option value = "AB+">AB RhD positive (AB+)</option>
-                        <option value = "AB-">AB RhD negative (AB-)</option>
-                    </select>
-                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.blood_groupError}</span>
-                </div>
-                <div>
-                    <label>Occupation</label>
-                    <input type = "text" value = {occupation} name = "occupation" onChange = {this.handleOccupationChange} required />
-                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.occupationError}</span>
-                </div>
-                <div>
-                    <label>Date of Birth</label>
-                    <input type="date" value = {date_birth} name = "date_birth" onChange = {this.handleDatebirthChange} required />
-                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.data_birthError}</span>
-                </div>
-                <div>
-                    <label>Password</label>
-                    <input type = "password" value = {password} name = "password" onChange = {this.handlePasswordChange} required />
-                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.passwordError}</span>
-                </div>
-                <div>
-                    <label>Person to contact Phone</label>
-                    <input type = "text" name = "person_to_contact_phone" value = {person_to_contact_phone} placeholder = "Ex: 123 456 789"
-                    onChange = {this.handlePersontophoneChange} pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" required />
-                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.person_to_contact_phoneError}</span>
-                </div>
-                <div>
-                    <label>Person to Contact Name</label>
-                    <input type = "text" name = "person_to_contact_name" value = {person_to_contact_name} onChange = {this.handlePersontonameChange} required />
-                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.person_to_contact_nameError}</span>
-                </div>
-                <div>
-                    <input class = "btn btn-info" type = "submit" />
-                </div>
-            </form>
-
-//             // <div className="base-container">
-//             //     <div className="header">Register as a patient</div>
-//             //     <div className="content">
-//             //         <div className="image">
-//             //             <img alt = "just a test" src={loginImg} />
-//             //         </div>
-//             //         <div className="form">
-//             //             <div className="form-group">
-//             //                 <label htmlFor="username">Username</label>
-//             //                 <input type="text" name="username" placeholder="username"/>
-//             //             </div>
-//             //             <div className="form-group">
-//             //                 <label htmlFor="email">Email</label>
-//             //                 <input type="email" name="email" placeholder="email"/>
-//             //             </div>
-//             //             <div className="form-group">
-//             //                 <label htmlFor="username">Password</label>
-//             //                 <input type="password" name="password" placeholder="password"/>
-//             //             </div>
-//             //             <div className="form-group">
-//             //                 <input type="radio" value="M" name="gender" /> Male
-//             //                 <input type="radio" value="F" name="gender" /> Female
-//             //             </div>
-//             //         </div>
-//             //     </div>
-//             //     <div className="footer">
-//             //         <button type = "button" className="btn">
-//             //             Register
-//             //         </button>
-//             //     </div>
-//             // </div>
+            <div className="base-container">
+                <div><br /></div>
+                <div className="header">Patient Registration</div>
+                <div className="content">
+                    <div className="image">
+                        <img alt = "another test" src={loginImg} />
+                    </div>
+                    <div><br /></div>
+                        <form onSubmit = {this.handleSubmit}>
+                            <div class="row">
+                                <div class="col-sm">
+                                    <div>
+                                        <label>Fullname</label>
+                                        <input class="form-control" type = "text" name = "fullname" value = {fullname} placeholder = "Names"
+                                        onChange = {this.handleFullnameChange} required />
+                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.fullnameError}</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm">
+                                    <div>
+                                        <label>Email</label>
+                                        <input class="form-control" type = "email" name = "email" value = {email} placeholder = "Email"
+                                        onChange = {this.handleEmailChange} required />
+                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.emailError}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm">
+                                    <div>
+                                        <label>Residence</label>
+                                        <input class="form-control" type = "text" name = "residence" value = {residence} placeholder = "Quater, Town"
+                                        onChange = {this.handleResidenceChange} required />
+                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.residenceError}</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm">
+                                    <div>
+                                        <label>Sex</label>
+                                        <select class="form-control" name = "sex" value = {sex} onChange = {this.handleSexChange} required>
+                                            <option value = "">Choose your Sex</option>
+                                            <option value = "F">Female</option>
+                                            <option value = "M">Male</option>
+                                        </select>
+                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.sexError}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm">
+                                    <div>
+                                        <label>Contact Phone</label>
+                                        <input class="form-control" type = "tel" name = "phone_contact" value = {contact_phone} placeholder = "Ex: 123 456 789"
+                                        onChange = {this.handleContactphoneChange} pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" required />
+                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.contact_phoneError}</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm">
+                                    <div>
+                                        <label>Blood Group</label>
+                                        <select class="form-control" value = {blood_group} name = "blood_gooup" onChange = {this.handleBloodgroupChange} required>
+                                            <option value = "">Choose your Blood Group</option>
+                                            <option value = "A+">A RhD positive (A+)</option>
+                                            <option value = "A-">A RhD negative (A-)</option>
+                                            <option value = "B+">B RhD positive (B+)</option>
+                                            <option value = "B-">B RhD negative (B-)</option>
+                                            <option value = "O+">O RhD positive (O+)</option>
+                                            <option value = "O-">O RhD negative (O-)</option>
+                                            <option value = "AB+">AB RhD positive (AB+)</option>
+                                            <option value = "AB-">AB RhD negative (AB-)</option>
+                                        </select>
+                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.blood_groupError}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm">
+                                    <div>
+                                        <label>Occupation</label>
+                                        <input class="form-control" type = "text" value = {occupation} name = "occupation" onChange = {this.handleOccupationChange} required />
+                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.occupationError}</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm">
+                                    <div>
+                                        <label>Date of Birth</label>
+                                        <input class="form-control" type="date" value = {date_birth} name = "date_birth" onChange = {this.handleDatebirthChange} required />
+                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.data_birthError}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm">
+                                    <div>
+                                        <label>Password</label>
+                                        <input class="form-control" type = "password" value = {password} name = "password" onChange = {this.handlePasswordChange} required />
+                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.passwordError}</span>
+                                    </div>
+                                </div>
+                                <div class="col-sm">
+                                    <div>
+                                        <label>Person to contact Phone</label>
+                                        <input class="form-control" type = "text" name = "person_to_contact_phone" value = {person_to_contact_phone} placeholder = "Ex: 123 456 789"
+                                        onChange = {this.handlePersontophoneChange} pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" required />
+                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.person_to_contact_phoneError}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        <div class="row">
+                            <div class="col-sm">
+                                <div>
+                                    <label>Person to Contact Name</label>
+                                    <input class="form-control" type = "text" name = "person_to_contact_name" value = {person_to_contact_name} onChange = {this.handlePersontonameChange} required />
+                                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.person_to_contact_nameError}</span>
+                                </div>
+                            </div>
+                        </div>
+                            <div>
+                                <input class="form-control btn btn-info" type = "submit" />
+                            </div>
+                        </form>
+                        </div>
+                        </div>
         );
     }
 }

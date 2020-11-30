@@ -3,14 +3,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import "./components/login/style.css";
 // import { Row, Col } from "react-bootstrap";
 // import logo from './logo.svg';
-import './App.css';
+// import './App.css';
 import { AllUsers } from './components/AllUsers';
 // import loginImg from "./login.svg";
 import TabNav from './components/TabNav';
 import Tab from './components/Tab';
 import Menu from './components/Menu';
-// import Login from './components/login/login';
-import RolePage from './components/register/rolePage';
+import Login from './components/login/login';
+// import RolePage from './components/register/rolePage';
 // import FormPatient from './components/Form/formPatient';
 import RegisterPatient from './components/register/registerPatientPage';
 import RegisterDoctor from './components/register/registerDoctorPage';
@@ -45,9 +45,11 @@ class App extends React.Component {
   {
     return (
       <div className="App">
+       
         <Menu />
         <br></br>
-        <TabNav tabs={['Patient Register', 'Doctor Register', 'Test Flask Backend API get Data', 'Test Flask Backend API send Data']} selected={ this.state.selected } setSelected={ this.setSelected }>
+        <div className="container">
+        <TabNav tabs={['Patient Register', 'Doctor Register', 'Getting all users', 'Login']} selected={ this.state.selected } setSelected={ this.setSelected }>
           <Tab isSelected={ this.state.selected === 'Patient Register'}>
           <RegisterPatient />
           {/* <FormPatient /> */}
@@ -57,14 +59,15 @@ class App extends React.Component {
           <RegisterDoctor />
           </Tab>
 
-          <Tab isSelected={ this.state.selected === 'Test Flask Backend API get Data'}>
+          <Tab isSelected={ this.state.selected === 'Getting all users'}>
           <AllUsers />
           </Tab>
 
-           <Tab isSelected={ this.state.selected === 'Test Flask Backend API send Data'}>
-           <RolePage />
+           <Tab isSelected={ this.state.selected === 'Login'}>
+           <Login />
            </Tab>
         </TabNav>
+        </div>
       </div>
     );
   }

@@ -5,7 +5,7 @@ class TabNav extends React.Component {
     render()
     {
         return(
-            <div style = {{ width: '30%'}}>
+            <div>
             <ul className="nav nav-tabs">
             {
                 this.props.tabs.map(tab => {
