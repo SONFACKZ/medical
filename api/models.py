@@ -8,9 +8,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 # from forms import RegistrationForm, LoginForm
 
-from faker import Faker
+# from faker import Faker
 
-fake = Faker()
+# fake = Faker()
 
 app = Flask(__name__)
 
@@ -192,7 +192,7 @@ def reg_doctor():
 
     x = datetime(data['date_birth'][0], data['date_birth'][1], data['date_birth'][2])
     hashed_password = generate_password_hash(data['password'], method='sha256')
-
+    dateB = datetime.strptime(data['date_birth'], '%Y-%m-%d').date()
     new_doctor = User(public_id=str(uuid.uuid4()),
                         fullname=data['fullname'], password=hashed_password, role_id=2,
                         email=data['email'], residence=data['residence'],
@@ -200,7 +200,7 @@ def reg_doctor():
                         occupation=data['occupation'],
                         nic_passport_path=data['nic_passport_path'],
                         cv_path=data['cv_path'], diplomas_path=data['diplomas_path'],
-                        marital_status=data['marital_status'], date_birth=x
+                        marital_status=data['marital_status'], date_birth=dateB
                        )
     db.session.add(new_doctor)
     db.session.commit()
@@ -228,15 +228,16 @@ def reg_patient():
 
     # return {'201': 'Patient account created successfully'}
 
-    x = datetime(data['date_birth'][0], data['date_birth'][1], data['date_birth'][2])
+    # x = datetime(data['date_birth'][0], data['date_birth'][1], data['date_birth'][2])
     data = json.loads(request.data)
     hashed_password = generate_password_hash(data['password'], method='sha256')
+    dateB = datetime.strptime(data['date_birth'], '%Y-%m-%d').date()
     new_patient = User(public_id=str(uuid.uuid4()),
                         fullname=data['fullname'], password=hashed_password, role_id=3,
                         email=data['email'], residence=data['residence'],
                         sex=data['sex'], contact_phone=data['contact_phone'],
                         blood_group=data['blood_group'], occupation=data['occupation'],
-                        date_birth=x,
+                        date_birth=dateB,
                         status=0,
                         person_to_contact_name=data['person_to_contact_name'],
                         person_to_contact_phone=data['person_to_contact_phone']

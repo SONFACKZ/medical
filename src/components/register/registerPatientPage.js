@@ -1,35 +1,6 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
+import axios from 'axios';
 import loginImg from "../../login.svg";
-// import {FormPatient} from '../Form/formPatient';
-
-// const RegisterPatientPage = ()=> {
-//     const [addPatient, setAddPatient] = useState('')
-
-
-//     const handleFormChange = (inputValue) => {
-//         setAddPatient(inputValue)
-//     }
-
-//     const handleFormSubmit = () =>{
-//         fetch('/register/patient', {
-//             method: 'POST',
-//             body: JSON.stringify({
-//                 name: addPatient
-//             }),
-//             headers: {
-//                 "Content-type": "application/json; charset=UTF-8"
-//             }
-//         }).then(response => response.json())
-//         .then(message => console.log(message))
-//     }
-//     return (
-//         <div>
-//             <FormPatient userInput={addPatient} onFormChange={handleFormChange} onFormSubmit = {handleFormSubmit} />
-//         </div>
-//     )
-// }
-
-// export default RegisterPatientPage;
 
 
 const initialState = {
@@ -62,6 +33,10 @@ const initialState = {
 class RegisterPatient extends React.Component {
     constructor(props){
         super(props)
+
+        const handleFormChange = (inputValue) => {
+            // setAddPatient(inputValue)
+        }
 
         this.state = initialState;
     }
@@ -177,68 +152,47 @@ class RegisterPatient extends React.Component {
 
 // handle submit value
     handleSubmit = event => {
-        alert(`${this.state.fullname} ${this.state.email} ${this.state.residence} ${this.state.sex}
-        ${this.state.contact_phone} ${this.state.blood_group} ${this.state.occupation} ${this.state.date_birth}
-        ${this.state.password} ${this.state.person_to_contact_phone} ${this.state.person_to_contact_name}`)
         event.preventDefault() //Avoid to lose data after submited
         const isValid = this.validate();
         if(isValid){
             console.log(this.state);
             this.setState(initialState); //Clearing Form
         }
+        axios.post('/register/patient', this.state)
+             .then(response => {
+                 console.log(response)
+             })
+             .catch(error => {
+                 console.log(error)
+             })
     }
 
 
-    // const [addPatient, setAddPatient] = useState('')
-
-
-    //     const handleFormChange = (inputValue) => {
-    //         setAddPatient(inputValue)
-    //     }
+   
     
-    //     const handleFormSubmit = () =>{
-    //         fetch('/register/patient', {
-    //             method: 'POST',
-    //             body: JSON.stringify({
-    //                 fullname: addPatient,
-    //                 email: addPatient,
-    //                 residence: addPatient,
-    //                 sex: addPatient,
-    //                 contact_phone: addPatient,
-    //                 blood_group: addPatient,
-    //                 occupation: addPatient,
-    //                 date_birth: addPatient,
-    //                 password: addPatient,
-    //                 person_to_contact_phone: addPatient,
-    //                 person_to_contact_name: addPatient
-    //             }),
-    //             headers: {
-    //                 "Content-type": "application/json; charset=UTF-8",
-    //                 "Accept": "application/json"
-    //             }
-    //         }).then(response => response.json())
-    //         .then(message => console.log(message))
-    //     }
-
-    handleSubmit()
-    {
-        let url = "/register/patient";
-        let data = this.state;
-        fetch(url, {
-            method:'POST',
-            headers:{
-                "Content-type": "application/json; charset=UTF-8",
-                "Accept": "application/json"
-            },
-            body:JSON.stringify(data)
-        }).then((result)=>{
-            result.json().then((resp)=>{
-                console.warn("resp", resp)
-                alert("data submited")
-            })
-        })
-    }
-
+        // const handleFormSubmit = () =>{
+        //     fetch('/register/patient', {
+        //         method: 'POST',
+        //         body: JSON.stringify({
+        //             fullname: addPatient,
+        //             email: addPatient,
+        //             residence: addPatient,
+        //             sex: addPatient,
+        //             contact_phone: addPatient,
+        //             blood_group: addPatient,
+        //             occupation: addPatient,
+        //             date_birth: addPatient,
+        //             password: addPatient,
+        //             person_to_contact_phone: addPatient,
+        //             person_to_contact_name: addPatient
+        //         }),
+        //         headers: {
+        //             "Content-type": "application/json; charset=UTF-8",
+        //             "Accept": "application/json"
+        //         }
+        //     }).then(response => response.json())
+        //     .then(message => console.log(message))
+        // }
 
     render() {
         const{ fullname,email, residence, sex, contact_phone, blood_group, occupation, date_birth,
