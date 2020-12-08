@@ -9,23 +9,25 @@ const initialState = {
             residence: '',
             sex: '',
             contact_phone: '',
-            blood_group: '',
+            nic_passport_path: '',
             occupation: '',
             date_birth: '',
             password: '',
-            person_to_contact_phone: '',
-            person_to_contact_name: '',
+            cv_path: '',
+            diplomas_path: '',
+            marital_status: '',
             fullnameError: '',
             emailError: '',
             residenceError: '',
             sexError: '',
             contact_phoneError: '',
-            blood_groupError: '',
+            nic_passport_pathError: '',
             occupationError: '',
             date_birthError: '',
             passwordError: '',
-            person_to_contact_phoneError: '',
-            person_to_contact_nameError: ''
+            cv_pathError: '',
+            diplomas_pathError: '',
+            marital_statusError: ''
 }
 
 
@@ -69,9 +71,9 @@ class RegisterPatient extends React.Component {
             contact_phone: event.target.value
         })
     }
-    handleBloodgroupChange = (event) => {
+    handleNicPassportPathChange = (event) => {
         this.setState({
-            blood_group: event.target.value
+            nic_passport_path: event.target.value
         })
     }
     handleOccupationChange = (event) => {
@@ -89,14 +91,20 @@ class RegisterPatient extends React.Component {
             password: event.target.value
         })
     }
-    handlePersontophoneChange = (event) => {
+    handleCvPathChange = (event) => {
         this.setState({
-            person_to_contact_phone: event.target.value
+            cv_path: event.target.value
         })
     }
-    handlePersontonameChange = (event) => {
+    handleDiplomasPathChange = (event) => {
         this.setState({
-            person_to_contact_name: event.target.value
+            diplomas_path: event.target.value
+        })
+    }
+
+    handleMaritalStatusChange = (event) => {
+        this.setState({
+            marital_status: event.target.value
         })
     }
 
@@ -128,12 +136,13 @@ class RegisterPatient extends React.Component {
         let residenceError = '';
         let sexError = '';
         let contact_phoneError = '';
-        let blood_groupError = '';
+        let nic_passport_pathError = '';
         let occupationError = '';
         let date_birthError = '';
         let passwordError = '';
-        let person_to_contact_phoneError = '';
-        let person_to_contact_nameError = '';
+        let cv_pathError = '';
+        let diplomas_pathError = '';
+        let marital_statusError = '';
 
         if(!this.state.fullname){
             fullnameError = 'Name cannot be blank';
@@ -158,7 +167,7 @@ class RegisterPatient extends React.Component {
             console.log(this.state);
             this.setState(initialState); //Clearing Form
         }
-        axios.post('/register/patient', this.state)
+        axios.post('/register/doctor', this.state)
              .then(response => {
                  console.log(response)
              })
@@ -168,16 +177,16 @@ class RegisterPatient extends React.Component {
     }
 
     render() {
-        const{ fullname,email, residence, sex, contact_phone, blood_group, occupation, date_birth,
-                password, person_to_contact_phone, person_to_contact_name } = this.state
+        const{ fullname,email, residence, sex, contact_phone, nic_passport_path, occupation, date_birth,
+                password, cv_path, diplomas_path, marital_status } = this.state
         return (
-            <div className="base-container">
+            <div className="base-container mx-auto border shadow p-5">
                 <div><br /></div>
                 <div className="header">Doctor Registration</div>
-                <div className="content">
-                    <div className="image">
+                <div className="image">
                         <img alt = "another test" src={loginImg} />
-                    </div>
+                </div>
+                <div className="content">
                     <div><br /></div>
                         <form onSubmit = {this.handleSubmit}>
                             <div class="row">
@@ -230,19 +239,10 @@ class RegisterPatient extends React.Component {
                                 </div>
                                 <div class="col-sm">
                                     <div>
-                                        <label>Blood Group</label>
-                                        <select class="form-control" value = {blood_group} name = "blood_gooup" onChange = {this.handleBloodgroupChange} required>
-                                            <option value = "">Choose your Blood Group</option>
-                                            <option value = "A+">A RhD positive (A+)</option>
-                                            <option value = "A-">A RhD negative (A-)</option>
-                                            <option value = "B+">B RhD positive (B+)</option>
-                                            <option value = "B-">B RhD negative (B-)</option>
-                                            <option value = "O+">O RhD positive (O+)</option>
-                                            <option value = "O-">O RhD negative (O-)</option>
-                                            <option value = "AB+">AB RhD positive (AB+)</option>
-                                            <option value = "AB-">AB RhD negative (AB-)</option>
-                                        </select>
-                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.blood_groupError}</span>
+                                        <label>ID Card or Passport</label>
+                                        <span style = {{fontSize: 9, color: 'grey'}}> Valid document</span>
+                                        <input class="form-control" type = "file" value = {nic_passport_path} name = "nic_passport_path" onChange = {this.handleNicPassportPathChange} required />
+                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.nic_passport_pathError}</span>
                                     </div>
                                 </div>
                             </div>
@@ -272,19 +272,31 @@ class RegisterPatient extends React.Component {
                                 </div>
                                 <div class="col-sm">
                                     <div>
-                                        <label>Person to contact Phone</label>
-                                        <input class="form-control" type = "text" name = "person_to_contact_phone" value = {person_to_contact_phone} placeholder = "Ex: 123 456 789"
-                                        onChange = {this.handlePersontophoneChange} pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" required />
-                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.person_to_contact_phoneError}</span>
+                                        <label>Upload your CV</label>
+                                        <input class="form-control" type = "file" name = "cv_path" value = {cv_path} placeholder = "Ex: 123 456 789"
+                                        onChange = {this.handleCvPathChange} required />
+                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.cv_pathError}</span>
                                     </div>
                                 </div>
                             </div>
                         <div class="row">
                             <div class="col-sm">
                                 <div>
-                                    <label>Person to Contact Name</label>
-                                    <input class="form-control" type = "text" name = "person_to_contact_name" value = {person_to_contact_name} onChange = {this.handlePersontonameChange} required />
-                                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.person_to_contact_nameError}</span>
+                                    <label>Upload Diplomas</label>
+                                    <span style = {{fontSize: 9, color: 'grey'}}> Latest diploma to apply to this role</span>
+                                    <input class="form-control" type = "file" name = "diplomas_path" value = {diplomas_path} onChange = {this.handleDiplomasPathChange} required />
+                                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.diplomas_pathError}</span>
+                                </div>
+                            </div>
+                            <div class="col-sm">
+                                <div>
+                                    <label>Marital Status</label>
+                                    <select class="form-control" value = {marital_status} name = "marital_status" onChange = {this.handleMaritalStatusChange} required>
+                                            <option value = "">Choose your status</option>
+                                            <option value = "S">Single</option>
+                                            <option value = "M">Married</option>
+                                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.marital_statusError}</span>
+                                    </select>
                                 </div>
                             </div>
                         </div>

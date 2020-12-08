@@ -1,10 +1,12 @@
-from flask import Flask, jsonify, json, render_template, request, redirect, url_for, flash
+from flask import Flask, jsonify, json, make_response, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import uuid
-from datetime import datetime
+import jwt
+from datetime import datetime, timedelta
 from flask_login import UserMixin, LoginManager, login_user, current_user
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 
 # from forms import RegistrationForm, LoginForm
 
@@ -107,21 +109,53 @@ class PastHistory(db.Model):
 
 db.create_all()
 
+
+# decorator for verifying the JWT 
+def token_required(f): 
+    @wraps(f) 
+    def decorated(*args, **kwargs): 
+        token = None
+        # jwt is passed in the request header 
+        if 'x-access-token' in request.headers: 
+            token = request.headers['x-access-token'] 
+        # return 401 if token is not passed 
+        if not token: 
+            return jsonify({'message' : 'Token is missing !!'}), 401
+   
+        try: 
+            # decoding the payload to fetch the stored details 
+            data = jwt.decode(token, app.config['SECRET_KEY']) 
+            current_user = User.query.filter_by(public_id = data['public_id']).first() 
+        except: 
+            return jsonify({ 
+                'message' : 'Token is invalid !!'
+            }), 401
+        # returns the current logged in users contex to the routes 
+        return  f(current_user, *args, **kwargs) 
+   
+    return decorated 
+
+
+
+
 @app.route("/")
 def index():
     return render_template("index.html")
 
-def user_serializer(use):
+
+def user_serializer(users):
     return{
-        'user_id': use.user_id,
-        'public_id': use.public_id,
-        'fullname': use.fullname,
-        'occupation': use.occupation,
-        'residence': use.residence
+        'user_id': users.user_id,
+        'public_id': users.public_id,
+        'fullname': users.fullname,
+        'occupation': users.occupation,
+        'residence': users.residence,
+        'email': users.email
     }
 
 
-@app.route('/user', methods=['GET'])
+@app.route('/users', methods=['GET'])
+# @token_required
 def get_all_users():
 
     users = User.query.all()
@@ -159,33 +193,36 @@ def get_one_user(public_id):
 
 
 
-@app.route('/role/create', methods=["POST"])
-def roles():
-    request_data = json.loads(request.data)
-    role = Role(name=request_data['name'])
+# @app.route('/role/create', methods=["POST"])
+# def roles():
+#     request_data = json.loads(request.data)
+#     role = Role(name=request_data['name'])
 
-    db.session.add(role)
-    db.session.commit()
+#     db.session.add(role)
+#     db.session.commit()
     
-    return {'201': 'Role created successfully'}
+#     return {'201': 'Role created successfully'}
+
+
     # data = request.get_json()
-@app.route('/pasthistory', methods=['POST'])
-def history():
-    data = json.loads(request.data)
-    history = PastHistory(past_history_type=data['past_history_type'],
-                          past_history_particular_observation=data['past_history_particular_observation'],
-                          past_history_year=data['past_history_year'],
-                          past_history_owner_id=2
-                          )
-    db.session.add(history)
-    db.session.commit()
-    return {'201': 'PastHistory created successfully'}
+# @app.route('/pasthistory', methods=['POST'])
+# def history():
+#     data = json.loads(request.data)
+#     history = PastHistory(past_history_type=data['past_history_type'],
+#                           past_history_particular_observation=data['past_history_particular_observation'],
+#                           past_history_year=data['past_history_year'],
+#                           past_history_owner_id=2
+#                           )
+#     db.session.add(history)
+#     db.session.commit()
+#     return {'201': 'PastHistory created successfully'}
     
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.get(user_id)
+# @login_manager.user_loader
+# def load_user(user_id):
+#     return User.query.get(user_id)
 
+#Register a Doctor
 @app.route('/register/doctor', methods=["POST"])
 def reg_doctor():
     data = request.get_json()
@@ -207,117 +244,92 @@ def reg_doctor():
 
     return jsonify({'message': 'Your new doctor account has been created!'})
 
-
+#Register a patient
 @app.route('/register/patient', methods=["POST"])
 def reg_patient():
-    # request_data = json.loads(request.data)
-    # hashed_password = generate_password_hash(request_data['password'], method='sha256')
-
-    # reg_user = User(public_id=str(uuid.uuid4()),
-    #                 fullname=request_data['fullname'],
-    #                 password=hashed_password, role_id=3,
-    #                 email=request_data['email'], residence=request_data['residence'],
-    #                 sex=request_data['sex'], contact_phone=request_data['contact_phone'],
-    #                 blood_group=request_data['blood_group'], occupation=request_data['occupation'],
-    #                 date_birth=request_data['date_birth'],
-    #                 person_to_contact_name=request_data['person_to_contact_name'],
-    #                 person_to_contact_phone=request_data['person_to_contact_phone']
-    #                 )
-    # db.session.add(reg_user)
-    # db.session.commit()
-
-    # return {'201': 'Patient account created successfully'}
-
-    # x = datetime(data['date_birth'][0], data['date_birth'][1], data['date_birth'][2])
+    
     data = json.loads(request.data)
     hashed_password = generate_password_hash(data['password'], method='sha256')
     dateB = datetime.strptime(data['date_birth'], '%Y-%m-%d').date()
-    new_patient = User(public_id=str(uuid.uuid4()),
-                        fullname=data['fullname'], password=hashed_password, role_id=3,
-                        email=data['email'], residence=data['residence'],
-                        sex=data['sex'], contact_phone=data['contact_phone'],
-                        blood_group=data['blood_group'], occupation=data['occupation'],
-                        date_birth=dateB,
-                        status=0,
-                        person_to_contact_name=data['person_to_contact_name'],
-                        person_to_contact_phone=data['person_to_contact_phone']
-                        )
-    db.session.add(new_patient)
-    db.session.commit()
 
-    return jsonify({'message': 'Your new patient account has been created!'})
+    # checking for existing user
+    new_patient = User.query.filter_by(email=data['email']).first()
+
+    if not new_patient:
+    # gets inputs
+        new_patient = User(public_id=str(uuid.uuid4()),
+                            fullname=data['fullname'], password=hashed_password, role_id=3,
+                            email=data['email'], residence=data['residence'],
+                            sex=data['sex'], contact_phone=data['contact_phone'],
+                            blood_group=data['blood_group'], occupation=data['occupation'],
+                            date_birth=dateB,
+                            status=0,
+                            person_to_contact_name=data['person_to_contact_name'],
+                            person_to_contact_phone=data['person_to_contact_phone']
+                            )
+
+        #Insert patient
+        db.session.add(new_patient)
+        db.session.commit()
+        return jsonify({'message': 'Your new patient account has been created!'})
+    else:
+        # returns 202 if user already exists 
+        return make_response('User already exists. Please Log in.', 202)
 
 
-@app.route('/login')
+
+#Login
+@app.route('/login', methods = ['POST'])
 def login():
     auth = request.authorization
 
     if not auth or not auth.username or not auth.password:
         return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
-    user = User.query.filter_by(name=auth.username).first()
+    user = User.query.filter_by(email=auth.username).first()
 
     if not user:
         return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
     if check_password_hash(user.password, auth.password):
-        token = JWT.encode({'public_id': user.public_id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
-
+        # token = jwt.encode({'public_id': user.public_id, 'exp': datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
+        token = jwt.encode({
+            'public_id': user.public_id,
+            'exp': datetime.utcnow() + timedelta(minutes = 30)
+        }, app.config['SECRET_KEY'])
         return jsonify({'token': token.decode('UTF-8')})
 
     return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
 
+#Update single record
+@app.route('/user/<public_id>', methods=['PUT'])
+def promote_user(public_id):
+    user = User.query.filter_by(public_id=public_id).first()
+
+    if not user:
+        return jsonify({'message': 'No user found!'})
+    
+    user.admin = True
+    db.session.commit()
+
+    return jsonify({'message': 'The user has been promoted!'})
+
+
+#Deleting record
+@app.route('/user/<public_id>', methods=['DELETE'])
+def delete_user(public_id):
+    user = User.query.filter_by(public_id=public_id).first()
+
+    if not user:
+        return jsonify({'message': 'No user found!'})
+    
+    db.session.delete(user)
+    db.session.commit()
+    return jsonify({'message': 'User has been deleted'})
 
 
 
-
-
-
-
-
-
-# @app.route("/login",methods=["GET", "POST"])
-# def login():
-#     if request.method == "POST":
-#         uname = request.form["uname"]
-#         passw = request.form["passw"]
-        
-#         login = user.query.filter_by(fullname=uname, password=passw).first()
-#         if login is not None:
-#             return redirect(url_for("index"))
-#     return render_template("login.html")
-
-@app.route("/register", methods=["GET", "POST"])
-def register():
-    if request.method == "POST":
-        uname = request.form['uname']
-        mail = request.form['mail']
-        passw = request.form['passw']
-        resi = request.form['resi']
-        se = request.form['se']
-        contact = request.form['contact']
-        rol = request.form['rol']
-
-        register = User(fullname = uname, email = mail, password = passw, residence = resi, sex = se, contact_phone = contact, role_id = rol)
-        db.session.add(register)
-        db.session.commit()
-
-        return redirect(url_for("login"))
-    return render_template("register.html")
-
-if __name__ == "__main__":
+if __name__ ==  '__main__':
+    # db.create_all()
     app.run(debug=True)
-
-
-
-
-
-
-
-
-    #  def __init__(self, name, description, price, qty):
-    #     self.name = name
-    #     self.description = description
-    #     self.price = price
-    #     self.qty = qty

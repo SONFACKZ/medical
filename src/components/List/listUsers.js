@@ -5,8 +5,7 @@ export const ListUsers = ({ listOfUsers })=> {
         <div>
         {listOfUsers.map(initialData =>{
             return(
-
-                <ul key={initialData.user_id}>
+                <ul key={initialData.public_id}>
                 <li>Public Id: {initialData.public_id}</li>
                 <li>Name: {initialData.fullname}</li>
                 <li>Occupation: {initialData.occupation}</li>

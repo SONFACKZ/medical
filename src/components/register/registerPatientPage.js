@@ -96,7 +96,7 @@ class RegisterPatient extends React.Component {
     }
     handlePersontonameChange = (event) => {
         this.setState({
-            person_to_contact_name: event.target.value
+            person_to_contact_name: event.target.value //All name attribute on the HTML form
         })
     }
 
@@ -171,13 +171,13 @@ class RegisterPatient extends React.Component {
         const{ fullname,email, residence, sex, contact_phone, blood_group, occupation, date_birth,
                 password, person_to_contact_phone, person_to_contact_name } = this.state
         return (
-            <div className="base-container">
+            <div className="base-container mx-auto border shadow p-5">
                 <div><br /></div>
                 <div className="header">Patient Registration</div>
-                <div className="content">
-                    <div className="image">
+                <div className="image">
                         <img alt = "another test" src={loginImg} />
-                    </div>
+                </div>
+                <div className="content">
                     <div><br /></div>
                         <form onSubmit = {this.handleSubmit}>
                             <div class="row">
@@ -289,7 +289,7 @@ class RegisterPatient extends React.Component {
                             </div>
                         </div>
                             <div>
-                                <input class="form-control btn btn-info" type = "submit" />
+                                <input class="form-control btn btn-info" value = "Register" type = "submit" />
                             </div>
                         </form>
                         </div>
