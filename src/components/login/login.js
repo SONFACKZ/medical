@@ -1,92 +1,87 @@
 import React, { useState }from 'react';
-import axios from 'axios';
-import loginImg from "../../login.svg";
+// import loginImg from "../../login.svg";
+import loginImg from "../../assets/images/doctor.png";
+import {Form, Icon, Input} from 'semantic-ui-react'
+import axios from "axios";
+import {QuoteContext} from "../../contexts/QuoteContext";
 
-// class Login extends React.Component {
-//     constructor(props) {
-//         super(props)
-//         let loggedIn = false
-//         this.state = {
-//             email: '',
-//             password: '',
-//             loggedIn
-//         }
+export default function AuthForm({role, history}) {
+    const {setLoggedIn} = React.useContext(QuoteContext);
 
-//         this.onChange = this.onChange.bind(this)
-//         this.submitForm = this.submitForm.bind(this) 
-//     }
+    const [authInfo, setAuthInfo] = useState( {
+        email: "",
+        password: ""
+    })
 
-//     onChange(e){
-//         this.setState({
-//             [e.target.name]: e.target.value
-//         })
-//     }
+    const handleChange = e => {
+        setAuthInfo({
+            ...authInfo,
+            [e.target.name]: e.target.value
+        })
+    }
 
-//     submitForm(e){
-//         e.prevenDefault()
-//         const { email, password } = this.state
-//         // login magic 
+    const handleSubmit = e => {
+        e.preventDefault();
 
-//         // axios.post('/login', data)
-//         // .then(res => {
-//         //     console.log(res)
-//         //     // console.log(data)
-//         // })
-//         // .catch(err => {
-//         //     console.log(err)
-//         // })
-//     };
-
-function Login(props) {
-    const email = useFormInput('');
-    const password = useFormInput('');
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
-
-    // handle button click of login form
-    const handleLogin = () => {
-        props.history.push('/admin');
-  }
+        
+        axios.post( `localhost:5000/auth/${role}`, authInfo)
+            .then(res => {
+                console.log(res)
+                    setLoggedIn(true);
+                    localStorage.setItem("token", res.data.token)
+                    history.push('/admin')
+            })
+            .catch(err => console.log(err))
+    }
 
         return (
             <div className="base-container">
                 <br />
                 <div className="header">Login</div>
+                <br />
                 <div className="content border shadow p-5 mx-auto">
                     <div className="image">
-                        <img alt = "another test" src={loginImg} />
+                        <img alt = "logo" src={loginImg} />
                     </div><br />
-                <form>
+
+                    <form onSubmit={handleSubmit}>
+                <input
+                    name="email"
+                    value={authInfo.email}
+                    onChange={handleChange} />
+                <input
+                    name="password"
+                    type="password"
+                    value={authInfo.password}
+                    onChange={handleChange} />
+                <button type="submit">Submit</button>
+            </form>
+                {/* <Form>
                     <div>
-                        <label>Email</label>
-                        <input class="form-control" type="email" {...email}
-                        name="email" />
-                    </div>
+                    <Input iconPosition='left'
+                     placeholder='Email' label = "Email"
+                     value={authInfo.email} name = "email"
+                     onChange={handleChange}
+                     required >
+                    <Icon name='mail' />
+                    <input />
+                    </Input>
+                    </div><br />
                     <div>
-                        <label>Password</label>
-                        <input class="form-control" type="password" {...password}
-                        name="password" />
+                    <Input iconPosition='left'
+                     placeholder='Password' label = "Password"
+                     value={authInfo.password} name = "password"
+                     onChange={handleChange}
+                     required >
+                    <Icon name='lock' />
+                    <input />
+                    </Input>
                     </div>
-                    {error && <><small style={{ color: 'red' }}>{error}</small><br /></>}<br />
                         <div>
-                            <input type = "submit" class = "form-control btn btn-info" value = {loading ? 'Loading...' : 'Login'} onClick={handleLogin} disabled={loading} />
+                            <input type = "submit" class = "form-control btn btn-info"  onClick={{handleSubmit}} />
                         </div>
-                </form>
+                </Form> */}
                 </div>
             </div>
         );
     }
-
-const useFormInput = initialValue => {
-    const [value, setValue] = useState(initialValue);
-       
-    const handleChange = e => {
-        setValue(e.target.value);
-        }
-        return {
-            value,
-            onChange: handleChange
-          }
-        }
-
-export default Login;

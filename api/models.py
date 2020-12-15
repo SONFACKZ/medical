@@ -1,12 +1,18 @@
-from flask import Flask, jsonify, json, make_response, render_template, request, redirect, url_for, flash
+from flask import Flask, jsonify, g, abort, json, make_response, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import uuid
+from flask_jwt_extended import (
+    JWTManager, jwt_required, create_access_token,
+    get_jwt_identity
+)
+# from flask_jwt import JWT, jwt_required
 import jwt
 from datetime import datetime, timedelta
 from flask_login import UserMixin, LoginManager, login_user, current_user
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+# from flask_httpauth import HTTPBasicAuth
 
 # from forms import RegistrationForm, LoginForm
 
@@ -20,6 +26,9 @@ app.config['SECRET_KEY'] = '\x0em\xfcF\x04\xd614\x7f$\x12\xba\xb9\x81\x9f\xe8w\x
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///medi.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
+tok = JWTManager(app)
+# auth = HTTPBasicAuth()
+
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -152,12 +161,25 @@ def user_serializer(users):
         'residence': users.residence,
         'email': users.email
     }
+    # user_id, public_id, fullname, occupation, residence, email
+
+@app.route('/pro', methods=['GET'])
+# @token_required
+# @jwt_required()
+def pro():
+ return jsonify({'message': 'Page protected!'})
+
+
 
 
 @app.route('/users', methods=['GET'])
 # @token_required
+@jwt_required
+# @auth.login_required
 def get_all_users():
-
+    print("header", request.headers)
+    current_user = get_jwt_identity()
+    print(current_user)
     users = User.query.all()
     return jsonify([*map(user_serializer, users)])
     # users = User.query.all()
@@ -175,7 +197,7 @@ def get_all_users():
     # return jsonify({'users': output})
 
 
-@app.route('/user/<public_id>', methods=['GET'])
+@app.route('/users/<public_id>', methods=['GET'])
 def get_one_user(public_id):
 
     user = User.query.filter_by(public_id=public_id).first()
@@ -223,7 +245,7 @@ def get_one_user(public_id):
 #     return User.query.get(user_id)
 
 #Register a Doctor
-@app.route('/register/doctor', methods=["POST"])
+@app.route('/auth/register/doctor', methods=["POST"])
 def reg_doctor():
     data = request.get_json()
 
@@ -245,7 +267,7 @@ def reg_doctor():
     return jsonify({'message': 'Your new doctor account has been created!'})
 
 #Register a patient
-@app.route('/register/patient', methods=["POST"])
+@app.route('/auth/register', methods=["POST"])
 def reg_patient():
     
     data = json.loads(request.data)
@@ -279,27 +301,53 @@ def reg_patient():
 
 
 #Login
-@app.route('/login', methods = ['POST'])
+@app.route('/auth/login', methods = ['POST'])
 def login():
-    auth = request.authorization
+    print(request.json)
+    if not request.is_json:
+        return jsonify({"msg": "Missing JSON in request"}), 400
 
-    if not auth or not auth.username or not auth.password:
-        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+    username = request.json.get('email', None)
+    password = request.json.get('password', None)
+    if not username:
+        return jsonify({"msg": "Missing username parameter"}), 400
+    if not password:
+        return jsonify({"msg": "Missing password parameter"}), 400
 
-    user = User.query.filter_by(email=auth.username).first()
+    # if username != 'test' or password != 'test':
+    #     return jsonify({"msg": "Bad username or password"}), 401
 
-    if not user:
-        return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+    # Identity can be any data that is json serializable
+    access_token = create_access_token(identity=username)
+    # return jsonify(access_token=access_token), 200
+    return jsonify({'message': 'success', 'token': access_token})
 
-    if check_password_hash(user.password, auth.password):
-        # token = jwt.encode({'public_id': user.public_id, 'exp': datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
-        token = jwt.encode({
-            'public_id': user.public_id,
-            'exp': datetime.utcnow() + timedelta(minutes = 30)
-        }, app.config['SECRET_KEY'])
-        return jsonify({'token': token.decode('UTF-8')})
 
-    return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+
+
+
+# def login():
+#     auth = request.authorization
+
+#     if not auth or not auth.username or not auth.password:
+#         return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+
+#     user = User.query.filter_by(email=auth.username).first()
+
+#     if not user:
+#         return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
+
+#     if check_password_hash(user.password, auth.password):
+#         # token = jwt.encode({'public_id': user.public_id, 'exp': datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
+#         token = jwt.encode({
+#             'public_id': user.public_id,
+#             'exp': datetime.utcnow() + timedelta(minutes = 30)
+#         }, app.config['SECRET_KEY'])
+#         access_token = create_access_token(identity=auth.username)
+#         print(access_token)
+#         return jsonify({'message': 'success', 'token': token.decode('UTF-8')})
+
+#     return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
 
 #Update single record

@@ -27,7 +27,8 @@ const Home = () => {
         <div className = "container">
             <div className = "py-4">
                 <h1>Home Page</h1>
-                <table class="table border shadow">
+                <div className = "table-responsive-sm">
+                <table class="table border shadow table-striped table-hover">
                     <thead class="thead-dark">
                         <tr>
                         <th scope="col">#</th>
@@ -57,6 +58,7 @@ const Home = () => {
                         }
                     </tbody>
                 </table>
+                </div>
                 <Link className = "btn btn-outline-primary" to = "/register"> Add User</Link>
                     
             </div>
