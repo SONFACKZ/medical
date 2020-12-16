@@ -6,27 +6,26 @@
         align-items: center;
     }
 
-.header
+ .header
     {
         font-size: 24px;
         font-family: "Open Sans", sans-serif;
-    }
+    } 
 
-.content
+ .content
     {
         display: flex;
         flex-direction: column;
-    }
+    } 
 
 .image
     {
-        width: 18em;
+        width: 8em;
     }
-img
+/* img
     {
-        width: 100%;
-        height: 200%;
-    }
+        width: 10%;
+    } */
 
 .form
     {

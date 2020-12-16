@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import axios from 'axios';
-import loginImg from "../../login.svg";
+// import loginImg from "../../login.svg";
+import loginImg from "../../assets/images/patient.jpg";
+
 
 
 const initialState = {
@@ -183,10 +185,11 @@ class RegisterPatient extends React.Component {
             <div className="base-container mx-auto border shadow p-5">
                 <div><br /></div>
                 <div className="header">Doctor Registration</div>
-                <div className="image">
-                        <img alt = "another test" src={loginImg} />
-                </div>
-                <div className="content">
+                <br />
+                <div className="text-center">
+                        <img className = 'image' alt = "logo" src={loginImg} />
+                    </div>
+               
                     <div><br /></div>
                         <form onSubmit = {this.handleSubmit}>
                             <div class="row">
@@ -305,7 +308,7 @@ class RegisterPatient extends React.Component {
                             </div>
                         </form>
                         </div>
-                        </div>
+                   
         );
     }
 }

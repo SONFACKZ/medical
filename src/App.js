@@ -1,33 +1,67 @@
-import React, {useState} from 'react';
-import './App.css';
-import {QuoteContext} from "./contexts/QuoteContext";
+import React from 'react'
+import './App.css'
+import Home from  './components/pages/Home';
 import {Route, BrowserRouter as Router} from "react-router-dom";
-import Navigation from "./components/Navigation";
-import AuthForm from "./components/AuthForm";
-import PrivateRoute from "./utils/PrivateRoute";
-import QuotesList from "./components/QuotesList";
-function App() {
-  const [quotes, setQuotes] = useState([]);
-  const [loggedIn, setLoggedIn] = useState(localStorage.getItem("token") ? true : false);
+import PatientBoard from './components/Dashboards/PatientBoard'
+import DoctorBoard from './components/Dashboards/DoctorBoard'
+import ManagerBoard from './components/Dashboards/ManagerBoard'
 
-  return (
 
-    <Router>
-      <QuoteContext.Provider value={{quotes, setQuotes, loggedIn, setLoggedIn}}>
-        <div className="App">
 
-          <Navigation />
+// const { Header, Footer, Sider, Content } = Layout;
 
-          <PrivateRoute path="/users" component={QuotesList} />
-          <Route path="/login" render={ props => <AuthForm {...props} role="login" /> } />
-          <Route path="/register" render={ props => <AuthForm {...props} role="register" /> } />
-          
-        </div>
-      </QuoteContext.Provider>
-    </Router>
-  );
+function App(){
+
+  return(
+    <div className='App'>
+      <Router>
+      <Route exact path ="/" component = {Home} />
+      <Route exact path ="/patient" component = {PatientBoard} />
+      <Route exact path ="/doctor" component = {DoctorBoard} />
+      <Route exact path ="/manager" component = {ManagerBoard} />
+      </Router>
+     {/* <Layout>
+     <Header style = {{padding: 9, background: 'grey'}}>
+      <Avatar shape = "circle" size={50} style = {{float: 'right'}} src={ patientImg } />
+       <Title style = {{color: 'white'}} level = {3}>
+         <img src = {logo} alt = 'Mediagnostic logo' style = {{margin: -17}} width="150" height="100" /></Title>
+     </Header>
+     <Layout>
+      <Sider>
+        <Menu defaultSelectedKeys = {['Dashboard']}
+          mode = 'inline'>
+          <Menu.Item key = 'Dashboard'>
+          <HomeOutlined />Dashboard
+          </Menu.Item>
+          <SubMenu
+          title = {
+            <span><MailOutlined /><span>About Us</span></span>
+          }>
+            <Menu.ItemGroup key = 'AboutUs' title = 'Country 1'>
+              <Menu.Item key = 'location1'>Location 1</Menu.Item>
+              <Menu.Item key = 'location2'>Location 2</Menu.Item>
+
+            </Menu.ItemGroup>
+          </SubMenu>
+        </Menu>
+      </Sider>
+      <Layout>
+        <Content style = {{ padding: '0 50px' }}>
+          <Breadcrumb style = {{ margin: '16px 0' }}>
+            <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
+          </Breadcrumb>
+          <div style = {{ background: '#fff', padding:24, minHeight: 580 }}>
+            Content
+            <SubMenuT />
+            </div>
+        </Content>
+        <Footer style = {{ textAlign: 'center'}}>Copyright Sonfack.Z. All right reserved 2020</Footer>
+      </Layout>
+    </Layout>
+    </Layout> */}
+    </div>
+  )
 }
-
 export default App;
 
 
@@ -45,152 +79,41 @@ export default App;
 
 
 
-
-
-
-
-
-
-
-
-
-
-// import React, {useState} from "react";
-// import 'bootstrap/dist/css/bootstrap.min.css';
-// // import {QuoteContext} from "./contexts/QuoteContext";
-// // import QuotesList from "./components/QuotesList";
+// import React, { useState } from 'react'
+// // import { render } from 'react-dom'
+// import Header from './components/Dashboards/Header'
+// import Main from './components/Dashboards/Main'
+// import Sidebar from './components/Dashboards/Sidebar'
 // import 'semantic-ui-css/semantic.min.css'
-// import Home from  './components/pages/Home';
-// import About from  './components/pages/About';
-// import Contact from  './components/pages/Contact';
-// import Register from './components/register/register';
-// // import Login from './components/login/login';
-// import Admin from './components/login/admin';
-// import AuthForm from "./components/login/login";
-// import QuotesList from "./contexts/QuotesList";
-// import Navbar from './components/layout/Navbar';
-// import { BrowserRouter, Switch, Route } from 'react-router-dom';
-// import NotFound from './components/pages/NotFound';
-// import "./components/login/style.css";
-// // // import { Row, Col } from "react-bootstrap";
-// // // import logo from './logo.svg';
-// // // import './App.css';
-// // import { AllUsers } from './components/AllUsers';
-// // // import loginImg from "./login.svg";
-// // import TabNav from './components/TabNav';
-// // import Tab from './components/Tab';
-// // import Menu from './components/Menu';
-// // import Login from './components/login/login';
-// // // import RolePage from './components/register/rolePage';
-// // // import FormPatient from './components/Form/formPatient';
-// // import RegisterPatient from './components/register/registerPatientPage';
-// // import RegisterDoctor from './components/register/registerDoctorPage';
-// // // import Users from './components/allUsers';
-// // // import PatientRegister from './components/register/PatientRegister';
-// // // import DoctorRegister from './components/register/DoctorRegister';
-// // // import { Login } from "./components/login/index";
-// // // import { Register } from "./components/register/index";
+
+// import cx from 'classnames'
 
 // function App(){
-//   const [quotes, setQuotes] = useState([]);
-//   const [loggedIn, setLoggedIn] = useState(localStorage.getItem("token") ? true : false);
+
+
+//   const [toggle, setToggle] = useState(false);
+
+//   const classes = cx(
+//     'pusher',
+//     'bottom',
+//     {'dimmed': toggle}
+//   );
+
+
+//   function toggleMenu(){
+//     setToggle(!toggle)
+//   }
+
 //   return(
 //     <div className='App'>
-//      <div className="App">
-//         <BrowserRouter>
-//         <QuoteContext.Provider value={{quotes, setQuotes, loggedIn, setLoggedIn}}>
-//         <div className="App">
-//        <Navbar />
-//        <Switch>
-//          <Route exact path ="/" component = {Home} />
-//          <Route exact path = "/about" component = {About} />
-//          <Route exact path = "/contact" component = {Contact} />
-//          <Route exact path = "/register" component = {Register} />
-//          <Route path="/login" render={ props => <AuthForm {...props} role="login" /> } />
-//          {/* <Route exact path = "/login" component = {Login} /> */}
-//          <Route path = "/admin" component = {Admin} />
-//          <Route component = {NotFound} />
-//        </Switch>
+//      <Header onToggleMenu = {toggleMenu} />
+//      <div className = "ui attached pushable" style = {{height: '100vh'}}>
+//       <Sidebar toggleMenu = {toggle} />
+//       <div className = {classes}>
+//         <Main />
+//       </div>
 //      </div>
-//      </QuoteContext.Provider>
-//      </BrowserRouter>
-//          {/* <Menu /> */}
-//          <br></br>
-//          {/* <div className="container"> */}
-//          {/* <TabNav tabs={['Patient Register', 'Doctor Register', 'Getting all users', 'Login']} selected={ this.state.selected } setSelected={ this.setSelected }> */}
-//            {/* <Tab isSelected={ this.state.selected === 'Patient Register'}> */}
-//            {/* <RegisterPatient /> */}
-//            {/* <FormPatient /> */}
-//            {/* </Tab> */}
-
-//            {/* <Tab isSelected={ this.state.selected === 'Doctor Register'}> */}
-//            {/* <RegisterDoctor /> */}
-//            {/* </Tab> */}
-
-//            {/* <Tab isSelected={ this.state.selected === 'Getting all users'}> */}
-//            {/* <AllUsers /> */}
-//            {/* </Tab> */}
-
-//             {/* <Tab isSelected={ this.state.selected === 'Login'}> */}
-//             {/* <Login /> */}
-//             {/* </Tab> */}
-//          {/* </TabNav> */}
-//          {/* </div> */}
-//        </div>
 //     </div>
 //   )
 // }
-// export default App;
-// const [quotes, setQuotes] = useState([]);
-//   const [loggedIn, setLoggedIn] = useState(localStorage.getItem("token") ? true : false);
-// class App extends React.Component {
-  
-
-//   render()
-//   {
-//     return (
-//       <div className="App">
-//        <BrowserRouter>
-//        <div className="App">
-//       <Navbar />
-//       <Switch>
-//         <Route exact path ="/" component = {Home} />
-//         <Route exact path = "/about" component = {About} />
-//         <Route exact path = "/contact" component = {Contact} />
-//         <Route exact path = "/register" component = {Register} />
-//         <Route exact path = "/login" component = {Login} />
-//         <Route path = "/admin" component = {Admin} />
-//         <Route path = "/logout" component = {Logout} />
-//         <Route component = {NotFound} />
-//       </Switch>
-//     </div>
-//     </BrowserRouter>
-//         {/* <Menu /> */}
-//         <br></br>
-//         {/* <div className="container"> */}
-//         {/* <TabNav tabs={['Patient Register', 'Doctor Register', 'Getting all users', 'Login']} selected={ this.state.selected } setSelected={ this.setSelected }> */}
-//           {/* <Tab isSelected={ this.state.selected === 'Patient Register'}> */}
-//           {/* <RegisterPatient /> */}
-//           {/* <FormPatient /> */}
-//           {/* </Tab> */}
-
-//           {/* <Tab isSelected={ this.state.selected === 'Doctor Register'}> */}
-//           {/* <RegisterDoctor /> */}
-//           {/* </Tab> */}
-
-//           {/* <Tab isSelected={ this.state.selected === 'Getting all users'}> */}
-//           {/* <AllUsers /> */}
-//           {/* </Tab> */}
-
-//            {/* <Tab isSelected={ this.state.selected === 'Login'}> */}
-//            {/* <Login /> */}
-//            {/* </Tab> */}
-//         {/* </TabNav> */}
-//         {/* </div> */}
-//       </div>
-//     );
-//   }
-  
-// }
-
 // export default App;

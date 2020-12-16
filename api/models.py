@@ -215,15 +215,15 @@ def get_one_user(public_id):
 
 
 
-# @app.route('/role/create', methods=["POST"])
-# def roles():
-#     request_data = json.loads(request.data)
-#     role = Role(name=request_data['name'])
+@app.route('/role/create', methods=["POST"])
+def roles():
+    request_data = json.loads(request.data)
+    role = Role(name=request_data['name'])
 
-#     db.session.add(role)
-#     db.session.commit()
+    db.session.add(role)
+    db.session.commit()
     
-#     return {'201': 'Role created successfully'}
+    return {'201': 'Role created successfully'}
 
 
     # data = request.get_json()
@@ -314,40 +314,12 @@ def login():
     if not password:
         return jsonify({"msg": "Missing password parameter"}), 400
 
-    # if username != 'test' or password != 'test':
-    #     return jsonify({"msg": "Bad username or password"}), 401
+    if username != 'test' or password != 'test':
+        return jsonify({"msg": "Bad username or password"}), 401
 
     # Identity can be any data that is json serializable
     access_token = create_access_token(identity=username)
-    # return jsonify(access_token=access_token), 200
     return jsonify({'message': 'success', 'token': access_token})
-
-
-
-
-
-# def login():
-#     auth = request.authorization
-
-#     if not auth or not auth.username or not auth.password:
-#         return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
-
-#     user = User.query.filter_by(email=auth.username).first()
-
-#     if not user:
-#         return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
-
-#     if check_password_hash(user.password, auth.password):
-#         # token = jwt.encode({'public_id': user.public_id, 'exp': datetime.utcnow() + datetime.timedelta(minutes=30)}, app.config['SECRET_KEY'])
-#         token = jwt.encode({
-#             'public_id': user.public_id,
-#             'exp': datetime.utcnow() + timedelta(minutes = 30)
-#         }, app.config['SECRET_KEY'])
-#         access_token = create_access_token(identity=auth.username)
-#         print(access_token)
-#         return jsonify({'message': 'success', 'token': token.decode('UTF-8')})
-
-#     return make_response('Could not verify', 401, {'WWW-Authenticate': 'Basic realm="Login required!"'})
 
 
 #Update single record
