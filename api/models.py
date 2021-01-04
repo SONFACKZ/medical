@@ -8,7 +8,7 @@ from flask_jwt_extended import (
 # from flask_jwt import JWT, jwt_required
 import jwt
 from datetime import datetime, timedelta
-from flask_login import UserMixin, LoginManager, login_user, current_user
+from flask_login import UserMixin, LoginManager, login_user, current_user, logout_user
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
@@ -25,6 +25,11 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = '\x0em\xfcF\x04\xd614\x7f$\x12\xba\xb9\x81\x9f\xe8w\xc7$\x1b\x01\xcaW\x9f'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///medi.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+
+app.config["UPLOAD_FOLDER"] = '/static/image'
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+
 db = SQLAlchemy(app)
 tok = JWTManager(app)
 # auth = HTTPBasicAuth()
@@ -152,6 +157,20 @@ def index():
     return render_template("index.html")
 
 
+#Test protected route
+@app.route('/pro', methods=['GET'])
+@jwt_required
+def pro():
+ return jsonify({'message': 'Page protected!'})
+
+# db.session.query(Post).select_from(Follow).filter_by(follower_id=self.id)
+# .join(Post, Follow.followed_id == Post.author_id)
+
+# Post.query.join(Follow, Follow.followed_id == Post.author_id)
+# .filter(Follow.follower_id == self.id)
+
+# User.query.join(Role, role.id == User.user_id).filter(Role, role_id == self.id)
+
 def user_serializer(users):
     return{
         'user_id': users.user_id,
@@ -159,29 +178,74 @@ def user_serializer(users):
         'fullname': users.fullname,
         'occupation': users.occupation,
         'residence': users.residence,
-        'email': users.email
+        'email': users.email,
+        'role_id': users.role_id,
+        'status': users.status
     }
-    # user_id, public_id, fullname, occupation, residence, email
-
-@app.route('/pro', methods=['GET'])
-# @token_required
-# @jwt_required()
-def pro():
- return jsonify({'message': 'Page protected!'})
-
-
-
 
 @app.route('/users', methods=['GET'])
-# @token_required
 @jwt_required
-# @auth.login_required
 def get_all_users():
-    print("header", request.headers)
-    current_user = get_jwt_identity()
-    print(current_user)
+    # print("header", request.headers)
+    # current_user = get_jwt_identity()
+    # print(current_user)
     users = User.query.all()
+    
+    # role  = Role.query.filter_by(id=users.role_id)
+
     return jsonify([*map(user_serializer, users)])
+
+def patient_serializer(patient):
+    return{
+        'user_id': patient.user_id,
+        'public_id': patient.public_id,
+        'fullname': patient.fullname,
+        'occupation': patient.occupation,
+        'residence': patient.residence,
+        'email': patient.email,
+        'role_id': patient.role_id,
+        'status': patient.status
+    }
+    
+@app.route('/users/patients', methods = ['GET'])
+@jwt_required
+def get_all_patients():
+    patients = User.query.filter_by(role_id = 3)
+    return jsonify([*map(patient_serializer, patients)])
+
+def doctor_serializer(doctor):
+    return{
+        'user_id': doctor.user_id,
+        'public_id': doctor.public_id,
+        'fullname': doctor.fullname,
+        'occupation': doctor.occupation,
+        'residence': doctor.residence,
+        'email': doctor.email,
+        'role_id': doctor.role_id,
+        'status': doctor.status
+    }
+
+@app.route('/users/doctors', methods = ['GET'])
+@jwt_required
+def get_all_doctors():
+    doctors = User.query.filter_by(role_id = 2)
+    return jsonify([*map(doctor_serializer, doctors)])
+
+#Inactive doctors
+@app.route('/users/doctors/rev', methods = ['GET'])
+@jwt_required
+def get_inactive_doctors():
+    doctors = User.query.filter_by(status == 0)
+    return jsonify([*map(doctor_serializer, doctors)])
+
+
+# @app.route('/role/view', methods=['GET'])
+# @jwt_required
+# def get_all_roles():
+#     role = Role.query.all()
+#     return jsonify([*map(user_serializer, role)])
+#     print(role)
+
     # users = User.query.all()
     # # print('xdg', users)
     # output = []
@@ -197,6 +261,34 @@ def get_all_users():
     # return jsonify({'users': output})
 
 
+#User Profil
+# @app.route('/user/<public_id>')
+# def user(username):
+# user = User.query.filter_by(public_id = public_id).first()
+# if user is None:
+# abort(404)
+# return jsonify({'message': 'This user does not exist!'})
+
+
+# #User Profil Edit
+# @app.route('/edit-profile', methods=['GET', 'POST'])
+# @login_required
+# def edit_profile():
+#     form = EditProfileForm()
+#     if form.validate_on_submit():
+#         current_user.name = form.name.data
+#         current_user.location = form.location.data
+#         current_user.about_me = form.about_me.data
+#         db.session.add(user)
+#         flash('Your profile has been updated.')
+#         return redirect(url_for('.user', username=current_user.username))
+# form.name.data = current_user.name
+# form.location.data = current_user.location
+# form.about_me.data = current_user.about_me
+# return render_template('edit_profile.html', form=form)
+
+
+#Get individual user
 @app.route('/users/<public_id>', methods=['GET'])
 def get_one_user(public_id):
 
@@ -214,7 +306,7 @@ def get_one_user(public_id):
     return jsonify({'user': user_data})
 
 
-
+#Create Role
 @app.route('/role/create', methods=["POST"])
 def roles():
     request_data = json.loads(request.data)
@@ -225,16 +317,35 @@ def roles():
     
     return {'201': 'Role created successfully'}
 
+#Update Role
+@app.route('/role/update/<public_id>', methods = ['PUT'])
+def updrole(public_id):
+    user = User.query.filter_by(public_id=public_id).first()
 
-    # data = request.get_json()
-# @app.route('/pasthistory', methods=['POST'])
-# def history():
-#     data = json.loads(request.data)
-#     history = PastHistory(past_history_type=data['past_history_type'],
-#                           past_history_particular_observation=data['past_history_particular_observation'],
-#                           past_history_year=data['past_history_year'],
-#                           past_history_owner_id=2
-#                           )
+    if not user:
+        return jsonify({'message': 'No user found!'})
+    
+    user.role_id = 3
+    db.session.commit()
+
+    return jsonify({'message': 'The user role has been updated!'})
+
+
+
+#create past history
+@app.route('/pasthistory/add', methods=['POST'])
+def history():
+    data = request.get_json()
+    new_history = PastHistory(past_history_type=data['past_history_type'],
+                          past_history_particular_observation=data['past_history_particular_observation'],
+                          past_history_year=data['past_history_year'],
+                          past_history_owner_id=2)
+    
+    db.session.add(new_history)
+    db.session.commit()
+    return jsonify({'message': 'Your Past History has been created successfully!'})
+
+
 #     db.session.add(history)
 #     db.session.commit()
 #     return {'201': 'PastHistory created successfully'}
@@ -249,7 +360,13 @@ def roles():
 def reg_doctor():
     data = request.get_json()
 
-    x = datetime(data['date_birth'][0], data['date_birth'][1], data['date_birth'][2])
+    dateB = datetime.strptime(data['date_birth'], '%Y-%m-%d').date()
+
+    # file = data['nic_passport_path']
+    # filename = secure_filename(file.filename)
+    # file.save((os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
+    # filepath = 'static/images/'+file.filename
+
     hashed_password = generate_password_hash(data['password'], method='sha256')
     dateB = datetime.strptime(data['date_birth'], '%Y-%m-%d').date()
     new_doctor = User(public_id=str(uuid.uuid4()),
@@ -267,12 +384,14 @@ def reg_doctor():
     return jsonify({'message': 'Your new doctor account has been created!'})
 
 #Register a patient
-@app.route('/auth/register', methods=["POST"])
+@app.route('/auth/register/patient', methods=["POST"])
 def reg_patient():
     
     data = json.loads(request.data)
     hashed_password = generate_password_hash(data['password'], method='sha256')
     dateB = datetime.strptime(data['date_birth'], '%Y-%m-%d').date()
+
+
 
     # checking for existing user
     new_patient = User.query.filter_by(email=data['email']).first()
@@ -285,7 +404,7 @@ def reg_patient():
                             sex=data['sex'], contact_phone=data['contact_phone'],
                             blood_group=data['blood_group'], occupation=data['occupation'],
                             date_birth=dateB,
-                            status=0,
+                            status=1,
                             person_to_contact_name=data['person_to_contact_name'],
                             person_to_contact_phone=data['person_to_contact_phone']
                             )
@@ -293,47 +412,76 @@ def reg_patient():
         #Insert patient
         db.session.add(new_patient)
         db.session.commit()
-        return jsonify({'message': 'Your new patient account has been created!'})
+        return jsonify({'message': 'Your account has been created successfully!'}), 200
     else:
         # returns 202 if user already exists 
-        return make_response('User already exists. Please Log in.', 202)
+        return jsonify({'warn_message': 'This email already exists. Please Log in.'}), 202
 
 
 
 #Login
 @app.route('/auth/login', methods = ['POST'])
 def login():
-    print(request.json)
+    # print(request.json)
     if not request.is_json:
-        return jsonify({"msg": "Missing JSON in request"}), 400
+        return jsonify({"error_message": "Missing JSON in request"}), 400
 
     username = request.json.get('email', None)
     password = request.json.get('password', None)
     if not username:
-        return jsonify({"msg": "Missing username parameter"}), 400
+        return jsonify({"error_message": "Missing email parameter"}), 400
     if not password:
-        return jsonify({"msg": "Missing password parameter"}), 400
+        return jsonify({"error_message": "Missing password parameter"}), 400
 
-    if username != 'test' or password != 'test':
-        return jsonify({"msg": "Bad username or password"}), 401
+    # if username != 'test' or password != 'test':
+    #     return jsonify({"msg": "Bad username or password"}), 401
 
+    user = User.query.filter_by(email=username).first()
+    user_data = {}
+    user_data['fullname'] = user.fullname
+    user_data['role_id'] = user.role_id
+    user_data['status'] = user.status
+
+    if user_data['status'] == 0:
+        return({"war_message": "Your account is not active contact adminstrator !"})
+    elif user_data['status'] == 1:
     # Identity can be any data that is json serializable
-    access_token = create_access_token(identity=username)
-    return jsonify({'message': 'success', 'token': access_token})
+        access_token = create_access_token(identity=username)
+        return jsonify({
+            'message': 'Successful login, Welcome !', 
+            'token': access_token, 
+            'user': user_data['fullname'],
+            'role_id': user_data['role_id'],
+            'status': user_data['status']
+        })
+
+
+@app.route('/auth/logout')
+@jwt_required
+def logout():
+    logout_user()
+    return {"success": 200}
+
 
 
 #Update single record
-@app.route('/user/<public_id>', methods=['PUT'])
+@app.route('/user/status/<public_id>', methods=['PUT'])
 def promote_user(public_id):
     user = User.query.filter_by(public_id=public_id).first()
 
     if not user:
         return jsonify({'message': 'No user found!'})
-    
-    user.admin = True
-    db.session.commit()
 
-    return jsonify({'message': 'The user has been promoted!'})
+    if user.status == 1:
+        user.status = False
+        db.session.commit()
+        return jsonify({'message': 'The user status updated from Active to Inactive'})
+    else:
+        user.status = True
+        db.session.commit()
+        return jsonify({'message': 'The user status updated from Inactive to Active'})
+
+    # return jsonify({'message': 'The user status has been updated!'})
 
 
 #Deleting record

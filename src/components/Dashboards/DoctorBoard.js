@@ -1,15 +1,19 @@
 import React, { Component } from 'react'
-import { Menu, Switch, Layout, Avatar, Breadcrumb } from 'antd'
+import { Menu, Switch, Layout, Avatar, Breadcrumb, Space, Typography } from 'antd'
+import { Link, Route, BrowserRouter as Router } from 'react-router-dom'
 import Title from 'antd/lib/typography/Title'
-import patientImg from "../../assets/images/doctor.svg"
+import doctorImg from "../../assets/images/doctor.svg"
 import logo from "../../assets/images/logo.png"
+import Logout from './logout'
 
 import { HomeOutlined, SettingOutlined, IssuesCloseOutlined,
    MessageOutlined, LogoutOutlined, MedicineBoxOutlined,
    HistoryOutlined, UserOutlined } from '@ant-design/icons'
 
+const user = localStorage.getItem('user')
 const SubMenu = Menu.SubMenu;
 const { Header, Footer, Content, Sider } = Layout;
+const { Text } = Typography;
 
 
 class DoctorBoard extends React.Component {
@@ -42,16 +46,19 @@ class DoctorBoard extends React.Component {
     return (
       <div>
           <Layout>
-            <Header
+          <Header
             style = {{padding: 9, background: '#34495E'}}>
-            <span style = {{float: 'right', color: 'red'}} >Sign Out <LogoutOutlined /></span>
-            <Avatar shape = "circle" size={50} style = {{float: 'right'}} src={ patientImg } />
+          <Space align="center" style = {{float: 'right'}}>
+            <Avatar shape = "circle" size={40}  src={ doctorImg } />
+            <Text strong style = {{color: 'white'}}>{user}</Text>
+            <Logout />
+          </Space>
             
             <Title style = {{color: 'white'}} level = {3}>
                 <img src = {logo} alt = 'Mediagnostic logo'
                 type={this.state.collapsed ? 'menu-unfold' : 'menu-fold'}
                 onClick={this.toggle}
-                 style = {{margin: -17}} width="150" height="100" />
+                 style = {{margin: -20}} width="150" height="100" />
             </Title>
           <Switch style = {{float: 'right'}}
           checked={this.state.theme === 'light'}
@@ -61,7 +68,7 @@ class DoctorBoard extends React.Component {
             />
             </Header>
             <Layout>
-            <Sider style = {{background: 'white'}}
+            <Sider theme={this.state.theme}
             trigger={null}
             collapsible
             collapsed={this.state.collapsed}
@@ -81,8 +88,8 @@ class DoctorBoard extends React.Component {
             <Menu.Item key="3"><HistoryOutlined />Past History</Menu.Item>
             <Menu.Item key="4"><IssuesCloseOutlined />Case Reporting</Menu.Item>
             <Menu.Item key="5"><MessageOutlined />Live Chat</Menu.Item>
-            <Menu.Item key="5"><UserOutlined />Profil</Menu.Item>
-            <Menu.Item key="6"><SettingOutlined />Setting</Menu.Item>
+            <Menu.Item key="6"><UserOutlined />Profil</Menu.Item>
+            <Menu.Item key="7"><SettingOutlined />Setting</Menu.Item>
           {/* </SubMenu> */}
           {/* <SubMenu key="sub2" title={<span><AppstoreAddOutlined /><span>Navigtion Two</span></span>}>
             <Menu.Item key="5">Option 5</Menu.Item>

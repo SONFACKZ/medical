@@ -1,7 +1,9 @@
-import React, {useState, useEffect} from 'react';
-import axios from 'axios';
-// import loginImg from "../../login.svg";
-import loginImg from "../../assets/images/patient.jpg";
+import React, {useState, useEffect} from 'react'
+import axios from 'axios'
+import patientImg from "../../assets/images/patient.png"
+import { Form, Input, Button, Checkbox, Select, Row, Col, DatePicker, message} from 'antd'
+import { MailOutlined, UserOutlined, LockOutlined, 
+        LoginOutlined, QuestionCircleOutlined, HomeOutlined } from '@ant-design/icons'
 
 
 
@@ -30,7 +32,11 @@ const initialState = {
             person_to_contact_nameError: ''
 }
 
+const { Option } = Select;
 
+const onFinish = (values) => {
+    console.log('Received values of form: ', values);
+  };
 
 class RegisterPatient extends React.Component {
     constructor(props){
@@ -76,6 +82,11 @@ class RegisterPatient extends React.Component {
             blood_group: event.target.value
         })
     }
+
+    handleBloodGroupChange = (value) =>{
+        console.log('selected: '+ value);
+    }
+
     handleOccupationChange = (event) => {
         this.setState({
             occupation: event.target.value
@@ -122,6 +133,7 @@ class RegisterPatient extends React.Component {
     //         }
     //     }
     // }
+    
 
 // Validation form
     validate = () => {
@@ -150,7 +162,7 @@ class RegisterPatient extends React.Component {
 
         return true;
     };
-
+    
 
 // handle submit value
     handleSubmit = event => {
@@ -160,12 +172,17 @@ class RegisterPatient extends React.Component {
             console.log(this.state);
             this.setState(initialState); //Clearing Form
         }
-        axios.post('/register/patient', this.state)
+        axios.post('auth/register/patient', this.state)
              .then(response => {
                  console.log(response)
+                // message.success(response.data.message, 5);
+                //  warn_message
              })
              .catch(error => {
-                 console.log(error)
+                 console.log('registration error:',this.state.data.war_message)
+                //  alert(error)
+                 console.log(error.data.warn_message)
+                // message.warning(error.data.warn_message, 15);
              })
     }
 
@@ -173,67 +190,169 @@ class RegisterPatient extends React.Component {
         const{ fullname,email, residence, sex, contact_phone, blood_group, occupation, date_birth,
                 password, person_to_contact_phone, person_to_contact_name } = this.state
         return (
-            <div className="base-container mx-auto border shadow p-5">
-                <div><br /></div>
+            // style={{ background: '#ECECEC', padding: '30px' }}
+            <div className="base-container" style={{ padding: '30px' }}>
+               
                 <div className="header">Patient Registration</div>
                 <br />
-                <div className="text-center">
-                        <img className = 'image' alt = "logo" src={loginImg} />
-                    </div>
-                <div className="content">
-                    <div><br /></div>
-                        <form onSubmit = {this.handleSubmit}>
-                            <div class="row">
-                                <div class="col-sm">
+                <div className="content mx-auto border shadow p-5" 
+                style={{ background: '#ECECEC', padding: '30px' }}>
+                    <div className="text-center">
+                            <img className = 'image' alt = "logo" src={patientImg} />
+                    </div><br />
+                   
+                        {/* <form onSubmit = {this.handleSubmit}> */}
+                        <Form 
+                            name = 'regiter' onFinish = {onFinish}>
+                            <Row gutter= {16}>
+                                <Col span={12}>
                                     <div>
-                                        <label>Fullname</label>
-                                        <input class="form-control" type = "text" name = "fullname" value = {fullname} placeholder = "Names"
-                                        onChange = {this.handleFullnameChange} required />
+                                    <Form.Item
+                                    name = "fullname"
+                                    value = {fullname}
+                                    onChange = {this.handleFullnameChange}
+                                    hasFeedback
+                                    rules = {[{ required: true, message: 'Please input your Full Name!' }]}
+                                    >
+                                        <Input type = "fullname"
+                                        name = "fullname"
+                                        value = {fullname}
+                                        onChange = {this.handleFullnameChange}
+                                        prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Full Name" allowClear />
+                                    </Form.Item>
                                         <span style = {{fontSize: 12, color: 'red'}}>{this.state.fullnameError}</span>
                                     </div>
-                                </div>
-                                <div class="col-sm">
+                                </Col>
+                                <Col span={12}>
                                     <div>
-                                        <label>Email</label>
-                                        <input class="form-control" type = "email" name = "email" value = {email} placeholder = "Email"
-                                        onChange = {this.handleEmailChange} required />
+                                    <Form.Item
+                                    name = "email"
+                                    value = {email}
+                                    onChange = {this.handleEmailChange}
+                                    hasFeedback
+                                        rules={[
+                                            {
+                                              type: 'email',
+                                              message: 'The input is not valid Email!',
+                                            },
+                                            {
+                                              required: true,
+                                              message: 'Please input your Email!',
+                                            },
+                                          ]}
+                                    >
+                                        <Input
+                                        name = "email"
+                                        value = {email}
+                                        onChange = {this.handleEmailChange}
+                                        prefix={<MailOutlined className="site-form-item-icon" />} placeholder="Email" allowClear />
+                                    </Form.Item>
+                                        
                                         <span style = {{fontSize: 12, color: 'red'}}>{this.state.emailError}</span>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm">
+                                </Col>
+                            </Row>
+                            <Row gutter= {16}>
+                                <Col span={12}>
                                     <div>
-                                        <label>Residence</label>
-                                        <input class="form-control" type = "text" name = "residence" value = {residence} placeholder = "Quater, Town"
-                                        onChange = {this.handleResidenceChange} required />
+                                    <Form.Item
+                                    name = "residence"
+                                    value = {residence}
+                                    onChange = {this.handleResidenceChange}
+                                    hasFeedback
+                                        rules = {[{ required: true, message: 'Please input your Residence!' }]}
+                                    >
+                                        <Input type = "residence"
+                                        name = "residence"
+                                        value = {residence}
+                                        onChange = {this.handleResidenceChange}
+                                        prefix={<HomeOutlined className="site-form-item-icon" />} placeholder="Residence" allowClear />
+                                    </Form.Item>
+
+                                        
                                         <span style = {{fontSize: 12, color: 'red'}}>{this.state.residenceError}</span>
                                     </div>
-                                </div>
-                                <div class="col-sm">
+                                </Col>
+                                <Col span={12}>
                                     <div>
+                                    <Form.Item 
+                                    name="sex"
+                                    value = {sex}
+                                    onChange = {this.handleSexChange}
+                                    hasFeedback
+                                        rules={[{ required: true, message: 'Please select your gender!' }]}
+                                    >
+                                        <Select size = "large"
+                                        name="sex"
+                                        value = {sex}
+                                        onChange = {this.handleSexChange}
+                                        placeholder="Gender">
+                                        <Option value = "">Choose your Gender</Option>
+                                        <Option value="F">Female</Option>
+                                        <Option value="M">Male</Option>
+                                        </Select>
+                                        {/* <span style = {{fontSize: 9, color: 'grey'}}>Choose your gender</span> */}
+                                    </Form.Item>
+{/* 
                                         <label>Sex</label>
                                         <select class="form-control" name = "sex" value = {sex} onChange = {this.handleSexChange} required>
                                             <option value = "">Choose your Sex</option>
                                             <option value = "F">Female</option>
                                             <option value = "M">Male</option>
-                                        </select>
+                                        </select> */}
                                         <span style = {{fontSize: 12, color: 'red'}}>{this.state.sexError}</span>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm">
+                                </Col>
+                            </Row>
+                            <Row gutter= {16}>
+                                <Col span={12}>
                                     <div>
-                                        <label>Contact Phone</label>
+                                    <Form.Item
+                                    name = "phone_contact" value = {contact_phone}
+                                    onChange = {this.handleContactphoneChange}
+                                    hasFeedback
+                                        rules={[{ required: true, message: 'Please input your phone number!' }]}
+                                    >
+                                        <Input addonBefore={+237}
+                                         name = "phone_contact" value = {contact_phone}
+                                         onChange = {this.handleContactphoneChange}
+                                         pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" placeholder="Contact Phone" 
+                                         allowClear />
+                                    </Form.Item>
+                                        {/* <label>Contact Phone</label>
                                         <input class="form-control" type = "tel" name = "phone_contact" value = {contact_phone} placeholder = "Ex: 123 456 789"
-                                        onChange = {this.handleContactphoneChange} pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" required />
+                                        onChange = {this.handleContactphoneChange} pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" required /> */}
                                         <span style = {{fontSize: 12, color: 'red'}}>{this.state.contact_phoneError}</span>
                                     </div>
-                                </div>
-                                <div class="col-sm">
+                                </Col>
+                                <Col span={12}>
                                     <div>
-                                        <label>Blood Group</label>
+                                    <Form.Item 
+                                        name="blood_gooup"
+                                        value = {blood_group}
+                                        onChange = {this.handleBloodgroupChange}
+                                        hasFeedback
+                                        rules={[{ required: true, message: 'Please select your Blood Group!' }]}
+                                    >
+                                        <Select size = "large"
+                                        name="blood_gooup"
+                                        value = {blood_group}
+                                        onChange = {this.handleBloodgroupChange}
+                                        placeholder = "Blood Group">
+                                            <Option value = "">Choose your Blood Group</Option>
+                                            <Option value="A+">A RhD positive (A+)</Option>
+                                            <Option value="A-">A RhD negative (A-)</Option>
+                                            <Option value="B+" >B RhD positive (B+)</Option>
+                                            <Option value="B-">B RhD negative (B-)</Option>
+                                            <Option value="O+">O RhD positive (O+)</Option>
+                                            <Option value="O-">O RhD negative (O-)</Option>
+                                            <Option value="AB+" >AB RhD positive (AB+)</Option>
+                                            <Option value="AB-">AB RhD negative (AB-)</Option>
+                                        </Select>
+                                        {/* <span style = {{fontSize: 9, color: 'grey'}}>Choose your Blood Group</span> */}
+                                    </Form.Item>
+
+                                        {/* <label>Blood Group</label>
                                         <select class="form-control" value = {blood_group} name = "blood_gooup" onChange = {this.handleBloodgroupChange} required>
                                             <option value = "">Choose your Blood Group</option>
                                             <option value = "A+">A RhD positive (A+)</option>
@@ -244,57 +363,150 @@ class RegisterPatient extends React.Component {
                                             <option value = "O-">O RhD negative (O-)</option>
                                             <option value = "AB+">AB RhD positive (AB+)</option>
                                             <option value = "AB-">AB RhD negative (AB-)</option>
-                                        </select>
+                                        </select> */}
                                         <span style = {{fontSize: 12, color: 'red'}}>{this.state.blood_groupError}</span>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm">
+                                </Col>
+                            </Row>
+                            <Row gutter= {16}>
+                                <Col span={12}>
                                     <div>
-                                        <label>Occupation</label>
-                                        <input class="form-control" type = "text" value = {occupation} name = "occupation" onChange = {this.handleOccupationChange} required />
+                                    <Form.Item
+                                    value = {occupation} name = "occupation" 
+                                    onChange = {this.handleOccupationChange}
+                                    hasFeedback
+                                        rules = {[{ required: true, message: 'Please input your Occupation!' }]}
+                                    >
+                                        <Input type = "email"
+                                        value = {occupation} name = "occupation" onChange = {this.handleOccupationChange}
+                                        placeholder="Occupation" allowClear />
+                                    </Form.Item>
+                                        {/* <label>Occupation</label>
+                                        <input class="form-control" type = "text" value = {occupation} name = "occupation" onChange = {this.handleOccupationChange} required /> */}
                                         <span style = {{fontSize: 12, color: 'red'}}>{this.state.occupationError}</span>
                                     </div>
-                                </div>
-                                <div class="col-sm">
+                                </Col>
+                                <Col span={12}>
                                     <div>
-                                        <label>Date of Birth</label>
-                                        <input class="form-control" type="date" value = {date_birth} name = "date_birth" onChange = {this.handleDatebirthChange} required />
+                                    <Form.Item
+                                    value = {date_birth} name = "date_birth" 
+                                    onChange = {this.handleDatebirthChange}
+                                    value = {date_birth} name = "date_birth"
+                                    hasFeedback
+                                        rules = {[{ required: true, message: 'Please input your Date of Birth!' }]}
+                                    >
+                                        <Input type = "date"
+                                        value = {date_birth} name = "date_birth" 
+                                        onChange = {this.handleDatebirthChange}
+                                        value = {date_birth} name = "date_birth"
+                                        placeholder="Date of Birth" allowClear />
+                                    </Form.Item>
+                                    {/* <DatePicker  format={dateFormat} /> */}
+                                        {/* <label>Date of Birth</label>
+                                        <input class="form-control" type="date" value = {date_birth} name = "date_birth" onChange = {this.handleDatebirthChange} required /> */}
                                         <span style = {{fontSize: 12, color: 'red'}}>{this.state.data_birthError}</span>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-sm">
+                                </Col>
+                            </Row>
+                            <Row gutter= {16}>
+                                <Col span={12}>
                                     <div>
-                                        <label>Password</label>
-                                        <input class="form-control" type = "password" value = {password} name = "password" onChange = {this.handlePasswordChange} required />
-                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.passwordError}</span>
+                                    <Form.Item
+                                    name = "person_to_contact_name" 
+                                    value = {person_to_contact_name} 
+                                    onChange = {this.handlePersontonameChange}
+                                    hasFeedback
+                                    rules = {[{ required: true, message: 'Please the name!' }]}
+                                    >
+                                        <Input type = "fullname"
+                                        name = "person_to_contact_name" 
+                                        value = {person_to_contact_name} 
+                                        onChange = {this.handlePersontonameChange}
+                                        prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Person to Contact Name" allowClear />
+                                    </Form.Item>
+                                        {/* <label>Person to Contact Name</label>
+                                        <input class="form-control" type = "text" name = "person_to_contact_name" value = {person_to_contact_name} onChange = {this.handlePersontonameChange} required /> */}
+                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.person_to_contact_nameError}</span>
                                     </div>
-                                </div>
-                                <div class="col-sm">
+                                </Col>
+                                <Col span={12}>
                                     <div>
-                                        <label>Person to contact Phone</label>
+                                    <Form.Item
+                                    name = "person_to_contact_phone" value = {person_to_contact_phone}
+                                    onChange = {this.handlePersontophoneChange}
+                                    hasFeedback
+                                    rules={[{ required: true, message: 'Please input your phone number!' }]}
+                                    >
+                                        <Input addonBefore={+237}
+                                        name = "person_to_contact_phone" value = {person_to_contact_phone}
+                                        onChange = {this.handlePersontophoneChange}
+                                         pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" placeholder="Person to contact Phone" 
+                                         allowClear />
+                                    </Form.Item>
+                                        {/* <label>Person to contact Phone</label>
                                         <input class="form-control" type = "text" name = "person_to_contact_phone" value = {person_to_contact_phone} placeholder = "Ex: 123 456 789"
-                                        onChange = {this.handlePersontophoneChange} pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" required />
+                                        onChange = {this.handlePersontophoneChange} pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" required /> */}
                                         <span style = {{fontSize: 12, color: 'red'}}>{this.state.person_to_contact_phoneError}</span>
                                     </div>
-                                </div>
-                            </div>
-                        <div class="row">
-                            <div class="col-sm">
+                                </Col>
+                            </Row>
+                        <Row gutter= {16}>
+                            <Col span={12}>
                                 <div>
-                                    <label>Person to Contact Name</label>
-                                    <input class="form-control" type = "text" name = "person_to_contact_name" value = {person_to_contact_name} onChange = {this.handlePersontonameChange} required />
-                                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.person_to_contact_nameError}</span>
+                                    <Form.Item
+                                        name="password" rules={[{required: true, message: 'Please input your password!',},]}
+                                        hasFeedback
+                                    >
+                                    <Input.Password 
+                                    name = "password"
+                                    value = {password}
+                                    onChange = {this.handlePasswordChange}
+                                    prefix={<LockOutlined className="site-form-item-icon" />}
+                                    type="password"
+                                    placeholder="Password" />
+                                    </Form.Item>
+                                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.passwordError}</span>
                                 </div>
-                            </div>
-                        </div>
+                            </Col>
+                            <Col span = {12}>
+                                <div>
+                                    <Form.Item
+                                        name="confirm"
+                                        dependencies={['password']}
+                                        hasFeedback
+                                        rules={[
+                                        {
+                                            required: true,
+                                            message: 'Please confirm your password!',
+                                        },
+                                        ({ getFieldValue }) => ({
+                                            validator(rule, value) {
+                                            if (!value || getFieldValue('password') === value) {
+                                                return Promise.resolve();
+                                            }
+                                            return Promise.reject('The two passwords that you entered do not match!');
+                                            },
+                                        }),
+                                        ]}
+                                    >
+                                        <Input.Password
+                                        prefix={<LockOutlined className="site-form-item-icon" />}
+                                        placeholder =" Confirm Password" />
+                                    </Form.Item>
+                                </div>
+                            </Col>
+                        </Row>
                             <div>
-                                <input class="form-control btn btn-info" value = "Register" type = "submit" />
+                            <Form.Item className = "text-center">
+                    <Button size = 'large' onClick = {this.handleSubmit} fluid type="primary" htmlType="submit"
+                     className="login-form-button"  style = {{width: 235}}> {/*290*/}
+                    <LoginOutlined className="site-form-item-icon" />Sign Up
+                    </Button>
+                </Form.Item>
+                                {/* <input class="form-control btn btn-info" value = "Register" type = "submit" /> */}
                             </div>
-                        </form>
+                            </Form>
+                        {/* </form> */}
                         </div>
                         </div>
         );

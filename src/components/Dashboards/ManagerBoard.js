@@ -1,15 +1,22 @@
 import React, { Component } from 'react'
-import { Menu, Switch, Layout, Avatar, Breadcrumb } from 'antd'
+import { Menu, Switch, Layout, Avatar, Breadcrumb, Space, Typography } from 'antd'
 import Title from 'antd/lib/typography/Title'
-import patientImg from "../../assets/images/manager.png"
+import { Link, Route, BrowserRouter as Router } from 'react-router-dom'
+import managerImg from "../../assets/images/manager.png"
 import logo from "../../assets/images/logo.png"
-
+import Logout from './logout'
 import { HomeOutlined, SettingOutlined, IssuesCloseOutlined,
    MessageOutlined, LogoutOutlined, MedicineBoxOutlined,
    HistoryOutlined, UserOutlined } from '@ant-design/icons'
+import UserList from '../pages/UserList'
+import PatientList from '../pages/PatientList'
+import DoctorList from '../pages/DoctorList'
+import DoctorsReview from '../pages/DoctorRev'
 
+const user = localStorage.getItem('user')
 const SubMenu = Menu.SubMenu;
 const { Header, Footer, Content, Sider } = Layout;
+const { Text } = Typography;
 
 
 class ManagerBoard extends React.Component {
@@ -40,12 +47,17 @@ class ManagerBoard extends React.Component {
 
   render() {
     return (
-      <div>
+      <Router>
+        <div>
           <Layout>
             <Header
             style = {{padding: 9, background: '#34495E'}}>
-            <span style = {{float: 'right', color: 'red'}} >Sign Out <LogoutOutlined /></span>
-            <Avatar shape = "circle" size={50} style = {{float: 'right'}} src={ patientImg } />
+              <Space align="center" style = {{float: 'right'}}>
+                <Avatar shape = "circle" size={40}  src={ managerImg } />
+                <Text strong style = {{color: 'white'}}>{user}</Text>
+                <Logout />
+              </Space>
+            
             
             <Title style = {{color: 'white'}} level = {3}>
                 <img src = {logo} alt = 'Mediagnostic logo'
@@ -61,11 +73,11 @@ class ManagerBoard extends React.Component {
             />
             </Header>
             <Layout>
-            <Sider style = {{background: 'white'}}
+            <Sider theme={this.state.theme}
             trigger={null}
             collapsible
             collapsed={this.state.collapsed}
-            collapsedWidth = {10}
+            collapsedWidth = {0}
             >
         <Menu
               theme={this.state.theme}
@@ -76,13 +88,13 @@ class ManagerBoard extends React.Component {
               mode="inline"
             >
           {/* <SubMenu key="sub1" title={<span><MailOutlined /><span>Navigation One</span></span>}> */}
-            <Menu.Item key = '1'><HomeOutlined />Dashboard</Menu.Item>
-            <Menu.Item key="2"><MedicineBoxOutlined />Doctors</Menu.Item>
-            <Menu.Item key="3"><HistoryOutlined />Patients</Menu.Item>
-            <Menu.Item key="4"><IssuesCloseOutlined />Doctor Review</Menu.Item>
-            <Menu.Item key="5"><MessageOutlined />Live Chat</Menu.Item>
-            <Menu.Item key="5"><UserOutlined />Profil</Menu.Item>
-            <Menu.Item key="6"><SettingOutlined />Setting</Menu.Item>
+            <Menu.Item key = "1" ><HomeOutlined />Dashboard <Link to="/manager" /></Menu.Item>
+            <Menu.Item key = "2"><MedicineBoxOutlined />Doctors <Link to="/manager/doctors" /></Menu.Item>
+            <Menu.Item key = "3"><HistoryOutlined />Patients <Link to="/manager/patients" /></Menu.Item>
+            <Menu.Item key = "4"><IssuesCloseOutlined />Doctor Review <Link to="/manager/doctorsreview" /></Menu.Item>
+            <Menu.Item key = "5"><MessageOutlined />Live Chat <Link to="/manager/chat" /></Menu.Item>
+            <Menu.Item key = "6"><UserOutlined />Profil <Link to="/manager/profil" /></Menu.Item>
+            <Menu.Item key = "7"><SettingOutlined />Setting <Link to="/manager/setting" /></Menu.Item>
           {/* </SubMenu> */}
           {/* <SubMenu key="sub2" title={<span><AppstoreAddOutlined /><span>Navigtion Two</span></span>}>
             <Menu.Item key="5">Option 5</Menu.Item>
@@ -106,7 +118,19 @@ class ManagerBoard extends React.Component {
             <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
           </Breadcrumb>
           <div style = {{ background: '#fff', padding:24, minHeight: 580 }}>
-            Content
+            {/* Content: */}
+            <Route exact path="/manager" component={UserList} />
+            <Route path="/manager/doctors" component={DoctorList} />
+            <Route path="/manager/patients" component={PatientList} />
+            <Route exact path="/manager/doctorsreview" component={DoctorsReview} />
+            {/* <Route exact path="/manager/chat" component={Chat} />
+            <Route exact path="/manager/profil" component={Profil} />
+            <Route exact path="/manager/setting" component={Setting} /> */}
+            {/* <UserList />
+            <br />
+            <PatientList />
+            <br />
+            <DoctorList /> */}
             </div>
         </Content>
         <Footer style = {{ textAlign: 'center'}}>Copyright Sonfack.Z. All right reserved 2020</Footer>
@@ -114,6 +138,7 @@ class ManagerBoard extends React.Component {
       </Layout>
       </Layout>
       </div>
+      </Router>
     );
   }
 }

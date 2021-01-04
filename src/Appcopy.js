@@ -52,7 +52,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 // import {QuoteContext} from "./contexts/QuoteContext";
 // import QuotesList from "./components/QuotesList";
 import 'semantic-ui-css/semantic.min.css'
-import Home from  './components/pages/Home';
+import Home from  './components/Dashboards/Manager/UserList';
 import About from  './components/pages/About';
 import Contact from  './components/pages/Contact';
 import Register from './components/register/register';

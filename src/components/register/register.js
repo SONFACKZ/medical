@@ -1,45 +1,24 @@
 import React from "react";
-import Tab from '../Tab';
+import { Tabs } from 'antd';
 import TabNav from '../TabNav';
 import RegisterPatient from '../register/registerPatientPage';
 import RegisterDoctor from '../register/registerDoctorPage';
 
+const { TabPane } = Tabs;
 
-// const Register = () => {
     class Register extends React.Component {
-
-    constructor(props){
-    super(props);
-
-    this.state = {
-      selected: 'Patient Register'
-    }
-  }
-
-  setSelected = (tab) => {
-    this.setState({ selected: tab });
-  }
+      
   render()
   {
     return(
-        <>
-            {/* <Menu /> */}
-                <br></br>
-                <div className="container">
-                  
-                  <TabNav className = "base-container" tabs={['Patient Register', 'Doctor Register']} selected={ this.state.selected } setSelected={ this.setSelected }>
-                  <Tab isSelected={ this.state.selected === 'Patient Register'}>
-                  <RegisterPatient />
-                  </Tab>
-
-                  <Tab isSelected={ this.state.selected === 'Doctor Register'}>
-                  <RegisterDoctor />
-                  </Tab>
-
-                  </TabNav>
-                
-                </div>
-               </> 
+        <Tabs defaultActiveKey="1" centered>
+            <TabPane tab="Patient Register" key="1">
+            <RegisterPatient />
+            </TabPane>
+            <TabPane tab="Doctor Register" key="2">
+            <RegisterDoctor />
+            </TabPane>
+        </Tabs>
     );
   }
 };
