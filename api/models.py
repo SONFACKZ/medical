@@ -121,6 +121,10 @@ class PastHistory(db.Model):
     past_history_year = db.Column(db.Date, nullable=False)
     past_history_owner_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
+class Symptoms(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+
 db.create_all()
 
 
@@ -330,6 +334,30 @@ def updrole(public_id):
 
     return jsonify({'message': 'The user role has been updated!'})
 
+#Create Symptoms
+@app.route('/symptoms/create', methods=["POST"])
+def symptoms():
+    request_data = json.loads(request.data)
+    symptoms = Symptoms(name=request_data['name'])
+
+    db.session.add(symptoms)
+    db.session.commit()
+    
+    return {'201': 'Symptoms created successfully'}
+
+
+#Update Role
+@app.route('/symptom/update/<id>', methods = ['PUT'])
+def updsymptom(id):
+    sympt = Symptoms.query.filter_by(id=id).first()
+
+    if not sympt:
+        return jsonify({'message': 'No symptom found!'})
+    
+    sympt.name = "anosmia"
+    db.session.commit()
+
+    return jsonify({'message': 'Sypmtom has been updated!'})
 
 
 #create past history

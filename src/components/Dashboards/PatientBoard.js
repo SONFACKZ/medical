@@ -108,7 +108,7 @@ class PatientBoard extends React.Component {
 
             <Menu.Item key="5" icon = {<IssuesCloseOutlined />}>
               Case Reporting
-              <Link to = '/case-reporting' />
+              <Link to = '/patient/case-reporting' />
             </Menu.Item>
             
             <Menu.Item key="6" icon = {<MessageOutlined />}>

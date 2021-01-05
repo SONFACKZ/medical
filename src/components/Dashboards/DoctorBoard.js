@@ -84,12 +84,12 @@ class DoctorBoard extends React.Component {
             >
           {/* <SubMenu key="sub1" title={<span><MailOutlined /><span>Navigation One</span></span>}> */}
             <Menu.Item key = '1'><HomeOutlined />Dashboard</Menu.Item>
-            <Menu.Item key="2"><MedicineBoxOutlined />Consultation</Menu.Item>
-            <Menu.Item key="3"><HistoryOutlined />Past History</Menu.Item>
-            <Menu.Item key="4"><IssuesCloseOutlined />Case Reporting</Menu.Item>
-            <Menu.Item key="5"><MessageOutlined />Live Chat</Menu.Item>
-            <Menu.Item key="6"><UserOutlined />Profil</Menu.Item>
-            <Menu.Item key="7"><SettingOutlined />Setting</Menu.Item>
+            <Menu.Item key = "2"><MedicineBoxOutlined />Consultation</Menu.Item>
+            <Menu.Item key = "3"><HistoryOutlined />Past History</Menu.Item>
+            <Menu.Item key = "4"><IssuesCloseOutlined />Case Reporting</Menu.Item>
+            <Menu.Item key = "5"><MessageOutlined />Live Chat</Menu.Item>
+            <Menu.Item key = "6"><UserOutlined />Profil</Menu.Item>
+            <Menu.Item key = "7"><SettingOutlined />Setting</Menu.Item>
           {/* </SubMenu> */}
           {/* <SubMenu key="sub2" title={<span><AppstoreAddOutlined /><span>Navigtion Two</span></span>}>
             <Menu.Item key="5">Option 5</Menu.Item>

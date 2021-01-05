@@ -32,12 +32,12 @@ function App(){
       <PrivateRoute path="/manager" component={ManagerBoard} />
       <Route exact path = "/" component = {Login} />
       <Route exact path = "/login" component = {Login} />
-      <Route exact path = "/register" component = {Register} />
-      <Route exact path ="/patient" component = {PatientBoard} />
-      <Route exact path ="/doctor" component = {DoctorBoard} />
+      <Route path = "/register" component = {Register} />
+      <PrivateRoute path ="/patient" component = {PatientBoard} />
+      <PrivateRoute path ="/doctor" component = {DoctorBoard} />
       {/* <Route exact path ="/manager" component = {ManagerBoard} /> */}
-      <Route exact path ="/consultation" component = {ConsultationForm} />
-      <Route exact path ="/pasthistory" component = {PastHistory} />
+      {/* <Route exact path ="/consultation" component = {ConsultationForm} />
+      <Route exact path ="/pasthistory" component = {PastHistory} /> */}
       </Switch>
       </div>
       </QuoteContext.Provider>
