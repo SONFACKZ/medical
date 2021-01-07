@@ -146,7 +146,9 @@ class PatientBoard extends React.Component {
             <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
           </Breadcrumb>
           <div style = {{ background: '#fff', padding:24, minHeight: 580 }}>
-          <Route exact path="/patient" component={ConsultationForm} />
+          <Route exact path="/patient/consultation" component={ConsultationForm} />
+          <Route path="/patient/past-history" component={PastHistory} />
+
             {/* <Route path="/patient/" component={DoctorList} />
             <Route path="/patient/" component={PatientList} />
             <Route exact path="/patient/" component={DoctorsReview} /> */}

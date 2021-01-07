@@ -27,7 +27,6 @@ export default function AuthForm({history}) {
     const handleSubmit = e => {
         e.preventDefault();
 
-        
         axios.post( `auth/login`, authInfo)
             .then(res => {
                 // console.log(res)
@@ -38,36 +37,22 @@ export default function AuthForm({history}) {
                     localStorage.setItem('status', res.data.status)
                     if (res.data.role_id === 1 && res.data.status === true)
                     {
-                        // console.log('logged success')
-                        // return (<Alert message="Success Tips" type="success" showIcon />);
-                        // alert('success');
                         message.success(res.data.message, 5);
-                    //    render(<Alert
-                    //     message={res.data.message}
-                    //     description="Detailed description and advice about successful copywriting."
-                    //     type="success"
-                    //     timer = '5'
-                    //     showIcon
-                    //   />)
                         history.push('/manager')
                     }
                     else if(res.data.role_id === 2 && res.data.status === true)
                     {
-                        // console.log('logged success')
                         message.success(res.data.message, 5);
                         history.push('/doctor')
                     }
                     else if(res.data.role_id === 3 && res.data.status === true)
                     {
-                        // console.log('logged success')
                         message.success(res.data.message, 5);
                         history.push('/patient')
                     }
                     else
                     {
-                        // return (<Alert message="Your account is not active contact adminstrator" type="warning" showIcon />);
                         message.warning(res.data.war_message, 3);
-                        // console.log('Your account is not active contact adminstrator')
                     }
             })
             .catch(err => {message.error('incorrect email or password', 5)});
@@ -89,38 +74,12 @@ export default function AuthForm({history}) {
                     <div className="text-center bg-login">
                         <img className = 'image' alt = "logo" src={logo} />
                     </div><br/>
-                {/* <Form>
-                    <div>
-                        <Form.Input iconPosition='left'
-                        placeholder='Email' label = "Email"
-                        icon = 'mail'
-                        required />
-                    </div><br />
-                    <div>
-                        <Form.Input iconPosition='left'
-                        placeholder='Password' label = "Password"
-                        icon = 'lock'
-                        required />
-                    </div><br />
-                    <div>
-                        <button type="submit" name="login-button" class="ui blue submit button">
-                        <i class="sign in icon"></i>
-                            Sign In
-                        </button>
-                        </div>
-                        {/* <div class="ui left icon input">
-                        <input type = "submit" 
-                        class = "text-center form-control btn btn-info"
-                        value = 'Sign In' />
-                        <i class="unlock icon"></i>
-                        </div> */}
-                {/* </Form> */} 
         <Form
             name="normal_login"
             className="login-form"
             initialValues={{ remember: true }}
             onFinish={onFinish}
-            >
+        >
                 <Form.Item
                 name = "email"
                 value={authInfo.email}
@@ -164,15 +123,9 @@ export default function AuthForm({history}) {
                     <LoginOutlined className="site-form-item-icon" />Sign In
                     </Button>
                 </Form.Item>
-            </Form>
+        </Form>
                 <div className = 'text-center'><br />Don't have an account?
                 <Link to="/register"> Sign Up </Link>
-                        {/* <Alert
-                            message="Successful Logged"
-                            description="Dashboard redirection ..."
-                            type="success"
-                            showIcon
-                          /> */}
                 </div>
                 </div>
             </div>

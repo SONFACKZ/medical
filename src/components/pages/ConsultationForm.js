@@ -1,84 +1,94 @@
-import React, { Component } from 'react'
-import { Form, Input, Button, Space, Select } from 'antd'
-import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import React, { Component, useState, useEffect } from 'react'
+import { Form, Button, Select } from 'antd'
+// import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
+import axiosWithAuth from "../../utils/axiosWithAuth"
+import { message, Alert, Row, Col } from 'antd'
+import { LoadingOutlined } from '@ant-design/icons'
 
-const onFinish = values => {
-    console.log('Received values of form:', values);
-  };
-
-  const { Option } = Select;
-
-  const children = [];
-for (let i = 10; i < 36; i++) {
-  children.push(<Option key={i.toString(36) + i}>{i.toString(36) + i}</Option>);
-}
 
 function handleChange(value) {
   console.log(`Selected: ${value}`);
 }
 
+class ConsultationForm extends Component {
+  state = {
+    Symptoms: [],
+    name: this.props.name,
+    buttonLoading: false,
+  }
 
-export class ConsultationForm extends Component {
+
+  // state = {
+  //   name: this.props.name,
+  //   buttonLoading: false,
+  // }
+
+  handleFormSubmit = event => {
+    event.preventDefault();
+    const name = event.target.elements.name.value;
+    this.setState({buttonLoading: true});
+  }
+
+  componentDidMount(){
+    axiosWithAuth().get('/symptoms')
+    .then(response => {
+      console.log(response.data.symptoms)
+      this.setState({
+        Symptoms: response.data.symptoms
+      })
+    })
+    .catch(error => {
+      console.log(error)
+    })
+
+    axiosWithAuth().post('/symptoms')
+  }
+
     render() {
+      const { Option } = Select;
+      let symptoms = this.state.Symptoms;
+      let symptomsItems = symptoms.map((symptom) =>
+      <Option value = {symptom.symptom_name} key = {symptom.symptom_name}>{symptom.symptom_name}</Option>
+          // symptomsItems.push(<Option key = {symptom.symptom_name}>{symptom.symptom_name}</Option>)
+            );
         return (
-            <div>
-                 <Form name="dynamic_form_nest_item" onFinish={onFinish} autoComplete="off">
-      <Form.List name="symptoms">
-        {(fields, { add, remove }) => (
-          <>
-            {fields.map(field => (
-              <Space key={field.key} style={{ display: 'flex', marginBottom: 8 }} align="baseline">
-                <Form.Item
-                  {...field}
-                  name={[field.name, 'symptom']}
-                  fieldKey={[field.fieldKey, 'symptom']}
-                  rules={[{ required: true, message: 'Missing symptom name' }]}
-                >
-                  <Input placeholder="Symptom Name" />
+            <div className = "text-center">
+              <Form onSubmit={(event) => this.handleFormSubmit(event)}>
+              <Row gutter= {16} justify = "center">
+              <Col span={16}>
+              <Form.Item>
+              <Select
+                mode="multiple"
+                size='large'
+                name = 'name'
+                placeholder="Please search or select your symptoms"
+                allowClear
+                // defaultValue={['a10', 'c12']}
+                onChange={handleChange}
+                style={{ width: '100%' }}
+              >
+              {symptomsItems}
+              </Select>
+              </Form.Item>
+              </Col>
+            </Row>
+            <Row gutter= {10} justify = "center">
+            <Col span={5}>
+                <Form.Item className = "text-center">
+                    <Button fluid type="primary" htmlType="submit" loading={this.state.buttonLoading}
+                     className="login-form-button"  style = {{width: '100%'}}>
+                    {/* <LoginOutlined className="site-form-item-icon" /> */}
+                    {/* <LoadingOutlined /> */}
+                    Predict
+                    </Button>
                 </Form.Item>
-                {/* <Form.Item
-                  {...field}
-                  name={[field.name, 'last']}
-                  fieldKey={[field.fieldKey, 'last']}
-                  rules={[{ required: true, message: 'Missing last name' }]}
-                >
-                  <Input placeholder="Last Name" />
-                </Form.Item> */}
-                <MinusCircleOutlined onClick={() => remove(field.name)} />
-              </Space>
-            ))}
-            <Form.Item>
-              <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
-                Add field
-              </Button>
-            </Form.Item>
-          </>
-        )}
-      </Form.List>
-      <Form.Item>
-        <Button type="primary" htmlType="submit">
-          Submit
-        </Button>
-      </Form.Item>
-    </Form>
-
-
-
-
-
-    <Select
-        mode="multiple"
-        size='large'
-        placeholder="Please select your symptoms"
-        defaultValue={['a10', 'c12']}
-        onChange={handleChange}
-        style={{ width: '100%' }}
-      >
-        {children}
-      </Select>
+                </Col>
+                </Row>
+              </Form>
+              
             </div>
         )
-    }
-}
+        }
+      }
 
 export default ConsultationForm

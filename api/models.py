@@ -12,6 +12,7 @@ from flask_login import UserMixin, LoginManager, login_user, current_user, logou
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
 from functools import wraps
+import pandas as pd
 # from flask_httpauth import HTTPBasicAuth
 
 # from forms import RegistrationForm, LoginForm
@@ -188,7 +189,7 @@ def user_serializer(users):
     }
 
 @app.route('/users', methods=['GET'])
-@jwt_required
+# @jwt_required
 def get_all_users():
     # print("header", request.headers)
     # current_user = get_jwt_identity()
@@ -525,6 +526,49 @@ def delete_user(public_id):
     return jsonify({'message': 'User has been deleted'})
 
 
+def symp_serializer(symptoms):
+    return{
+        symptoms
+        # 'name': sypmtoms.user_id,
+        # 'public_id': sypmtoms.public_id,
+        # 'fullname': sypmtoms.fullname,
+        # 'occupation': sypmtoms.occupation,
+        # 'residence': sypmtoms.residence,
+        # 'email': sypmtoms.email,
+        # 'role_id': sypmtoms.role_id,
+        # 'status': sypmtoms.status
+    }
+
+@app.route('/symptoms', methods=['GET'])
+def get_symptoms():
+    data = pd.read_csv('DataSetSymptoms.csv')
+    # symptoms = data.iloc[1:0]
+    # symptoms = data.iloc[2:1]
+    df = pd.DataFrame(data)
+    cols = df.columns
+    cols = cols[1:] #Removing the first column name "Disease"
+    output = []
+    print(cols)
+    for sym in cols:
+        symp_data = {}
+        symp_data['symptom_name'] = sym
+        output.append(symp_data)
+    return jsonify({"symptoms": output})
+    # return jsonify([*map(symp_serializer, symptoms)])
+
+ # users = User.query.all()
+    # # print('xdg', users)
+    # output = []
+
+    # for user in users:
+    #     user_data = {}
+    #     user_data['public_id'] = user.public_id
+    #     user_data['fullname'] = user.fullname
+    #     user_data['password'] = user.password
+    #     user_data['occupation'] = user.occupation
+    #     output.append(user_data)
+    # # print('output', output)
+    # return jsonify({'users': output})
 
 if __name__ ==  '__main__':
     # db.create_all()
