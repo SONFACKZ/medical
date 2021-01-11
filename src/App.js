@@ -6,13 +6,16 @@ import Login from './components/login/login'
 import Register from './components/register/register';
 import ConsultationForm from  './components/pages/ConsultationForm'
 import {Route, BrowserRouter as Router, Switch} from "react-router-dom"
+import NotFound from './components/pages/NotFound';
 import PatientBoard from './components/Dashboards/PatientBoard'
 import DoctorBoard from './components/Dashboards/DoctorBoard'
 import ManagerBoard from './components/Dashboards/ManagerBoard'
 import PastHistory from './components/pages/PastHistory'
 import {QuoteContext} from "./contexts/QuoteContext"
 import QuotesList from "./components/QuotesList"
-import PrivateRoute from "./utils/PrivateRoute";
+import PrivateRoute from "./utils/PrivateRoute"
+// import { message } from 'antd'
+
 // import UserList from './components/Dashboards/UserList';
 // import CheckRole from './components/RoleChecking'
 
@@ -22,6 +25,10 @@ function App(){
 
   const [quotes, setQuotes] = useState([]);
   const [loggedIn, setLoggedIn] = useState(localStorage.getItem("token") ? true : false);
+  // if(!localStorage.getItem('token'))
+  // {
+    
+  // }
 
   return(
 
@@ -29,12 +36,13 @@ function App(){
       <QuoteContext.Provider value={{quotes, setQuotes, loggedIn, setLoggedIn}}>
       <div className='App'>
       <Switch>
-      <PrivateRoute path="/manager" component={ManagerBoard} />
       <Route exact path = "/" component = {Login} />
       <Route exact path = "/login" component = {Login} />
       <Route path = "/register" component = {Register} />
+      <PrivateRoute path="/manager" component={ManagerBoard} />
       <PrivateRoute path ="/patient" component = {PatientBoard} />
       <PrivateRoute path ="/doctor" component = {DoctorBoard} />
+      <Route component = {NotFound} />
       {/* <Route exact path ="/manager" component = {ManagerBoard} /> */}
       {/* <Route exact path ="/consultation" component = {ConsultationForm} />
       <Route exact path ="/pasthistory" component = {PastHistory} /> */}

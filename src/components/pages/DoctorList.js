@@ -122,7 +122,9 @@ const columns = [
             <div className = "py-4">
                 <h1 style = {{textAlign: 'center'}}>List of Doctors</h1>
 
-                <Table columns = {columns} dataSource = {users} scroll={{ x: 1500, y: 300 }} />
+                <Table columns = {columns} dataSource = {users}
+                scroll={{ x: 1500, y: 300 }} 
+                rowClassName={(record, index) => index % 2 === 0 ? 'table-row-light' :  'table-row-dark'}/>
 
                 <Modal visible = {modalEdit}
                 title = 'Edit User'

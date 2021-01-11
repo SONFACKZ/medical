@@ -2,12 +2,12 @@ from flask import Flask, jsonify, g, abort, json, make_response, render_template
 from flask_sqlalchemy import SQLAlchemy
 import uuid
 from flask_jwt_extended import (
-    JWTManager, jwt_required, create_access_token,
-    get_jwt_identity
-)
-# from flask_jwt import JWT, jwt_required
+    JWTManager, jwt_required, create_access_token, get_jwt_identity)
+
+from flask_socketio import SocketIO, send
+
 import jwt
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from flask_login import UserMixin, LoginManager, login_user, current_user, logout_user
 from flask_migrate import Migrate
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -33,8 +33,9 @@ ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 db = SQLAlchemy(app)
 tok = JWTManager(app)
-# auth = HTTPBasicAuth()
 
+#Initialization of Flask-SocketIo
+socketio = SocketIO(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -96,7 +97,7 @@ class Consultation(db.Model):
     result1 = db.Column(db.String(255), nullable=False)
     result2 = db.Column(db.String(255), nullable=False)
     result3 = db.Column(db.String(255), nullable=False)
-    other_observation = db.Column(db.Text, nullable=False)
+    other_observation = db.Column(db.Text)
     syptoms = db.Column(db.String(255), nullable=False)
     consultation_owner_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
@@ -118,7 +119,7 @@ class ReportCase(db.Model):
 class PastHistory(db.Model):
     past_history_id = db.Column(db.Integer, primary_key=True)
     past_history_type = db.Column(db.String(255), nullable=False)
-    past_history_particular_observation = db.Column(db.String(255), nullable=False)
+    past_history_particular_observation = db.Column(db.String(255))
     past_history_year = db.Column(db.Date, nullable=False)
     past_history_owner_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
@@ -176,30 +177,52 @@ def pro():
 
 # User.query.join(Role, role.id == User.user_id).filter(Role, role_id == self.id)
 
-def user_serializer(users):
+# #USers
+def user_serializer(usersall):
+    # for users, roles in users:
     return{
-        'user_id': users.user_id,
-        'public_id': users.public_id,
-        'fullname': users.fullname,
-        'occupation': users.occupation,
-        'residence': users.residence,
-        'email': users.email,
-        'role_id': users.role_id,
-        'status': users.status
-    }
+    'user_id': usersall.User.user_id,
+    'public_id': usersall.User.public_id,
+    'fullname': usersall.User.fullname,
+    'occupation': usersall.User.occupation,
+    'residence': usersall.User.residence,
+    'email': usersall.User.email,
+    'role_id': usersall.User.role_id,
+    'status': usersall.User.status,
+    'role': usersall.Role.name,
+    # 'role': Role.query.filter_by(id=users.role_id)
+}
 
 @app.route('/users', methods=['GET'])
-# @jwt_required
+@jwt_required
 def get_all_users():
-    # print("header", request.headers)
-    # current_user = get_jwt_identity()
-    # print(current_user)
-    users = User.query.all()
+    usersall = db.session.query(User, Role).join(Role).all()
+    # users = User.query.all()
+    return jsonify([*map(user_serializer, usersall)])
+
+# @app.route('/users', methods=['GET'])
+# # @jwt_required
+# def get_all_users():
+#     usersall = db.session.query(User, Role).join(Role).all()
+#     output = []
+#     for users, roles in usersall:
+#         user_data = {}
+#         # user_role = {}
+#         user_data['user_id'] = users.user_id
+#         user_data['public_id'] = users.public_id
+#         user_data['fullname'] = users.fullname
+#         user_data['occupation'] = users.occupation
+#         user_data['residence'] = users.residence
+#         user_data['email'] = users.email
+#         user_data['role_id'] = users.role_id
+#         user_data['status'] = users.status
+#         user_data['role'] = roles.name
+#         output.append(user_data)
+#     # print('output', output)
+#     return jsonify({'users': output})
     
-    # role  = Role.query.filter_by(id=users.role_id)
 
-    return jsonify([*map(user_serializer, users)])
-
+#Patient
 def patient_serializer(patient):
     return{
         'user_id': patient.user_id,
@@ -218,6 +241,49 @@ def get_all_patients():
     patients = User.query.filter_by(role_id = 3)
     return jsonify([*map(patient_serializer, patients)])
 
+
+#Consultation
+@app.route('/create/consultation', methods=['GET', 'POST'])
+@jwt_required
+def create_consultation():
+    request_data = json.loads(request.data)
+    dat = date.today().strftime('%Y-%m-%d')
+    da = datetime.strptime(dat, '%Y-%m-%d')
+    user = User.query.filter_by(email=get_jwt_identity()).first() # Filter DB by token (email)
+    owner = user.user_id #assign the the user_id to owner variable
+    consultation = Consultation(consultation_date=da,
+                                result1='jfkszjckdsuzhcsiocjhsdio',
+                                result2='result2azerty',
+                                result3='result3',
+                                syptoms='result1, result2, result3',
+                                other_observation='cdghcvhgvuyjgvuy',
+                                consultation_owner_id=owner
+                                )
+    db.session.add(consultation)
+    db.session.commit()
+    
+    return {'201': 'Consultation created successfully'}
+
+def consultation_serializer(consult):
+    return{
+        'consultation_id': consult.consultation_id,
+        'consultation_date': consult.consultation_date,
+        'result1': consult.result1,
+        'result2': consult.result2,
+        'result3': consult.result3,
+        'other_observation': consult.other_observation,
+        'symptoms': consult.syptoms,
+        'consultation_owner_id': consult.consultation_owner_id,
+    }
+
+@app.route('/consultations/user', methods = ['GET'])
+@jwt_required
+def get_use_consultation():
+    user = User.query.filter_by(email=get_jwt_identity()).first() # Filter DB by token (email)
+    consultations = Consultation.query.filter_by(consultation_owner_id = user.user_id)
+    return jsonify([*map(consultation_serializer, consultations)])
+
+#Doctors
 def doctor_serializer(doctor):
     return{
         'user_id': doctor.user_id,
@@ -227,7 +293,8 @@ def doctor_serializer(doctor):
         'residence': doctor.residence,
         'email': doctor.email,
         'role_id': doctor.role_id,
-        'status': doctor.status
+        'status': doctor.status,
+        'pending': 'Pending ...'
     }
 
 @app.route('/users/doctors', methods = ['GET'])
@@ -240,7 +307,7 @@ def get_all_doctors():
 @app.route('/users/doctors/rev', methods = ['GET'])
 @jwt_required
 def get_inactive_doctors():
-    doctors = User.query.filter_by(status == 0)
+    doctors = User.query.filter_by(status = False)
     return jsonify([*map(doctor_serializer, doctors)])
 
 
@@ -267,12 +334,34 @@ def get_inactive_doctors():
 
 
 #User Profil
-# @app.route('/user/<public_id>')
-# def user(username):
-# user = User.query.filter_by(public_id = public_id).first()
-# if user is None:
-# abort(404)
-# return jsonify({'message': 'This user does not exist!'})
+def profile_serializer(profile):
+    return{
+        'name': profile.User.fullname,
+        'email': profile.User.email,
+        'sex': profile.User.sex,
+        'occupation': profile.User.occupation,
+        'residence': profile.User.residence,
+        'contact_phone': profile.User.contact_phone,
+        'blood_group': profile.User.blood_group,
+        'marital_status': profile.User.marital_status,
+        'date_birth': profile.User.date_birth,
+        'person_to_contact_name': profile.User.person_to_contact_name,
+        'person_to_contact_phone': profile.User.person_to_contact_phone,
+        'role_id': profile.User.role_id,
+        'status': profile.User.status,
+        'role': profile.Role.name
+    }
+@app.route('/user/<email>/profile', methods = ['GET'])
+@jwt_required
+def user_profile(email):
+    user = db.session.query(User, Role).join(Role).filter(User.email==get_jwt_identity(), User.role_id==Role.id)
+    # user = User.query.filter_by(email=get_jwt_identity())# Filter DB by token (email)
+    # print(user)
+    if user is None:
+        abort(404)
+        return jsonify({'message': 'This user does not exist!'})
+    else:
+        return jsonify([*map(profile_serializer, user)])
 
 
 # #User Profil Edit
@@ -293,22 +382,39 @@ def get_inactive_doctors():
 # return render_template('edit_profile.html', form=form)
 
 
-#Get individual user
-@app.route('/users/<public_id>', methods=['GET'])
-def get_one_user(public_id):
+# #Get and Edit individual user
 
-    user = User.query.filter_by(public_id=public_id).first()
+# def user_update_serializer(useredit):
+#     return{
+#     'public_id':
+#     'fullname':
+#     'occupation':
+#     'email': useredit.email,
+#     'sex': useredit.sex,
+#     'passord': 
+#     'residence': useredit.residence,
+#     'contact_phone': useredit.contact_phone,
+#     'blood_group': useredit.blood_group,
+#     'marital_status': useredit.marital_status,
+#     'date_birth': useredit.date_birth,
+#     'person_to_contact_name': useredit.person_to_contact_name,
+#     'person_to_contact_phone': useredit.person_to_contact_phone,
+#     'status': useredit.status,
+#     }
 
-    if not user:
-        return jsonify({'message': 'No user found!'})
+# @app.route('/users/<public_id>', methods=['GET', 'POST'])
+# @jwt_required
+# def get_one_user(public_id):
 
-    user_data = {}
-    user_data['public_id'] = user.public_id
-    user_data['fullname'] = user.fullname
-    user_data['password'] = user.password
-    user_data['occupation'] = user.occupation
+#     user = User.query.filter_by(public_id=public_id).first()
 
-    return jsonify({'user': user_data})
+#     if not user:
+#         return jsonify({'message': 'No user found!'})
+#     user_data = {}
+#     user_data['public_id'] = user.public_id
+#     user_data['fullname'] = user.fullname
+#     user_data['occupation'] = user.occupation
+#     return jsonify({'user': user_data})
 
 
 #Create Role
@@ -330,7 +436,7 @@ def updrole(public_id):
     if not user:
         return jsonify({'message': 'No user found!'})
     
-    user.role_id = 3
+    user.role_id = 1
     db.session.commit()
 
     return jsonify({'message': 'The user role has been updated!'})
@@ -363,17 +469,37 @@ def updsymptom(id):
 
 #create past history
 @app.route('/pasthistory/add', methods=['POST'])
+@jwt_required
 def history():
     data = request.get_json()
-    new_history = PastHistory(past_history_type=data['past_history_type'],
-                          past_history_particular_observation=data['past_history_particular_observation'],
-                          past_history_year=data['past_history_year'],
-                          past_history_owner_id=2)
+    dat = date.today().strftime('%Y-%m-%d')
+    da = datetime.strptime(dat, '%Y-%m-%d')
+    user = User.query.filter_by(email=get_jwt_identity()).first() # Filter DB by token (email)
+    owner = user.user_id #assign the the user_id to owner variable
+    new_history = PastHistory(past_history_type='Allergy',
+                          past_history_particular_observation='Allergy past history particular observation',
+                        #   past_history_particular_observation=data['past_history_particular_observation'],
+                          past_history_year=da,
+                          past_history_owner_id=owner)
     
     db.session.add(new_history)
     db.session.commit()
     return jsonify({'message': 'Your Past History has been created successfully!'})
 
+def pasthistory_serializer(history):
+    return{
+        'pasthistory_id': history.past_history_id,
+        'pasthistory_date': history.past_history_year,
+        'pasthistory_observation': history.past_history_particular_observation,
+        'pasthistory_type': history.past_history_type
+    }
+
+@app.route('/pasthistory/user', methods = ['GET'])
+@jwt_required
+def get_user_pasthistory():
+    user = User.query.filter_by(email=get_jwt_identity()).first() # Filter DB by token (email)
+    pasthistory = PastHistory.query.filter_by(past_history_owner_id = user.user_id)
+    return jsonify([*map(pasthistory_serializer, pasthistory)])
 
 #     db.session.add(history)
 #     db.session.commit()
@@ -467,9 +593,15 @@ def login():
 
     user = User.query.filter_by(email=username).first()
     user_data = {}
+    user_data['email'] = user.email
     user_data['fullname'] = user.fullname
     user_data['role_id'] = user.role_id
     user_data['status'] = user.status
+    user_data['role_id'] = user.role_id
+
+    r = Role.query.filter_by(id=user.role_id).first()
+    # roles = Roles.query.filter_by(id = user_data['role_id'])
+    role_data = r.name
 
     if user_data['status'] == 0:
         return({"war_message": "Your account is not active contact adminstrator !"})
@@ -477,23 +609,24 @@ def login():
     # Identity can be any data that is json serializable
         access_token = create_access_token(identity=username)
         return jsonify({
-            'message': 'Successful login, Welcome !', 
+            'message': 'Logged In Successfully, Welcome '+ user_data['fullname']+ ' !', 
             'token': access_token, 
             'user': user_data['fullname'],
             'role_id': user_data['role_id'],
+            'email': user_data['email'],
+            'role_name': role_data,
             'status': user_data['status']
         })
 
 
-@app.route('/auth/logout')
+@app.route('/auth/logout', methods = ['GET'])
 @jwt_required
 def logout():
     logout_user()
     return {"success": 200}
 
 
-
-#Update single record
+#Update single user status
 @app.route('/user/status/<public_id>', methods=['PUT'])
 def promote_user(public_id):
     user = User.query.filter_by(public_id=public_id).first()
@@ -504,16 +637,16 @@ def promote_user(public_id):
     if user.status == 1:
         user.status = False
         db.session.commit()
-        return jsonify({'message': 'The user status updated from Active to Inactive'})
+        return jsonify({'message': 'The user status has been updated from Active to Inactive'})
     else:
         user.status = True
         db.session.commit()
-        return jsonify({'message': 'The user status updated from Inactive to Active'})
+        return jsonify({'message': 'The user status has been updated from Inactive to Active'})
 
     # return jsonify({'message': 'The user status has been updated!'})
 
 
-#Deleting record
+#Deleting user
 @app.route('/user/<public_id>', methods=['DELETE'])
 def delete_user(public_id):
     user = User.query.filter_by(public_id=public_id).first()
@@ -525,51 +658,36 @@ def delete_user(public_id):
     db.session.commit()
     return jsonify({'message': 'User has been deleted'})
 
-
-def symp_serializer(symptoms):
-    return{
-        symptoms
-        # 'name': sypmtoms.user_id,
-        # 'public_id': sypmtoms.public_id,
-        # 'fullname': sypmtoms.fullname,
-        # 'occupation': sypmtoms.occupation,
-        # 'residence': sypmtoms.residence,
-        # 'email': sypmtoms.email,
-        # 'role_id': sypmtoms.role_id,
-        # 'status': sypmtoms.status
-    }
-
 @app.route('/symptoms', methods=['GET'])
 def get_symptoms():
     data = pd.read_csv('DataSetSymptoms.csv')
-    # symptoms = data.iloc[1:0]
-    # symptoms = data.iloc[2:1]
     df = pd.DataFrame(data)
     cols = df.columns
     cols = cols[1:] #Removing the first column name "Disease"
     output = []
-    print(cols)
+    # print(cols)
     for sym in cols:
         symp_data = {}
         symp_data['symptom_name'] = sym
         output.append(symp_data)
     return jsonify({"symptoms": output})
-    # return jsonify([*map(symp_serializer, symptoms)])
 
- # users = User.query.all()
-    # # print('xdg', users)
-    # output = []
 
-    # for user in users:
-    #     user_data = {}
-    #     user_data['public_id'] = user.public_id
-    #     user_data['fullname'] = user.fullname
-    #     user_data['password'] = user.password
-    #     user_data['occupation'] = user.occupation
-    #     output.append(user_data)
-    # # print('output', output)
-    # return jsonify({'users': output})
+# @app.route('chat', methods = ['GET', 'POST'])
+# def chat():
+#     if not current_user.is_authenticate:
+#         flsh('Pleade login.', 'danger')
+#         return redirect(url_for('login'))
+#     return "Chat with me"
+
+
+# #Socket decorator
+# @socketio.on('message')
+# def message(data):
+#     print(f"\n\n{data}\n\n"
+#     send(data)
 
 if __name__ ==  '__main__':
     # db.create_all()
     app.run(debug=True)
+    # socketio.run(app, debug=True)

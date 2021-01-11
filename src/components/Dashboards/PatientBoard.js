@@ -8,8 +8,11 @@ import { HomeOutlined, SettingOutlined, IssuesCloseOutlined,
          MessageOutlined, LogoutOutlined, MedicineBoxOutlined,
          HistoryOutlined, UserOutlined } from '@ant-design/icons'
 import ConsultationForm from '../pages/ConsultationForm'
+import ConsultationList from '../pages/ConsultationList'
 import { Link, Route, BrowserRouter as Router } from 'react-router-dom'
 import PastHistory from '../pages/PastHistory'
+import Profile from '../pages/Profile'
+import { message } from 'antd'
 // import Logout from './logout'
 
 // const SubMenu = Menu.SubMenu;
@@ -18,6 +21,10 @@ const SubMenu = Menu.SubMenu;
 const { Header, Footer, Content, Sider } = Layout;
 const { Text } = Typography;
 
+// if(localStorage.getItem('token') && localStorage.getItem('role_id') != 3)
+// {
+//   message.error('You do not have authorization, you are not a patient', 5);
+// }
 
 class PatientBoard extends React.Component {
 
@@ -90,7 +97,7 @@ class PatientBoard extends React.Component {
               selectedKeys={[this.state.current]}
               mode="inline"
             >
-          {/* <SubMenu key="sub1" title={<span><MailOutlined /><span>Navigation One</span></span>}> */}
+
             <Menu.Item key = '1' icon = {<HomeOutlined />}>
               Dashboard
               <Link to = '/patient' />
@@ -106,38 +113,23 @@ class PatientBoard extends React.Component {
               <Link to = '/patient/past-history' />
             </Menu.Item>
 
-            <Menu.Item key="5" icon = {<IssuesCloseOutlined />}>
+            <Menu.Item key="4" icon = {<IssuesCloseOutlined />}>
               Case Reporting
               <Link to = '/patient/case-reporting' />
             </Menu.Item>
             
-            <Menu.Item key="6" icon = {<MessageOutlined />}>
+            <Menu.Item key="5" icon = {<MessageOutlined />}>
               Live Chat
               <Link to = '/patient/chat' />
             </Menu.Item>
-            <Menu.Item key="7" icon = {<UserOutlined />}>
-              Profil
-              <Link to = '/patient/profil' />
+            <Menu.Item key="6" icon = {<UserOutlined />}>
+              Profile
+              <Link to = '/patient/profile' />
             </Menu.Item>
-            <Menu.Item key="/8" icon = {<SettingOutlined />}>
+            <Menu.Item key="/7" icon = {<SettingOutlined />}>
               Setting
               <Link to = '/patient/setting' />
             </Menu.Item>
-          {/* </SubMenu> */}
-          {/* <SubMenu key="sub2" title={<span><AppstoreAddOutlined /><span>Navigtion Two</span></span>}>
-            <Menu.Item key="5">Option 5</Menu.Item>
-            <Menu.Item key="6">Option 6</Menu.Item>
-            <SubMenu key="sub3" title="Submenu">
-              <Menu.Item key="7">Option 7</Menu.Item>
-              <Menu.Item key="8">Option 8</Menu.Item>
-            </SubMenu>
-          </SubMenu>
-          <SubMenu key="sub4" title={<span><SettingOutlined /><span>Navigation Three</span></span>}>
-            <Menu.Item key="9">Option 9</Menu.Item>
-            <Menu.Item key="10">Option 10</Menu.Item>
-            <Menu.Item key="11">Option 11</Menu.Item>
-            <Menu.Item key="12">Option 12</Menu.Item>
-          </SubMenu> */}
         </Menu>
         </Sider>
         <Layout>
@@ -146,12 +138,11 @@ class PatientBoard extends React.Component {
             <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
           </Breadcrumb>
           <div style = {{ background: '#fff', padding:24, minHeight: 580 }}>
-          <Route exact path="/patient/consultation" component={ConsultationForm} />
+          <Route exact path="/patient" component={ConsultationList} />
+          <Route path="/patient/consultation" component={ConsultationForm} />
           <Route path="/patient/past-history" component={PastHistory} />
+          <Route path="/patient/profile" component={Profile} />
 
-            {/* <Route path="/patient/" component={DoctorList} />
-            <Route path="/patient/" component={PatientList} />
-            <Route exact path="/patient/" component={DoctorsReview} /> */}
             </div>
         </Content>
         <Footer style = {{ textAlign: 'center'}}>Copyright Sonfack.Z. All right reserved 2020</Footer>

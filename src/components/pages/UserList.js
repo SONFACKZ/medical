@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from "react"
 // import axios from "axios"
-import { Link } from 'react-router-dom'
+import { Route, Redirect } from 'react-router-dom'
+import { message } from 'antd'
+// import { Link } from 'react-router-dom'
 import axiosWithAuth from "../../utils/axiosWithAuth"
 import { EditOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons'
 import {Table, Button, Modal, Input, Form, Checkbox, Tag } from 'antd'
@@ -26,9 +28,14 @@ const UserList = () => {
         await axiosWithAuth().get('/users')
         .then(response=>{
             setUser(response.data);
-            console.log(response.data);
+            // console.log(response.data);
         }).catch(error=>{
-            console.log(error);
+            // if(!localStorage.getItem('token') || error.response.status === 401)
+            // {
+            //   message.error('You are not authenticated, authenticate first', 5);
+            // }
+            return <Redirect to='/login' />
+            // console.log(error);
         })
         // const result = await axiosWithAuth().get('/users');
         // setUser(result.data);
@@ -87,9 +94,9 @@ const columns = [
     },
     {
     title: 'Role',
-    dataIndex: 'role_id',
+    dataIndex: 'role',
     align: 'center',
-    key: 'role_id'
+    key: 'role'
     },
     {
     title: 'Status',
@@ -122,7 +129,10 @@ const columns = [
             <div className = "py-4">
                 <h1 style = {{textAlign: 'center'}}>User List</h1>
 
-                <Table columns = {columns} dataSource = {users} scroll={{ x: 1500, y: 300 }} />
+                <Table columns = {columns} 
+                    dataSource = {users} scroll={{ x: 1500, y: 300 }}
+                    rowClassName={(record, index) => index % 2 === 0 ? 'table-row-light' :  'table-row-dark'}
+                />
 
                 <Modal visible = {modalEdit}
                 title = 'Edit User'

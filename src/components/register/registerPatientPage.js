@@ -4,7 +4,7 @@ import patientImg from "../../assets/images/patient.png"
 import { Form, Input, Button, Checkbox, Select, Row, Col, DatePicker, message} from 'antd'
 import { MailOutlined, UserOutlined, LockOutlined, 
         LoginOutlined, QuestionCircleOutlined, HomeOutlined } from '@ant-design/icons'
-
+import {Link} from "react-router-dom"
 
 
 const initialState = {
@@ -191,12 +191,12 @@ class RegisterPatient extends React.Component {
                 password, person_to_contact_phone, person_to_contact_name } = this.state
         return (
             // style={{ background: '#ECECEC', padding: '30px' }}
-            <div className="base-container" style={{ padding: '30px' }}>
+            <div className="base-container" style={{background: '#ECECEC', padding: '60px' }}>
                
                 <div className="header">Patient Registration</div>
                 <br />
                 <div className="content mx-auto border shadow p-5" 
-                style={{ background: '#ECECEC', padding: '30px' }}>
+                style={{ background: 'white', padding: '30px' }}>
                     <div className="text-center">
                             <img className = 'image' alt = "logo" src={patientImg} />
                     </div><br />
@@ -506,7 +506,9 @@ class RegisterPatient extends React.Component {
                                 {/* <input class="form-control btn btn-info" value = "Register" type = "submit" /> */}
                             </div>
                             </Form>
-                        {/* </form> */}
+                        <div className = 'text-center'><br />Have an account? 
+                            <Link to="/login"> Sign In </Link>
+                        </div>
                         </div>
                         </div>
         );

@@ -5,8 +5,8 @@ import { Form, Input, Button, Checkbox } from 'antd'
 import { MailOutlined, LockOutlined, LoginOutlined } from '@ant-design/icons'
 import axios from "axios"
 import {QuoteContext} from "../../contexts/QuoteContext"
-import { message, Alert } from 'antd'
-import { render } from '@testing-library/react'
+import { message } from 'antd'
+// import { render } from '@testing-library/react'
 
 export default function AuthForm({history}) {
 
@@ -31,21 +31,23 @@ export default function AuthForm({history}) {
             .then(res => {
                 // console.log(res)
                     setLoggedIn(true);
-                    localStorage.setItem("token", res.data.token)
                     localStorage.setItem("user", res.data.user)
+                    localStorage.setItem("token", res.data.token)
+                    localStorage.setItem("email", res.data.email)
                     localStorage.setItem('role_id', res.data.role_id)
+                    localStorage.setItem("role_name", res.data.role_name)
                     localStorage.setItem('status', res.data.status)
-                    if (res.data.role_id === 1 && res.data.status === true)
+                    if (res.data.role_id === 1 && res.data.status === true && res.data.role_name === 'Manager')
                     {
                         message.success(res.data.message, 5);
                         history.push('/manager')
                     }
-                    else if(res.data.role_id === 2 && res.data.status === true)
+                    else if(res.data.role_id === 2 && res.data.status === true && res.data.role_name === 'Doctor')
                     {
                         message.success(res.data.message, 5);
                         history.push('/doctor')
                     }
-                    else if(res.data.role_id === 3 && res.data.status === true)
+                    else if(res.data.role_id === 3 && res.data.status === true  && res.data.role_name === 'Patient')
                     {
                         message.success(res.data.message, 5);
                         history.push('/patient')
@@ -66,11 +68,11 @@ export default function AuthForm({history}) {
       };
       
         return (
-            <div className="base-container">
+            <div className="base-container" style={{background: '#ECECEC', padding: '60px' }}>
                 <br />
                 <div className="header">Login</div>
                 <br />
-                <div className="content border shadow p-5 mx-auto" style={{ background: '#ECECEC', padding: '30px' }}>
+                <div className="content border shadow p-5 mx-auto" style={{ background: 'white', padding: '30px' }}>
                     <div className="text-center bg-login">
                         <img className = 'image' alt = "logo" src={logo} />
                     </div><br/>

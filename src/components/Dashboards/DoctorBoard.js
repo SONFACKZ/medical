@@ -88,23 +88,8 @@ class DoctorBoard extends React.Component {
             <Menu.Item key = "3"><HistoryOutlined />Past History</Menu.Item>
             <Menu.Item key = "4"><IssuesCloseOutlined />Case Reporting</Menu.Item>
             <Menu.Item key = "5"><MessageOutlined />Live Chat</Menu.Item>
-            <Menu.Item key = "6"><UserOutlined />Profil</Menu.Item>
+            <Menu.Item key = "6"><UserOutlined />Profile</Menu.Item>
             <Menu.Item key = "7"><SettingOutlined />Setting</Menu.Item>
-          {/* </SubMenu> */}
-          {/* <SubMenu key="sub2" title={<span><AppstoreAddOutlined /><span>Navigtion Two</span></span>}>
-            <Menu.Item key="5">Option 5</Menu.Item>
-            <Menu.Item key="6">Option 6</Menu.Item>
-            <SubMenu key="sub3" title="Submenu">
-              <Menu.Item key="7">Option 7</Menu.Item>
-              <Menu.Item key="8">Option 8</Menu.Item>
-            </SubMenu>
-          </SubMenu>
-          <SubMenu key="sub4" title={<span><SettingOutlined /><span>Navigation Three</span></span>}>
-            <Menu.Item key="9">Option 9</Menu.Item>
-            <Menu.Item key="10">Option 10</Menu.Item>
-            <Menu.Item key="11">Option 11</Menu.Item>
-            <Menu.Item key="12">Option 12</Menu.Item>
-          </SubMenu> */}
         </Menu>
         </Sider>
         <Layout>
@@ -113,8 +98,12 @@ class DoctorBoard extends React.Component {
             <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
           </Breadcrumb>
           <div style = {{ background: '#fff', padding:24, minHeight: 580 }}>
-            Content
-            </div>
+            {/* <Route exact path="/doctor" component={UserList} />
+            <Route path="/doctor/doctors" component={DoctorList} />
+            <Route path="/doctor/patients" component={PatientList} />
+            <Route exact path="/doctor/doctorsreview" component={DoctorsReview} />
+            <Route exact path="/doctor/profile" component={Profile} /> */}
+          </div>
         </Content>
         <Footer style = {{ textAlign: 'center'}}>Copyright Sonfack.Z. All right reserved 2020</Footer>
       </Layout>

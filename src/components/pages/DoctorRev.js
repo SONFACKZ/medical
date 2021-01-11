@@ -94,12 +94,12 @@ const columns = [
     {
     title: 'Status',
     align: 'center',
-    dataIndex: 'status',
-    key: 'status',
-    render: (dataIndex) =>(
-            <>
-            <Checkbox name = '' onChange={onChange} defaultChecked = {dataIndex}>Status</Checkbox>
-            </>)
+    dataIndex: 'pending',
+    key: 'Pending'
+    // render: (dataIndex) =>(
+    //         <>
+    //         <Checkbox name = '' onChange={onChange} defaultChecked = {dataIndex}>Status</Checkbox>
+    //         </>)
     },
     {
     title: 'Actions',
@@ -108,9 +108,9 @@ const columns = [
     fixed: 'right',
     render: (action) =>(
         <>
-        <Button type = 'primary' danger><EyeOutlined />Details</Button>{"  "}
-        <Button type = 'primary'><EditOutlined />Edit</Button>
-        {/* <Button type = 'warning'>Detail</Button>{"  "} */}
+        <Button type = 'primary'><EyeOutlined />Details</Button>
+        {/* <Button type = 'primary'><EditOutlined />Edit</Button>
+        <Button type = 'warning'>Detail</Button>{"  "} */}
         </>
     )
     }

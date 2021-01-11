@@ -2,9 +2,10 @@ import React, { Component, useState, useEffect } from 'react'
 import { Form, Button, Select } from 'antd'
 // import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import axiosWithAuth from "../../utils/axiosWithAuth"
-import { message, Alert, Row, Col } from 'antd'
+import { message, Alert, Row, Col, Typography } from 'antd'
 import { LoadingOutlined } from '@ant-design/icons'
 
+const { Title } = Typography;
 
 function handleChange(value) {
   console.log(`Selected: ${value}`);
@@ -17,17 +18,33 @@ class ConsultationForm extends Component {
     buttonLoading: false,
   }
 
+  // handle submit value
+  handleSubmit = event => {
+    event.preventDefault() //Avoid to lose data after submited
+    axiosWithAuth().post('create/consultation', this.state)
+         .then(response => {
+             console.log(response)
+            // message.success(response.data.message, 5);
+            //  warn_message
+         })
+         .catch(error => {
+             console.log('registration error:',this.state.data.war_message)
+            //  alert(error)
+             console.log(error.data.warn_message)
+            // message.warning(error.data.warn_message, 15);
+         })
+}
 
-  // state = {
-  //   name: this.props.name,
-  //   buttonLoading: false,
+  // // state = {
+  // //   name: this.props.name,
+  // //   buttonLoading: false,
+  // // }
+
+  // handleFormSubmit = event => {
+  //   event.preventDefault();
+  //   const name = event.target.elements.name.value;
+  //   this.setState({buttonLoading: true});
   // }
-
-  handleFormSubmit = event => {
-    event.preventDefault();
-    const name = event.target.elements.name.value;
-    this.setState({buttonLoading: true});
-  }
 
   componentDidMount(){
     axiosWithAuth().get('/symptoms')
@@ -40,8 +57,6 @@ class ConsultationForm extends Component {
     .catch(error => {
       console.log(error)
     })
-
-    axiosWithAuth().post('/symptoms')
   }
 
     render() {
@@ -53,10 +68,15 @@ class ConsultationForm extends Component {
             );
         return (
             <div className = "text-center">
-              <Form onSubmit={(event) => this.handleFormSubmit(event)}>
+              <Form>
               <Row gutter= {16} justify = "center">
+              <Title level={3}>Fill the form below
+                   by selecting or by seraching
+                    and selecting your symptoms to predict the
+                     disease you may have</Title>
               <Col span={16}>
               <Form.Item>
+              <Title level={1}>
               <Select
                 mode="multiple"
                 size='large'
@@ -69,16 +89,17 @@ class ConsultationForm extends Component {
               >
               {symptomsItems}
               </Select>
+              </Title>
+              <div><Title level={4}>Result:</Title></div>
               </Form.Item>
               </Col>
             </Row>
             <Row gutter= {10} justify = "center">
             <Col span={5}>
                 <Form.Item className = "text-center">
-                    <Button fluid type="primary" htmlType="submit" loading={this.state.buttonLoading}
+                    <Button onClick = {this.handleSubmit}fluid type="primary" htmlType="submit" 
+                    // loading={this.state.buttonLoading}
                      className="login-form-button"  style = {{width: '100%'}}>
-                    {/* <LoginOutlined className="site-form-item-icon" /> */}
-                    {/* <LoadingOutlined /> */}
                     Predict
                     </Button>
                 </Form.Item>

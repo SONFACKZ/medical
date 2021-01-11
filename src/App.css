@@ -124,6 +124,12 @@
     background-color: #dddddd;
   } */
 
+  .table-row-light {
+    background-color: #ffffff;
+}
+.table-row-dark {
+    background-color: #fbfbfb;
+}
 
 
 

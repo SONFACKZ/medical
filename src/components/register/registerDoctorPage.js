@@ -4,6 +4,7 @@ import doctorImg from "../../assets/images/doctor.svg"
 import { Form, Input, Button, Checkbox, Select, Row, Col, DatePicker} from 'antd'
 import { MailOutlined, UserOutlined, LockOutlined, 
         LoginOutlined, QuestionCircleOutlined, HomeOutlined } from '@ant-design/icons'
+import {Link} from "react-router-dom"
 
 
 
@@ -189,11 +190,11 @@ class RegisterPatient extends React.Component {
         const{ fullname,email, residence, sex, contact_phone, nic_passport_path, occupation, date_birth,
                 password, cv_path, diplomas_path, marital_status } = this.state
         return (
-            <div className="base-container" style={{ padding: '30px' }}>
+            <div className="base-container" style={{background: '#ECECEC', padding: '60px' }}>
                 <div className="header">Doctor Registration</div>
                 <br />
                 <div className="content mx-auto border shadow p-5" 
-                style={{ background: '#ECECEC', padding: '30px' }}>
+                style={{ background: 'white', padding: '30px' }}>
                     <div className="text-center"> 
                         <img className = 'image' alt = "Patient logo" src={doctorImg} />
                     </div>
@@ -522,8 +523,12 @@ class RegisterPatient extends React.Component {
                             </Col>
                         </Row>
                         </Form>
+                        <div className = 'text-center'><br />Have an account? 
+                            <Link to="/login"> Sign In </Link>
                         </div>
                         </div>
+                        </div>
+                        
                    
         );
     }

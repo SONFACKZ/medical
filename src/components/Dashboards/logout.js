@@ -9,14 +9,15 @@ const { Text } = Typography;
 export default function Logout() {
     const {loggedIn, setLoggedIn} = React.useContext(QuoteContext);
 
-
     const logout = _ => {
         localStorage.removeItem("token");
         localStorage.removeItem("user");
         localStorage.removeItem("role_id");
         localStorage.removeItem("status");
+        localStorage.removeItem("role_name");
+        localStorage.removeItem("email");
         setLoggedIn(false);
-        message.success('Logout success', 5);
+        message.success('See you soon!', 5);
     }
 
     return (
