@@ -89,7 +89,7 @@ class DoctorBoard extends React.Component {
             <Menu.Item key = "4"><IssuesCloseOutlined />Case Reporting</Menu.Item>
             <Menu.Item key = "5"><MessageOutlined />Live Chat</Menu.Item>
             <Menu.Item key = "6"><UserOutlined />Profile</Menu.Item>
-            <Menu.Item key = "7"><SettingOutlined />Setting</Menu.Item>
+            {/* <Menu.Item key = "7"><SettingOutlined />Setting</Menu.Item> */}
         </Menu>
         </Sider>
         <Layout>

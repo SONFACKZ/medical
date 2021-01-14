@@ -31,8 +31,8 @@ function App(){
   // }
 
   return(
-
-    <Router>
+    <div>
+      <Router>
       <QuoteContext.Provider value={{quotes, setQuotes, loggedIn, setLoggedIn}}>
       <div className='App'>
       <Switch>
@@ -50,6 +50,7 @@ function App(){
       </div>
       </QuoteContext.Provider>
     </Router>
+    </div>
 
     
   )

@@ -124,14 +124,18 @@
     background-color: #dddddd;
   } */
 
+  @media (max-width: 992px) {
+    .graficaCircular{
+      padding-bottom: 20px;
+    }
+  }
+
   .table-row-light {
     background-color: #ffffff;
 }
 .table-row-dark {
     background-color: #fbfbfb;
 }
-
-
 
 
   label {

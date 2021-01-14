@@ -1,8 +1,8 @@
 from flask import Flask, jsonify, g, abort, json, make_response, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 import uuid
-from flask_jwt_extended import (
-    JWTManager, jwt_required, create_access_token, get_jwt_identity)
+from flask_jwt_extended import (JWTManager, jwt_required, create_access_token, 
+    get_jwt_identity, verify_jwt_in_request, get_jwt_claims)
 
 from flask_socketio import SocketIO, send
 
@@ -130,32 +130,52 @@ class Symptoms(db.Model):
 db.create_all()
 
 
-# decorator for verifying the JWT 
-def token_required(f): 
-    @wraps(f) 
-    def decorated(*args, **kwargs): 
-        token = None
-        # jwt is passed in the request header 
-        if 'x-access-token' in request.headers: 
-            token = request.headers['x-access-token'] 
-        # return 401 if token is not passed 
-        if not token: 
-            return jsonify({'message' : 'Token is missing !!'}), 401
+# # decorator for verifying the JWT 
+# def token_required(f): 
+#     @wraps(f) 
+#     def decorated(*args, **kwargs): 
+#         token = None
+#         # jwt is passed in the request header 
+#         if 'x-access-token' in request.headers: 
+#             token = request.headers['x-access-token'] 
+#         # return 401 if token is not passed 
+#         if not token: 
+#             return jsonify({'message' : 'Token is missing !!'}), 401
    
-        try: 
-            # decoding the payload to fetch the stored details 
-            data = jwt.decode(token, app.config['SECRET_KEY']) 
-            current_user = User.query.filter_by(public_id = data['public_id']).first() 
-        except: 
-            return jsonify({ 
-                'message' : 'Token is invalid !!'
-            }), 401
-        # returns the current logged in users contex to the routes 
-        return  f(current_user, *args, **kwargs) 
+#         try: 
+#             # decoding the payload to fetch the stored details 
+#             data = jwt.decode(token, app.config['SECRET_KEY']) 
+#             current_user = User.query.filter_by(public_id = data['public_id']).first() 
+#         except: 
+#             return jsonify({ 
+#                 'message' : 'Token is invalid !!'
+#             }), 401
+#         # returns the current logged in users contex to the routes 
+#         return  f(current_user, *args, **kwargs) 
    
-    return decorated 
+#     return decorated 
 
 
+# # Here is a custom decorator that verifies the JWT is present in
+# # the request, as well as insuring that this user has a role of
+# # `admin` in the access token
+# def admin_required(fn):
+#     @wraps(fn)
+#     def wrapper(*args, **kwargs):
+#         verify_jwt_in_request()
+#         claims = get_jwt_claims()
+#         if claims['roles'] != 'admin':
+#             return jsonify(msg='Admins only!'), 403
+#         else:
+#             return fn(*args, **kwargs)
+#     return wrapper
+
+# @jwt.user_claims_loader
+# def add_claims_to_access_token(identity):
+#     if identity == 'admin':
+#         return {'roles': 'admin'}
+#     else:
+#         return {'roles': 'peasant'}
 
 
 @app.route("/")
@@ -199,6 +219,19 @@ def get_all_users():
     usersall = db.session.query(User, Role).join(Role).all()
     # users = User.query.all()
     return jsonify([*map(user_serializer, usersall)])
+
+@app.route('/stat', methods=['GET'])
+@jwt_required
+def stat():
+    nbr_user = db.session.query(User).count()
+    nbr_pending_user = User.query.filter_by(status = False).count()
+    nbr_active_user = User.query.filter_by(status = True).count()
+    nbr_doctor = User.query.filter_by(role_id = 2).count()
+    nbr_patient = User.query.filter_by(role_id=3).count()
+    return jsonify({"nbr_user": nbr_user, "nbr_doctor": nbr_doctor,
+    "nbr_pending_user": nbr_pending_user, "nbr_active_user": nbr_active_user,
+    "nbr_patient": nbr_patient})
+
 
 # @app.route('/users', methods=['GET'])
 # # @jwt_required
@@ -336,7 +369,7 @@ def get_inactive_doctors():
 #User Profil
 def profile_serializer(profile):
     return{
-        'name': profile.User.fullname,
+        'fullname': profile.User.fullname,
         'email': profile.User.email,
         'sex': profile.User.sex,
         'occupation': profile.User.occupation,

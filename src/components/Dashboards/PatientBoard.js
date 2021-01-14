@@ -126,10 +126,10 @@ class PatientBoard extends React.Component {
               Profile
               <Link to = '/patient/profile' />
             </Menu.Item>
-            <Menu.Item key="/7" icon = {<SettingOutlined />}>
+            {/* <Menu.Item key="/7" icon = {<SettingOutlined />}>
               Setting
               <Link to = '/patient/setting' />
-            </Menu.Item>
+            </Menu.Item> */}
         </Menu>
         </Sider>
         <Layout>

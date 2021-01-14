@@ -125,7 +125,7 @@ const columns = [
     fixed: 'right',
     render: (action) =>(
         <>
-        <Button type = 'primary' danger onClick = {()=>selectuser(action, "Details")}><EyeOutlined />Details</Button>{"  "}
+        <Button type = 'primary' danger onClick = {()=>selectuser(action.public_id, "Details")}><EyeOutlined />Details</Button>{"  "}
         <Button type = 'primary' onClick = {()=>selectuser(action, "Edit")}><EditOutlined />Edit</Button>
         {/* <Button type = 'warning'>Detail</Button>{"  "} */}
         </>

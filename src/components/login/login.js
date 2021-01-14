@@ -68,7 +68,7 @@ export default function AuthForm({history}) {
       };
       
         return (
-            <div className="base-container" style={{background: '#ECECEC', padding: '60px' }}>
+            <div className="base-container" style={{background: '#ECECEC', padding: '139px' }}>
                 <br />
                 <div className="header">Login</div>
                 <br />
