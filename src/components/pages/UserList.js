@@ -80,12 +80,6 @@ const UserList = () => {
         getUsers();
     }, []);
 
-    // const singUser = async() => {
-    //     await axiosWithAuth().get('/users', artisa)
-    //     .then(response=>{
-    //         setUser(data.concat(response.data));
-    //     })
-    // }
 
 
 // Making table
@@ -497,43 +491,6 @@ const columns = [
                     </Form>
       </Modal>
 
-
-
-
-                {/* <div className = "table-responsive-sm">
-                <table class="table border shadow table-striped table-hover">
-                    <thead class="thead-dark">
-                        <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Occupation</th>
-                        <th scope="col">Public ID</th>
-                        <th scope="col">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            users.map((user, index) => (
-                                <tr>
-                                    <th scope = "row">{index +1}</th>
-                                    <td>{user.fullname}</td>
-                                    <td>{user.email}</td>
-                                    <td>{user.occupation}</td>
-                                    <td>{user.public_id}</td>
-                                    <td>
-                                        <Link to = ''><EyeOutlined style = {{color: 'primary'}} />Edit</Link>
-                                        <Link to = ''><EditOutlined style = {{color: 'gold'}} />View</Link>
-                                        <Link to = ''><DeleteOutlined style = {{color: 'red'}} />Delete</Link>
-                                    </td>
-                                </tr>
-                            ))
-                        }
-                    </tbody>
-                </table>
-                </div>
-                <Link className = "btn btn-outline-primary" to = "/register"> Add User</Link>
-                     */}
             </div>
         </div>
     );

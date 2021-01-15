@@ -3,7 +3,7 @@ import React, {useState, useEffect} from "react"
 import { Link } from 'react-router-dom'
 import axiosWithAuth from "../../utils/axiosWithAuth"
 import { EditOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons'
-import {Table, Button, Modal, Input, Form, Checkbox, Tag } from 'antd'
+import {Table, Button, Modal, Input, Form, message } from 'antd'
 
 
 const {Item} = Form;
@@ -11,16 +11,15 @@ const {Item} = Form;
 
 const DoctorsReview = () => {
 
-    const [modalEdit, setModalEdit] = useState(false);
+    const [visible, setVisible] = useState(false);
     // const [useredit, setUserEdit] = useState({
     //     status: ''
     // })
 
-    const usersModalEdit = ()=>{
-        setModalEdit(!modalEdit);
-    }
 
     const [users, setUser] = useState([]);
+
+    const [user, setUse] = useState([]);
 
     const getUsers = async () => {
         await axiosWithAuth().get('/users/doctors/rev')
@@ -44,16 +43,31 @@ const DoctorsReview = () => {
         getUsers();
     }, []);
 
+    function activateUser(public_id){
+            axiosWithAuth().put('/user/status/'+public_id, public_id)
+             .then(response => {
+                //  console.log(response)
+                message.success(response.data.message, 5);
 
-    //     axios.get('/users')
-    //     .then(res => {
-    //         console.log(res)
-    //         setUser(res.data)
-    //     })
-    //     .catch(err => {
-    //         console.log(err)
-    //     })
-    // }, [])
+             })
+             .catch(error => {
+                 console.log(error.data.warn_message)
+             })
+    }
+
+    function detailsUser(public_id){
+        axiosWithAuth().get('/users/'+public_id)
+         .then(response => {
+            setUse(response.data);
+             console.log(response)
+
+         })
+         .catch(error => {
+            //  console.log(error.data.warn_message)
+         })
+}
+
+
 
 
 // Making table
@@ -64,13 +78,17 @@ const columns = [
     key: 'user_id',
     align: 'center',
     width: 50,
-    fixed: 'left'
+    fixed: 'left',
+    // sortable: false,
+    // filterable: false,
     },
     {
     title: 'Public Id',
     dataIndex: 'public_id',
     align: 'center',
     key: 'public_id',
+    // sortable: false,
+    // filterable: false,
     // fixed: 'left',
     },
     {
@@ -108,10 +126,16 @@ const columns = [
     fixed: 'right',
     render: (action) =>(
         <>
-        <Button type = 'primary'><EyeOutlined />Details</Button>
-        {/* <Button type = 'primary'><EditOutlined />Edit</Button>
-        <Button type = 'warning'>Detail</Button>{"  "} */}
+        <Button type = 'primary' onClick = {() => {setVisible(true, detailsUser(action.public_id))}}>
+            <EyeOutlined />Details
+        </Button>{"  "}
+        <Button style = {{background: '#5cb85c', color: 'white'}}
+         onClick = {() =>{activateUser(action.public_id)}}>
+            <EditOutlined />Activate
+        </Button>
+        {/* <Button type = 'warning'>Detail</Button>{"  "} */}
         </>
+        
     )
     }
 
@@ -120,27 +144,46 @@ const columns = [
     return (
         <div className = "container">
             <div className = "py-4">
-                <h1 style = {{textAlign: 'center'}}>Waiting Doctors Registration</h1>
+                <h1 style = {{textAlign: 'center'}}>Waiting Doctors Registration{users.public_id}</h1>
 
                 <Table columns = {columns} dataSource = {users} scroll={{ x: 1500, y: 300 }} />
 
-                <Modal visible = {modalEdit}
-                title = 'Edit User'
-                destroyOnClose = {true}
-                onCancel = {usersModalEdit}
-                centeredfooter = {[
-                    <Button onClick = {usersModalEdit}>Cancel</Button>,
-                    <Button type = 'primary'>Update</Button>
-                ]}
+                <Modal
+                    title="User Details"
+                    centered
+                    visible={visible}
+                    onOk={() => setVisible(false)}
+                    onCancel={() => setVisible(false)}
+                    width={1000}
+                    footer={[
+                        <Button key="back" onClick={() => setVisible(false)}>
+                          Return
+                        </Button>,
+                        <Button key="submit" type="primary" onClick={() => setVisible(false)}>
+                          Ok
+                        </Button>,
+                      ]}
                 >
-                    <Form>
-                        <Item label = "Fullname">
-                            <Input name = 'fullname' />
-                        </Item>
-                        <Item label = "Email">
-                            <Input name = 'email' />
-                        </Item>
-                    </Form>
+                     {
+                            user.map(use => {
+                                return(
+                            <>
+                                <li><b>Public_id</b>: {use.public_id}</li>
+                                <li><b>Email</b>: {use.email}</li>
+                                <li><b>Fullname</b>: {use.fullname}</li>   
+                                <li><b>Residence</b>: {use.residence}</li>   <li></li>
+                                <li><b>Occupation</b>: {use.occupation}</li>   <li></li>
+                                <li><b>Status</b>: {use.satus === true?'Activate':'Inactive'}</li>
+                                <li><b>Birthday</b>: {use.date_birth}</li>
+                                <li><b>Phone</b>: {use.contact_phone}</li>
+                                <li><b>Gender</b>: {use.sex === 'M'?'Male':'Female'}</li>
+                                <li><b>Blood Group</b>: {use.blood_group}</li>
+                                <li><b>Marital Status</b>: {use.sex === 'S'?'Single':'Married'}</li>
+                            </>
+                                )
+                            }
+                                )
+                     } 
                 </Modal>
 
             </div>

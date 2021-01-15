@@ -201,6 +201,8 @@ handlePersontonameChange = (event) => {
                         <StarFilled />
                         <StarTwoTone twoToneColor="#eb2f96" /> */}
                       </Row>
+                      <Button style = {{background: '#f0ad4e', color: 'white', float: 'right'}} onClick={this.showModal}><EditOutlined />Edit profil</Button>
+
                     </Card>
                     )
                 
@@ -209,7 +211,6 @@ handlePersontonameChange = (event) => {
 
               {/* Edit profil Modal */}
 
-        <Button style = {{background: '#f0ad4e', color: 'white'}} onClick={this.showModal}><EditOutlined />Edit profil</Button>
 
             <Modal
               title="Update my profile"

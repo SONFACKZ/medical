@@ -3,7 +3,7 @@ import React, {useState, useEffect} from "react"
 import { Link } from 'react-router-dom'
 import axiosWithAuth from "../../utils/axiosWithAuth"
 import { EditOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons'
-import {Table, Button, Modal, Input, Form, Checkbox, Tag } from 'antd'
+import {Table, Button, Modal, Input, Form, message, Tag } from 'antd'
 
 
 const {Item} = Form;
@@ -11,28 +11,23 @@ const {Item} = Form;
 
 const PatientList = () => {
 
-    // const [data, setData] = useState([])
-    const [modalEdit, setModalEdit] = useState(false);
-    const [modalDelete, setModalDelete] = useState(false);
-    const [use, setUse] = useState(
-        {
-            user_id: '',
-            fullname: '',
-            status: '',
-            email: '',
-            role_id: ''
-        }
-    )
+    // const [use, setUse] = useState(
+    //     {
+    //         user_id: '',
+    //         fullname: '',
+    //         status: '',
+    //         email: '',
+    //         role_id: ''
+    //     }
+    // )
 
-    const usersModalEdit = ()=>{
-        setModalEdit(!modalEdit);
-    }
+    const [visible, setVisible] = useState(false);
 
-    const usersModalDelete = ()=>{
-        setModalDelete(!modalDelete);
-    }
+ 
 
     const [users, setUser] = useState([]);
+
+    const [user, setUse] = useState([]);
 
     const getUsers = async () => {
         await axiosWithAuth().get('/users/patients')
@@ -57,20 +52,30 @@ const PatientList = () => {
     }, []);
 
 
-    //     axios.get('/users')
-    //     .then(res => {
-    //         console.log(res)
-    //         setUser(res.data)
-    //     })
-    //     .catch(err => {
-    //         console.log(err)
-    //     })
-    // }, [])
+    function activateUser(public_id){
+        axiosWithAuth().put('/user/status/'+public_id, public_id)
+         .then(response => {
+            //  console.log(response)
+            message.success(response.data.message, 5);
 
-    const selectuser = (user, action)=>{
-        setUser(user);
-        (action === "Edit")?usersModalEdit():usersModalDelete()
-    }
+         })
+         .catch(error => {
+             console.log(error.data.warn_message)
+         })
+}
+
+
+    function detailsUser(public_id){
+        axiosWithAuth().get('/users/'+public_id)
+         .then(response => {
+            setUse(response.data);
+             console.log(response)
+
+         })
+         .catch(error => {
+            //  console.log(error.data.warn_message)
+         })
+}
 
 
 // Making table
@@ -114,19 +119,20 @@ const columns = [
     dataIndex: 'status',
     key: 'status',
     render: (dataIndex) =>(
-            <>
-            <Checkbox name = '' onChange={onChange} defaultChecked = {dataIndex}	>Status</Checkbox>
+            <>{dataIndex === true?<Tag style = {{color: '#5cb85c'}}>Active</Tag>:
+                <Tag style = {{color: '#f0ad4e'}}>Inactive</Tag>}
             </>)
     },
     {
-    title: 'Actions',
+    title: 'Details',
     key: 'actions',
     align: 'center',
     fixed: 'right',
     render: (action) =>(
         <>
-        <Button type = 'primary' danger onClick = {()=>selectuser(action.public_id, "Details")}><EyeOutlined />Details</Button>{"  "}
-        <Button type = 'primary' onClick = {()=>selectuser(action, "Edit")}><EditOutlined />Edit</Button>
+        <Button type = 'primary' onClick = {() => {setVisible(true, detailsUser(action.public_id))}}>
+            <EyeOutlined /></Button>{"  "}
+            {/* <Button type = 'link' style = {{background: '#f0ad4e', color: 'white'}}><EditOutlined /></Button> */}
         {/* <Button type = 'warning'>Detail</Button>{"  "} */}
         </>
     )
@@ -143,76 +149,50 @@ const columns = [
                 scroll={{ x: 1500, y: 300 }} 
                 rowClassName={(record, index) => index % 2 === 0 ? 'table-row-light' :  'table-row-dark'}/>
 
-                <Modal visible = {modalEdit}
-                title = 'Edit User'
-                destroyOnClose = {true}
-                onCancel = {usersModalEdit}
-                centered
-                footer = {[
-                    <Button onClick = {usersModalEdit}>Cancel</Button>,
-                    <Button type = 'primary'>Update</Button>
-                ]}
+                <Modal
+                    title="User Details"
+                    centered
+                    visible={visible}
+                    onOk={() => setVisible(false)}
+                    onCancel={() => setVisible(false)}
+                    width={1000}
+                    footer={[
+                        <Button key="back" onClick={() => setVisible(false)}>
+                          Return
+                        </Button>,
+                        <Button key="submit" type="primary" onClick={() => setVisible(false)}>
+                          Ok
+                        </Button>,
+                      ]}
                 >
-                    {/* user_id: '',
-            fullname: '',
-            status: '',
-            email: '',
-            role_id: */}
-                    <Form>
-                        <Item label = "Fullname">
-                            <Input name = 'fullname' />
-                        </Item>
-                        <Item label = "Email">
-                            <Input name = 'email' />
-                        </Item>
-                        <Item label = "Role">
-                            <Input name = 'role' />
-                        </Item>
-                        <Item label = "Status">
-                            <Input name = 'status' />
-                        </Item>
-                    </Form>
+                     {
+                            user.map(use => {
+                                return(
+                            <>
+                                <li><b>Public_id</b>: {use.public_id}</li>
+                                <li><b>Email</b>: {use.email}</li>
+                                <li><b>Fullname</b>: {use.fullname}</li>   
+                                <li><b>Residence</b>: {use.residence}</li>   <li></li>
+                                <li><b>Occupation</b>: {use.occupation}</li>   <li></li>
+                                <li><b>Status</b>: {use.satus === true?<Tag style = {{color: '#5cb85c'}}>Active</Tag>:<Tag style = {{color: '#f0ad4e'}}>Inactive</Tag>}</li>
+                                <li><b>Birthday</b>: {use.date_birth}</li>
+                                <li><b>Phone</b>: {use.contact_phone}</li>
+                                <li><b>Gender</b>: {use.sex === 'M'?'Male':'Female'}</li>
+                                <li><b>Blood Group</b>: {use.blood_group}</li>
+                                <li><b>Marital Status</b>: {use.sex === 'S'?'Single':'Married'}</li>
+                                {use.status === true?
+                                <Button key="submit" type="link" style = {{background: '#f0ad4e', color: 'white'}}
+                                    onClick={() => activateUser(use.public_id)}>
+                                    Desactivate this user</Button>:
+                                    <Button key="submit" type="primary" style = {{background: '#5cb85c', color: 'white'}}
+                                    onClick={() => activateUser(use.public_id)}>
+                                    Activate this user</Button>}
+                            </>
+                                )
+                            }
+                                )
+                     } 
                 </Modal>
-
-
-
-
-
-
-                {/* <div className = "table-responsive-sm">
-                <table class="table border shadow table-striped table-hover">
-                    <thead class="thead-dark">
-                        <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Name</th>
-                        <th scope="col">Email</th>
-                        <th scope="col">Occupation</th>
-                        <th scope="col">Public ID</th>
-                        <th scope="col">Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {
-                            users.map((user, index) => (
-                                <tr>
-                                    <th scope = "row">{index +1}</th>
-                                    <td>{user.fullname}</td>
-                                    <td>{user.email}</td>
-                                    <td>{user.occupation}</td>
-                                    <td>{user.public_id}</td>
-                                    <td>
-                                        <Link to = ''><EyeOutlined style = {{color: 'primary'}} />Edit</Link>
-                                        <Link to = ''><EditOutlined style = {{color: 'gold'}} />View</Link>
-                                        <Link to = ''><DeleteOutlined style = {{color: 'red'}} />Delete</Link>
-                                    </td>
-                                </tr>
-                            ))
-                        }
-                    </tbody>
-                </table>
-                </div>
-                <Link className = "btn btn-outline-primary" to = "/register"> Add User</Link>
-                     */}
             </div>
         </div>
     );

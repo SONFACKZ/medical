@@ -34,8 +34,8 @@ import { Pie} from '@ant-design/charts';
 
     return(
          <div className="site-statistic-demo-card">
-                            <Row gutter={16} className="text-center">
-                        <Col span={6}>
+                            <Row gutter={16} className="text-center" type = 'flex'>
+                        <Col span={8}>
                             <Card className = "border shadow p-5 mx-auto">
                               <Statistic
                                 title="Total Users"
@@ -48,7 +48,7 @@ import { Pie} from '@ant-design/charts';
                               />
                             </Card>
                           </Col>
-                          <Col span={6}>
+                          <Col span={8}>
                             <Card className = "border shadow p-5 mx-auto">
                               <Statistic
                                 title="Active Users"
@@ -61,10 +61,10 @@ import { Pie} from '@ant-design/charts';
                               />
                             </Card><br />
                           </Col>
-                          <Col span={6}>
+                          <Col span={8}>
                             <Card className = "border shadow p-5 mx-auto">
                               <Statistic
-                                title="Doctors' Number"
+                                title="Doctors"
                                 value={stat.nbr_doctor}
                                 // precision={2}
                                 valueStyle={{ color: '#cf1322' }}
@@ -74,10 +74,12 @@ import { Pie} from '@ant-design/charts';
                               />
                             </Card>
                           </Col>
-                          <Col span={6}>
+                          </Row>
+                          <Row gutter={16} className="text-center" type = 'flex'>
+                          <Col span={8}>
                             <Card className = "border shadow p-5 mx-auto">
                               <Statistic
-                                title="Patients' Number"
+                                title="Patients"
                                 value={stat.nbr_patient}
                                 // precision={2}
                                 valueStyle={{ color: 'teal' }}
@@ -87,9 +89,7 @@ import { Pie} from '@ant-design/charts';
                               />
                             </Card>
                           </Col>
-                          </Row><br />
-                          <Row gutter={16} className="text-center">
-                          <Col span={12}>
+                          <Col span={8}>
                             <Card className = "border shadow p-5 mx-auto">
                               <Statistic
                                 title="Pending Users"
@@ -103,7 +103,7 @@ import { Pie} from '@ant-design/charts';
                             </Card>
                           </Col>
                           </Row><br />
-                          <Row gutter={16} className="text-center">
+                          <Row gutter={16}>
                           <Col span={18}>
                           <PieChart />
                           </Col>

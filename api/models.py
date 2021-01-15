@@ -2,7 +2,11 @@ from flask import Flask, jsonify, g, abort, json, make_response, render_template
 from flask_sqlalchemy import SQLAlchemy
 import uuid
 from flask_jwt_extended import (JWTManager, jwt_required, create_access_token, 
+    jwt_refresh_token_required, create_refresh_token,
     get_jwt_identity, verify_jwt_in_request, get_jwt_claims)
+
+from flask_mail import Mail, Message
+from random import randint
 
 from flask_socketio import SocketIO, send
 
@@ -27,12 +31,19 @@ app.config['SECRET_KEY'] = '\x0em\xfcF\x04\xd614\x7f$\x12\xba\xb9\x81\x9f\xe8w\x
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///medi.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USERNAME'] = "elfridsonfack@gmail.com"
+app.config['MAIL_PASSWORD'] = 'Zane091262'
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
 
 app.config["UPLOAD_FOLDER"] = '/static/image'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 db = SQLAlchemy(app)
 tok = JWTManager(app)
+mail = Mail(app)
 
 #Initialization of Flask-SocketIo
 socketio = SocketIO(app)
@@ -108,12 +119,12 @@ class ReportCase(db.Model):
     report_date = db.Column(db.DateTime, default=datetime.utcnow())
     report_case_owner_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
-    def __init__(self, report_reason, report_case_owner_id):
-        self.report_reason = report_reason
-        self.report_case_owner_id = report_case_owner_id
+    # def __init__(self, report_reason, report_case_owner_id):
+    #     self.report_reason = report_reason
+    #     self.report_case_owner_id = report_case_owner_id
 
-    def __repr__(self):
-        return 'The report_reason is {}, report_case_owner_id{}'.format(self.report_reason, self.report_date, self.report_case_owner_id)
+    # def __repr__(self):
+    #     return 'The report_reason is {}, report_case_owner_id{}'.format(self.report_reason, self.report_date, self.report_case_owner_id)
 
 
 class PastHistory(db.Model):
@@ -123,9 +134,9 @@ class PastHistory(db.Model):
     past_history_year = db.Column(db.Date, nullable=False)
     past_history_owner_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
-class Symptoms(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255), nullable=False)
+# class Symptoms(db.Model):
+#     id = db.Column(db.Integer, primary_key=True)
+#     name = db.Column(db.String(255), nullable=False)
 
 db.create_all()
 
@@ -415,39 +426,35 @@ def user_profile(email):
 # return render_template('edit_profile.html', form=form)
 
 
-# #Get and Edit individual user
+#Get and Edit individual user
 
-# def user_update_serializer(useredit):
-#     return{
-#     'public_id':
-#     'fullname':
-#     'occupation':
-#     'email': useredit.email,
-#     'sex': useredit.sex,
-#     'passord': 
-#     'residence': useredit.residence,
-#     'contact_phone': useredit.contact_phone,
-#     'blood_group': useredit.blood_group,
-#     'marital_status': useredit.marital_status,
-#     'date_birth': useredit.date_birth,
-#     'person_to_contact_name': useredit.person_to_contact_name,
-#     'person_to_contact_phone': useredit.person_to_contact_phone,
-#     'status': useredit.status,
-#     }
+def user_update_serializer(useredit):
+    return{
+    'public_id': useredit.public_id,
+    'fullname': useredit.fullname,
+    'occupation': useredit.occupation,
+    'email': useredit.email,
+    'sex': useredit.sex,
+    'residence': useredit.residence,
+    'contact_phone': useredit.contact_phone,
+    'blood_group': useredit.blood_group,
+    'marital_status': useredit.marital_status,
+    'date_birth': useredit.date_birth,
+    'person_to_contact_name': useredit.person_to_contact_name,
+    'person_to_contact_phone': useredit.person_to_contact_phone,
+    'status': useredit.status,
+    }
 
-# @app.route('/users/<public_id>', methods=['GET', 'POST'])
+@app.route('/users/<public_id>', methods=['GET', 'POST'])
 # @jwt_required
-# def get_one_user(public_id):
+def get_one_user(public_id):
 
-#     user = User.query.filter_by(public_id=public_id).first()
+    user = User.query.filter_by(public_id=public_id)
 
-#     if not user:
-#         return jsonify({'message': 'No user found!'})
-#     user_data = {}
-#     user_data['public_id'] = user.public_id
-#     user_data['fullname'] = user.fullname
-#     user_data['occupation'] = user.occupation
-#     return jsonify({'user': user_data})
+    if not user:
+        return jsonify({'war_message': 'No user found!'})
+    else:
+        return jsonify([*map(user_update_serializer, user)])
 
 
 #Create Role
@@ -469,7 +476,7 @@ def updrole(public_id):
     if not user:
         return jsonify({'message': 'No user found!'})
     
-    user.role_id = 1
+    user.role_id = 2
     db.session.commit()
 
     return jsonify({'message': 'The user role has been updated!'})
@@ -566,6 +573,15 @@ def reg_doctor():
                         cv_path=data['cv_path'], diplomas_path=data['diplomas_path'],
                         marital_status=data['marital_status'], date_birth=dateB
                        )
+    subject = 'Welcome to Mediagnostic'
+    mess = "Hello <b>"+data['fullname']+"</b>, welcome to Mediagnostic. Your registered successfully<br>Login <a href = 'http://localhost:3000/login'>here</a>"
+    msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=data['email'].split())
+    msg.html = mess
+    with app.open_resource("../src/assets/images/logo.png") as fp:
+            msg.attach("logo.png", "image/png", fp.read())
+            mail.send(msg)
+
+    #Insert Doctor
     db.session.add(new_doctor)
     db.session.commit()
 
@@ -596,8 +612,15 @@ def reg_patient():
                             person_to_contact_name=data['person_to_contact_name'],
                             person_to_contact_phone=data['person_to_contact_phone']
                             )
+        subject = 'Welcome to Mediagnostic'
+        mess = "Hello <b>"+data['fullname']+"</b>, welcome to Mediagnostic. Your registered successfully<br>Login <a href = 'http://localhost:3000/login'>here</a>"
+        msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=data['email'].split())
+        msg.html = mess
+        with app.open_resource("../src/assets/images/logo.png") as fp:
+            msg.attach("logo.png", "image/png", fp.read())
+            mail.send(msg)
 
-        #Insert patient
+        #Insert Patient
         db.session.add(new_patient)
         db.session.commit()
         return jsonify({'message': 'Your account has been created successfully!'}), 200
@@ -641,9 +664,11 @@ def login():
     elif user_data['status'] == 1:
     # Identity can be any data that is json serializable
         access_token = create_access_token(identity=username)
+        refresh_token = create_refresh_token(identity=username)
         return jsonify({
             'message': 'Logged In Successfully, Welcome '+ user_data['fullname']+ ' !', 
             'token': access_token, 
+            'ref_token': refresh_token,
             'user': user_data['fullname'],
             'role_id': user_data['role_id'],
             'email': user_data['email'],
@@ -661,11 +686,12 @@ def logout():
 
 #Update single user status
 @app.route('/user/status/<public_id>', methods=['PUT'])
+@jwt_required
 def promote_user(public_id):
     user = User.query.filter_by(public_id=public_id).first()
 
     if not user:
-        return jsonify({'message': 'No user found!'})
+        return jsonify({'warn_message': 'No user found!'})
 
     if user.status == 1:
         user.status = False

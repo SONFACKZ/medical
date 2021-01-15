@@ -40,11 +40,14 @@ const onFinish = (values) => {
 
 class RegisterPatient extends React.Component {
     constructor(props){
-        super(props)
+        super(props);
 
-        const handleFormChange = (inputValue) => {
-            // setAddPatient(inputValue)
-        }
+        this.handleSexOnChange = this.handleSexOnChange.bind(this);
+        this.handleBloodOnChange = this.handleBloodOnChange.bind(this);
+
+        // const handleFormChange = (inputValue) => {
+        //     // setAddPatient(inputValue)
+        // }
 
         this.state = initialState;
     }
@@ -67,24 +70,38 @@ class RegisterPatient extends React.Component {
             residence: event.target.value
         })
     }
-    handleSexChange = (event) => {
+
+    // handleSexChange = (value, event) => {
+    //     this.setState({
+    //         sex: event.target.value
+    //     })
+    // }
+
+    handleSexOnChange = (value, event) =>{
+        console.log('selected: '+ value);
         this.setState({
-            sex: event.target.value
+            sex: value
         })
     }
+
     handleContactphoneChange = (event) => {
         this.setState({
             contact_phone: event.target.value
         })
     }
-    handleBloodgroupChange = (event) => {
-        this.setState({
-            blood_group: event.target.value
-        })
-    }
 
-    handleBloodGroupChange = (value) =>{
+    // handleBloodgroupChange = (value, event) => {
+    //     this.setState({
+    //         blood_group: event.target.value
+    //     })
+    // }
+
+    handleBloodOnChange = (value, event) =>{
         console.log('selected: '+ value);
+        this.setState({
+            blood_group: value
+        })
+
     }
 
     handleOccupationChange = (event) => {
@@ -92,6 +109,7 @@ class RegisterPatient extends React.Component {
             occupation: event.target.value
         })
     }
+
     handleDatebirthChange = (event) => {
         this.setState({
             date_birth: event.target.value
@@ -175,13 +193,23 @@ class RegisterPatient extends React.Component {
         axios.post('auth/register/patient', this.state)
              .then(response => {
                  console.log(response)
-                // message.success(response.data.message, 5);
+                message.success(response.data.message, 5);
                 //  warn_message
              })
              .catch(error => {
-                 console.log('registration error:',this.state.data.war_message)
+                 if(error.response)
+                 {
+                     if(error.response.status === 202){
+                        message.warning('This user already exists')
+                     }
+                     else if(error.response.status === 500)
+                     {
+                        message.error('Server Error !')
+                     }
+                 }
+                //  console.log('registration error:',this.state.data.war_message)
                 //  alert(error)
-                 console.log(error.data.warn_message)
+                //  console.log(error.data.warn_message)
                 // message.warning(error.data.warn_message, 15);
              })
     }
@@ -269,7 +297,6 @@ class RegisterPatient extends React.Component {
                                         prefix={<HomeOutlined className="site-form-item-icon" />} placeholder="Residence" allowClear />
                                     </Form.Item>
 
-                                        
                                         <span style = {{fontSize: 12, color: 'red'}}>{this.state.residenceError}</span>
                                     </div>
                                 </Col>
@@ -278,14 +305,14 @@ class RegisterPatient extends React.Component {
                                     <Form.Item 
                                     name="sex"
                                     value = {sex}
-                                    onChange = {this.handleSexChange}
+                                    onChange={(value, event) => this.handleSexOnChange(value, event)}
                                     hasFeedback
-                                        rules={[{ required: true, message: 'Please select your gender!' }]}
+                                    rules={[{ required: true, message: 'Please select your gender!' }]}
                                     >
                                         <Select size = "large"
                                         name="sex"
                                         value = {sex}
-                                        onChange = {this.handleSexChange}
+                                        onChange={(value, event) => this.handleSexOnChange(value, event)}
                                         placeholder="Gender">
                                         <Option value = "">Choose your Gender</Option>
                                         <Option value="F">Female</Option>
@@ -311,8 +338,16 @@ class RegisterPatient extends React.Component {
                                     name = "phone_contact" value = {contact_phone}
                                     onChange = {this.handleContactphoneChange}
                                     hasFeedback
-                                        rules={[{ required: true, message: 'Please input your phone number!' }]}
-                                    >
+                                    rules={[
+                                        {
+                                            required: true, message: 'Please input your phone number!'
+                                        }, 
+                                        {
+                                         pattern: /[0-9]{3} [0-9]{3} [0-9]{3}/,
+                                         message: 'Please input a valid phone number format! (Ex: 000 000 000)',
+                                        }
+                                         ]}
+                                         >
                                         <Input addonBefore={+237}
                                          name = "phone_contact" value = {contact_phone}
                                          onChange = {this.handleContactphoneChange}
@@ -327,17 +362,17 @@ class RegisterPatient extends React.Component {
                                 </Col>
                                 <Col span={12}>
                                     <div>
-                                    <Form.Item 
+                                   <Form.Item 
                                         name="blood_gooup"
                                         value = {blood_group}
-                                        onChange = {this.handleBloodgroupChange}
+                                        onChange={(value, event) => this.handleBloodOnChange(value, event)}
                                         hasFeedback
                                         rules={[{ required: true, message: 'Please select your Blood Group!' }]}
                                     >
                                         <Select size = "large"
                                         name="blood_gooup"
                                         value = {blood_group}
-                                        onChange = {this.handleBloodgroupChange}
+                                        onChange={(value, event) => this.handleBloodOnChange(value, event)}
                                         placeholder = "Blood Group">
                                             <Option value = "">Choose your Blood Group</Option>
                                             <Option value="A+">A RhD positive (A+)</Option>
@@ -352,18 +387,6 @@ class RegisterPatient extends React.Component {
                                         {/* <span style = {{fontSize: 9, color: 'grey'}}>Choose your Blood Group</span> */}
                                     </Form.Item>
 
-                                        {/* <label>Blood Group</label>
-                                        <select class="form-control" value = {blood_group} name = "blood_gooup" onChange = {this.handleBloodgroupChange} required>
-                                            <option value = "">Choose your Blood Group</option>
-                                            <option value = "A+">A RhD positive (A+)</option>
-                                            <option value = "A-">A RhD negative (A-)</option>
-                                            <option value = "B+">B RhD positive (B+)</option>
-                                            <option value = "B-">B RhD negative (B-)</option>
-                                            <option value = "O+">O RhD positive (O+)</option>
-                                            <option value = "O-">O RhD negative (O-)</option>
-                                            <option value = "AB+">AB RhD positive (AB+)</option>
-                                            <option value = "AB-">AB RhD negative (AB-)</option>
-                                        </select> */}
                                         <span style = {{fontSize: 12, color: 'red'}}>{this.state.blood_groupError}</span>
                                     </div>
                                 </Col>
@@ -377,7 +400,7 @@ class RegisterPatient extends React.Component {
                                     hasFeedback
                                         rules = {[{ required: true, message: 'Please input your Occupation!' }]}
                                     >
-                                        <Input type = "email"
+                                        <Input type = "occupation"
                                         value = {occupation} name = "occupation" onChange = {this.handleOccupationChange}
                                         placeholder="Occupation" allowClear />
                                     </Form.Item>
@@ -391,14 +414,12 @@ class RegisterPatient extends React.Component {
                                     <Form.Item
                                     value = {date_birth} name = "date_birth" 
                                     onChange = {this.handleDatebirthChange}
-                                    value = {date_birth} name = "date_birth"
                                     hasFeedback
                                         rules = {[{ required: true, message: 'Please input your Date of Birth!' }]}
                                     >
                                         <Input type = "date"
                                         value = {date_birth} name = "date_birth" 
                                         onChange = {this.handleDatebirthChange}
-                                        value = {date_birth} name = "date_birth"
                                         placeholder="Date of Birth" allowClear />
                                     </Form.Item>
                                     {/* <DatePicker  format={dateFormat} /> */}
@@ -435,7 +456,15 @@ class RegisterPatient extends React.Component {
                                     name = "person_to_contact_phone" value = {person_to_contact_phone}
                                     onChange = {this.handlePersontophoneChange}
                                     hasFeedback
-                                    rules={[{ required: true, message: 'Please input your phone number!' }]}
+                                    rules={[
+                                        {
+                                            required: true, message: 'Please input your phone number!'
+                                        }, 
+                                        {
+                                         pattern: /[0-9]{3} [0-9]{3} [0-9]{3}/,
+                                         message: 'Please input a valid phone number format! (Ex: 000 000 000)',
+                                        }
+                                         ]}
                                     >
                                         <Input addonBefore={+237}
                                         name = "person_to_contact_phone" value = {person_to_contact_phone}

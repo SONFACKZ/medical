@@ -1,24 +1,52 @@
-import React from 'react';
-import { Pie} from '@ant-design/charts';
+import React, {useState, useEffect} from 'react'
+import { Pie} from '@ant-design/charts'
+import axiosWithAuth from "../../utils/axiosWithAuth"
 
 function PieChart() {
 
+    const [users, setUser] = useState([]);
+
+    const getUsers = async () => {
+        await axiosWithAuth().get('/stat')
+        .then(response=>{
+            setUser(response.data);
+            // console.log(response.data);
+        }).catch(error=>{
+            // if(!localStorage.getItem('token') || error.response.status === 401)
+            // {
+            //   message.error('You are not authenticated, authenticate first', 5);
+            // }
+            // console.log(error);
+        })
+
+    };
+
+
+
+    useEffect(() => {
+        getUsers();
+    }, []);
+
     const dataPie = [
+        // {
+        //   type: 'Users',
+        //   value: users.nbr_user,
+        // },
         {
-          type: 'Users',
-          value: 130737,
+            type: 'Active Users',
+            value: users.nbr_active_user,
         },
         {
           type: 'Doctors',
-          value: 21468,
+          value: users.nbr_doctor,
         },
         {
           type: 'Patients',
-          value: 18098,
+          value: users.nbr_patient,
         },
         {
           type: 'Pending',
-          value: 17912,
+          value: users.nbr_pending_user,
         },
       ];
     
@@ -42,7 +70,7 @@ function PieChart() {
       };
 
     return (
-        <Pie {...configPie} style={{ backgroundColor: '#1F263C'}} />      
+        <Pie {...configPie} style={{ backgroundColor: '#1F263C'}} />
     );
 }
 
