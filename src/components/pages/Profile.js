@@ -22,6 +22,17 @@ class Profile extends Component {
     Profil: [],
     loading: false,
     visible: false,
+    fullname: '',
+    email: '',
+    residence: '',
+    sex: '',
+    contact_phone: '',
+    blood_group: '',
+    occupation: '',
+    date_birth: '',
+    password: '',
+    person_to_contact_phone: '',
+    person_to_contact_name: ''
   }
 
   // Enable fielling form

@@ -1,5 +1,7 @@
 from flask import Flask, jsonify, g, abort, json, make_response, render_template, request, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
+# from sqlalchemy.orm import backref
+# from sqlalchemy.orm import relationship
 import uuid
 from flask_jwt_extended import (JWTManager, jwt_required, create_access_token, 
     jwt_refresh_token_required, create_refresh_token,
@@ -11,6 +13,7 @@ from random import randint
 from flask_socketio import SocketIO, send
 
 import jwt
+from werkzeug.utils import secure_filename
 from datetime import datetime, timedelta, date
 from flask_login import UserMixin, LoginManager, login_user, current_user, logout_user
 from flask_migrate import Migrate
@@ -28,17 +31,19 @@ import pandas as pd
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = '\x0em\xfcF\x04\xd614\x7f$\x12\xba\xb9\x81\x9f\xe8w\xc7$\x1b\x01\xcaW\x9f'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///medi.db'
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///medi.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:postgres@localhost:5432/medical'
+#'sqlite:///medi.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = "gmailAddress"
-app.config['MAIL_PASSWORD'] = 'gmailPassword'
+app.config['MAIL_USERNAME'] = "elfridsonfack@gmail.com"
+app.config['MAIL_PASSWORD'] = 'Zane091262'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
-app.config["UPLOAD_FOLDER"] = '/static/image'
+app.config["UPLOAD_FOLDER"] = '/static/files'
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 
 db = SQLAlchemy(app)
@@ -58,7 +63,6 @@ class Role(db.Model):
     __tablename__ = 'roles'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
-    permissions = db.Column(db.Integer)
     users = db.relationship('User', backref='role', lazy='dynamic')
 
     # def __str__(self):
@@ -76,7 +80,8 @@ class User(UserMixin, db.Model):
     sex = db.Column(db.String(1), nullable=False)
     contact_phone = db.Column(db.Integer)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
-
+    parent_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    children = db.relationship("User", backref=db.backref('doctor', remote_side=[user_id]))
     blood_group = db.Column(db.String(3))
     occupation = db.Column(db.String(100), nullable=False)
     marital_status = db.Column(db.String(1))
@@ -134,9 +139,6 @@ class PastHistory(db.Model):
     past_history_year = db.Column(db.Date, nullable=False)
     past_history_owner_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
-# class Symptoms(db.Model):
-#     id = db.Column(db.Integer, primary_key=True)
-#     name = db.Column(db.String(255), nullable=False)
 
 db.create_all()
 
@@ -208,7 +210,7 @@ def pro():
 
 # User.query.join(Role, role.id == User.user_id).filter(Role, role_id == self.id)
 
-# #USers
+# USers
 def user_serializer(usersall):
     # for users, roles in users:
     return{
@@ -225,7 +227,7 @@ def user_serializer(usersall):
 }
 
 @app.route('/users', methods=['GET'])
-@jwt_required
+# @jwt_required
 def get_all_users():
     usersall = db.session.query(User, Role).join(Role).all()
     # users = User.query.all()
@@ -286,6 +288,69 @@ def get_all_patients():
     return jsonify([*map(patient_serializer, patients)])
 
 
+#Patients for a specific Doctor
+@app.route('/doctor-patients/', methods = ['GET'])
+@jwt_required
+def get_patients_for_doctor():
+    doct_patients = User.query.filter_by(user_id=parent_id)
+    return jsonify(*map[patient_serializer, doc_patients])
+
+
+# Doctor Assignation
+@app.route('/patient/assign-doctor/<public_id>', methods = ['PUT'])
+# @jwt_required
+def assign_doctor(public_id):
+    user = User.query.filter_by(public_id=public_id).first()
+    print(user.email)
+    if not user:
+        return jsonify({'warn_message': 'No user found!'})
+    else:
+        data = json.loads(request.data)
+        doc_id = data['doc_id']
+        user.parent_id = doc_id
+
+        #Sending Email Notification
+        # subject = 'Account Activated'
+        # mess = "Hello <b>"+user.fullname+"</b>, Your account has been activated<br>Login <a href = 'http://localhost:3000/login'>here</a>"
+        # msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=user.email.split())
+        # msg.html = mess
+        # with app.open_resource("../src/assets/images/logo.png") as fp:
+        #         msg.attach("logo.png", "image/png", fp.read())
+        #         mail.send(msg)
+        db.session.commit()
+        return jsonify({'message': 'The user status has been updated from Inactive to Active'})
+        return jsonify({"message": "Doctor assigned successfully"})
+
+    # # if request.method == 'PUT':
+    #     patient = User.query.filter_by(public_id=public_id).first()
+    #     patient.parent_id = id
+    #     return jsonify({'message': 'The Doctor has been assigned'})
+    # if not user:
+    #     return jsonify({'warn_message': 'No user found!'}) 
+    # if user.status == 1:
+    #     user.status = False
+    #     subject = 'Account Desactivated'
+    #     mess = "Hello <b>"+user.fullname+"</b>, Your account has been desactivated<br> You can't anymore accessed to hit"
+    #     msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=user.email.split())
+    #     msg.html = mess
+    #     with app.open_resource("../src/assets/images/logo.png") as fp:
+    #             msg.attach("logo.png", "image/png", fp.read())
+    #             mail.send(msg)
+    #     db.session.commit()
+    #     return jsonify({'message': 'The user status has been updated from Active to Inactive'})
+    # else:
+    #     user.status = True
+    #     subject = 'Account Activated'
+    #     mess = "Hello <b>"+user.fullname+"</b>, Your account has been activated<br>Login <a href = 'http://localhost:3000/login'>here</a>"
+    #     msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=user.email.split())
+    #     msg.html = mess
+    #     with app.open_resource("../src/assets/images/logo.png") as fp:
+    #             msg.attach("logo.png", "image/png", fp.read())
+    #             mail.send(msg)
+    #     db.session.commit()
+    #     return jsonify({'message': 'The user status has been updated from Inactive to Active'})
+
+
 #Consultation
 @app.route('/create/consultation', methods=['GET', 'POST'])
 @jwt_required
@@ -344,15 +409,15 @@ def doctor_serializer(doctor):
 @app.route('/users/doctors', methods = ['GET'])
 @jwt_required
 def get_all_doctors():
-    doctors = User.query.filter_by(role_id = 2)
+    doctors = User.query.filter_by(role_id = 2, status = True)
     return jsonify([*map(doctor_serializer, doctors)])
 
 #Inactive doctors
-@app.route('/users/doctors/rev', methods = ['GET'])
+@app.route('/users/rev', methods = ['GET'])
 @jwt_required
 def get_inactive_doctors():
-    doctors = User.query.filter_by(status = False)
-    return jsonify([*map(doctor_serializer, doctors)])
+    users = User.query.filter_by(status = False)
+    return jsonify([*map(doctor_serializer, users)])
 
 
 # @app.route('/role/view', methods=['GET'])
@@ -466,7 +531,7 @@ def roles():
     db.session.add(role)
     db.session.commit()
     
-    return {'201': 'Role created successfully'}
+    return {'200': 'Role created successfully'}
 
 #Update Role
 @app.route('/role/update/<public_id>', methods = ['PUT'])
@@ -476,7 +541,8 @@ def updrole(public_id):
     if not user:
         return jsonify({'message': 'No user found!'})
     
-    user.role_id = 2
+    user.role_id = 1
+    # user.parent_id = 4
     db.session.commit()
 
     return jsonify({'message': 'The user role has been updated!'})
@@ -550,17 +616,51 @@ def get_user_pasthistory():
 # def load_user(user_id):
 #     return User.query.get(user_id)
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# @app.route('/upload', methods=['GET', 'POST'])
+# def upload_file():
+#     if request.method == 'POST':
+#         # check if the post request has the file part
+#         if 'file' not in request.files:
+#             return jsonify({'msg': 'No file part1'})
+#             # return redirect(request.url)
+#         file = request.files['file']
+#         # if user does not select file, browser also
+#         # submit an empty part without filename
+#         if file.filename == '':
+#             return jsonify({'msg': 'No selected file 2'})
+#             # return redirect(request.url)
+#         if file and allowed_file(file.filename):
+#             filename = secure_filename(file.filename)
+#             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+#             filename = filename
+#             return jsonify({'uploaded_file': filename})
+
 #Register a Doctor
 @app.route('/auth/register/doctor', methods=["POST"])
 def reg_doctor():
     data = request.get_json()
+    
 
     dateB = datetime.strptime(data['date_birth'], '%Y-%m-%d').date()
 
-    # file = data['nic_passport_path']
-    # filename = secure_filename(file.filename)
-    # file.save((os.path.join(app.config['UPLOAD_FOLDER'], file.filename))
-    # filepath = 'static/images/'+file.filename
+    # id_passport = data['nic_passport_path']
+    # id_passport_filename = secure_filename(id_passport.filename)
+    # id_passport.save(os.path.join(app.config['UPLOAD_FOLDER'], id_passport_filename))
+    # id_pass_filepath = 'static/files/'+id_passport_filename
+
+    # cv = data['cv_path']
+    # cv_filename = secure_filename(cv.filename)
+    # cv.save(os.path.join(app.config['UPLOAD_FOLDER'], cv_filename))
+    # cv_filepath = 'static/files/'+cv_filename
+
+    # diploma = data['diplomas_path']
+    # diploma_filename = secure_filename(diploma.filename)
+    # diploma.save(os.path.join(app.config['UPLOAD_FOLDER'], diploma_filename))
+    # diploma_filepath = 'static/files/'+diploma_filename
 
     hashed_password = generate_password_hash(data['password'], method='sha256')
     dateB = datetime.strptime(data['date_birth'], '%Y-%m-%d').date()
@@ -569,8 +669,11 @@ def reg_doctor():
                         email=data['email'], residence=data['residence'],
                         sex=data['sex'], contact_phone=data['contact_phone'],
                         occupation=data['occupation'],
-                        nic_passport_path=data['nic_passport_path'],
-                        cv_path=data['cv_path'], diplomas_path=data['diplomas_path'],
+                        # data['nic_passport_path']
+                        # nic_passport_path=id_pass_filepath,
+                        # data['cv_path']
+                        # data['diplomas_path']
+                        # cv_path=cv_filepath, diplomas_path=diploma_filepath,
                         marital_status=data['marital_status'], date_birth=dateB
                        )
     subject = 'Welcome to Mediagnostic'
@@ -580,7 +683,6 @@ def reg_doctor():
     with app.open_resource("../src/assets/images/logo.png") as fp:
             msg.attach("logo.png", "image/png", fp.read())
             mail.send(msg)
-
     #Insert Doctor
     db.session.add(new_doctor)
     db.session.commit()
@@ -590,16 +692,13 @@ def reg_doctor():
 #Register a patient
 @app.route('/auth/register/patient', methods=["POST"])
 def reg_patient():
-    
     data = json.loads(request.data)
     hashed_password = generate_password_hash(data['password'], method='sha256')
     dateB = datetime.strptime(data['date_birth'], '%Y-%m-%d').date()
 
-
-
     # checking for existing user
     new_patient = User.query.filter_by(email=data['email']).first()
-
+    manager = User.query.filter_by(role_id = 1).first() #Getting the manager
     if not new_patient:
     # gets inputs
         new_patient = User(public_id=str(uuid.uuid4()),
@@ -613,8 +712,16 @@ def reg_patient():
                             person_to_contact_phone=data['person_to_contact_phone']
                             )
         subject = 'Welcome to Mediagnostic'
-        mess = "Hello <b>"+data['fullname']+"</b>, welcome to Mediagnostic. Your registered successfully<br>Login <a href = 'http://localhost:3000/login'>here</a>"
+        mess = "Hello <b>"+data['fullname']+"</b>, welcome to Mediagnostic. You registered successfully<br>Login <a href = 'http://localhost:3000/login'>here</a>"
         msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=data['email'].split())
+        msg.html = mess
+        with app.open_resource("../src/assets/images/logo.png") as fp:
+            msg.attach("logo.png", "image/png", fp.read())
+            mail.send(msg)
+
+        subject = 'New Account created'
+        mess = "New patient account created in your application.<br> Email: <b>"+data['email']+"</b>"
+        msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=manager.email.split())
         msg.html = mess
         with app.open_resource("../src/assets/images/logo.png") as fp:
             msg.attach("logo.png", "image/png", fp.read())
@@ -695,10 +802,24 @@ def promote_user(public_id):
 
     if user.status == 1:
         user.status = False
+        subject = 'Account Desactivated'
+        mess = "Hello <b>"+user.fullname+"</b>, Your account has been desactivated<br> You can't anymore accessed to hit"
+        msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=user.email.split())
+        msg.html = mess
+        with app.open_resource("../src/assets/images/logo.png") as fp:
+                msg.attach("logo.png", "image/png", fp.read())
+                mail.send(msg)
         db.session.commit()
         return jsonify({'message': 'The user status has been updated from Active to Inactive'})
     else:
         user.status = True
+        subject = 'Account Activated'
+        mess = "Hello <b>"+user.fullname+"</b>, Your account has been activated<br>Login <a href = 'http://localhost:3000/login'>here</a>"
+        msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=user.email.split())
+        msg.html = mess
+        with app.open_resource("../src/assets/images/logo.png") as fp:
+                msg.attach("logo.png", "image/png", fp.read())
+                mail.send(msg)
         db.session.commit()
         return jsonify({'message': 'The user status has been updated from Inactive to Active'})
 

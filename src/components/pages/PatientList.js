@@ -3,31 +3,25 @@ import React, {useState, useEffect} from "react"
 import { Link } from 'react-router-dom'
 import axiosWithAuth from "../../utils/axiosWithAuth"
 import { EditOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons'
-import {Table, Button, Modal, Input, Form, message, Tag } from 'antd'
+import {Table, Button, Modal, Select, Form, message, Tag, Row, Col } from 'antd'
 
-
-const {Item} = Form;
-
+const { Option } = Select;
 
 const PatientList = () => {
 
-    // const [use, setUse] = useState(
-    //     {
-    //         user_id: '',
-    //         fullname: '',
-    //         status: '',
-    //         email: '',
-    //         role_id: ''
-    //     }
-    // )
+    const state = {
+        doc_id: ''
+    }
 
     const [visible, setVisible] = useState(false);
 
- 
+    const [doctors, setDoctors] = useState([]);
 
     const [users, setUser] = useState([]);
 
     const [user, setUse] = useState([]);
+
+    let doc_id = '';
 
     const getUsers = async () => {
         await axiosWithAuth().get('/users/patients')
@@ -41,9 +35,22 @@ const PatientList = () => {
         // setUser(result.data);
     };
 
+    function onChange(value) {
+        console.log(`selected ${value}`);
+        {doc_id = value}
+      }
 
-    function onChange(e) {
-        console.log(`checked = ${e.target.checked}`);
+      
+      function onBlur() {
+        console.log('blur');
+      }
+      
+      function onFocus() {
+        console.log('focus');
+      }
+      
+      function onSearch(val) {
+        console.log('search:', val);
       }
 
 
@@ -53,15 +60,34 @@ const PatientList = () => {
 
 
     function activateUser(public_id){
-        axiosWithAuth().put('/user/status/'+public_id, public_id)
+        axiosWithAuth().put('/user/status/'+public_id)
          .then(response => {
             //  console.log(response)
             message.success(response.data.message, 5);
+            window.location.reload();
 
          })
          .catch(error => {
              console.log(error.data.warn_message)
          })
+}
+
+function assignDoctor(public_id)
+{
+    // doc_id = this.state.doc_id
+    axiosWithAuth().put('/patient/assign-doctor/'+public_id, 
+    {
+        doc_id: doc_id
+    })
+    .then(response => {
+        // console.log(response.data)
+        console.log("================> "+doc_id)
+        message.success(response.data.assign, 5);
+        window.location.reload();
+    })
+    .catch(error => {
+        console.log(error)
+    })
 }
 
 
@@ -78,6 +104,22 @@ const PatientList = () => {
 }
 
 
+
+const getDoctors = async () => {
+    await axiosWithAuth().get('/users/doctors')
+    .then(response=>{
+        setDoctors(response.data);
+        // console.log(response.data);
+    }).catch(error=>{
+        console.log(error);
+    })
+};
+
+useEffect(() => {
+    getDoctors();
+}, []);
+
+
 // Making table
 const columns = [
     {
@@ -88,31 +130,31 @@ const columns = [
     width: 50,
     fixed: 'left'
     },
-    {
-    title: 'Public Id',
-    dataIndex: 'public_id',
-    align: 'center',
-    key: 'public_id',
-    // fixed: 'left',
-    },
-    {
-    title: 'Name',
-    dataIndex: 'fullname',
-    align: 'center',
-    key: 'fullname'
-    },
+    // {
+    // title: 'Public Id',
+    // dataIndex: 'public_id',
+    // align: 'center',
+    // key: 'public_id',
+    // // fixed: 'left',
+    // },
+    // {
+    // title: 'Name',
+    // dataIndex: 'fullname',
+    // align: 'center',
+    // key: 'fullname'
+    // },
     {
     title: 'Email',
     dataIndex: 'email',
     align: 'center',
     key: 'email'
     },
-    {
-    title: 'Role',
-    dataIndex: 'role_id',
-    align: 'center',
-    key: 'role_id'
-    },
+    // {
+    // title: 'Role',
+    // dataIndex: 'role_id',
+    // align: 'center',
+    // key: 'role_id'
+    // },
     {
     title: 'Status',
     align: 'center',
@@ -127,7 +169,7 @@ const columns = [
     title: 'Details',
     key: 'actions',
     align: 'center',
-    fixed: 'right',
+    // fixed: 'right',
     render: (action) =>(
         <>
         <Button type = 'primary' onClick = {() => {setVisible(true, detailsUser(action.public_id))}}>
@@ -169,29 +211,116 @@ const columns = [
                             user.map(use => {
                                 return(
                             <>
+                            <Row gutter= {16}>
+                            <Col span={12}>
                                 <li><b>Public_id</b>: {use.public_id}</li>
+                            </Col>
+                            <Col span={12}>
                                 <li><b>Email</b>: {use.email}</li>
-                                <li><b>Fullname</b>: {use.fullname}</li>   
-                                <li><b>Residence</b>: {use.residence}</li>   <li></li>
-                                <li><b>Occupation</b>: {use.occupation}</li>   <li></li>
+                            </Col>
+                            </Row><br />
+                            <Row gutter= {16}>
+                            <Col span={12}>
+                                <li><b>Fullname</b>: {use.fullname}</li>
+                            </Col>  
+                            <Col span={12}> 
+                                <li><b>Residence</b>: {use.residence}</li> 
+                            </Col>
+                            </Row><br />
+                            <Row gutter= {16}>
+                            <Col span={12}> 
+                                <li><b>Occupation</b>: {use.occupation}</li>
+                            </Col>
+                            <Col span={12}>   
                                 <li><b>Status</b>: {use.satus === true?<Tag style = {{color: '#5cb85c'}}>Active</Tag>:<Tag style = {{color: '#f0ad4e'}}>Inactive</Tag>}</li>
+                            </Col>
+                            </Row><br />
+                            <Row gutter= {16}>
+                            <Col span={12}>
                                 <li><b>Birthday</b>: {use.date_birth}</li>
+                            </Col>
+                            <Col span={12}>
                                 <li><b>Phone</b>: {use.contact_phone}</li>
+                            </Col>
+                            </Row><br />
+                            <Row gutter= {16}>
+                            <Col span={12}>
                                 <li><b>Gender</b>: {use.sex === 'M'?'Male':'Female'}</li>
+                            </Col>
+                            <Col span={12}>
                                 <li><b>Blood Group</b>: {use.blood_group}</li>
+                            </Col>
+                            </Row><br />
+                            <Row gutter= {16}>
+                            <Col span={12}>
                                 <li><b>Marital Status</b>: {use.sex === 'S'?'Single':'Married'}</li>
+                            </Col>
+                            <Col span={12}>
                                 {use.status === true?
                                 <Button key="submit" type="link" style = {{background: '#f0ad4e', color: 'white'}}
                                     onClick={() => activateUser(use.public_id)}>
-                                    Desactivate this user</Button>:
+                                    Desactivate this Patient</Button>:
                                     <Button key="submit" type="primary" style = {{background: '#5cb85c', color: 'white'}}
                                     onClick={() => activateUser(use.public_id)}>
                                     Activate this user</Button>}
+                                </Col>
+                                </Row>
+                                    
                             </>
                                 )
                             }
                                 )
                      } 
+                                <p></p>
+                                    <Form> Assign a Doctor:{" "}
+                                        <Select
+                                        showSearch
+                                        style={{ width: 200 }}
+                                        placeholder="Please select a Doctor to assign!"
+                                        optionFilterProp="children"
+                                        onChange={onChange} 
+                                        onFocus={onFocus}
+                                        onBlur={onBlur}
+                                        onSearch={onSearch}
+                                        filterOption={(input, option) =>
+                                        option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                        }
+                                        >
+                                {
+                                    doctors.map(doctor => {
+                                        return(
+                                        <Option value={doctor.user_id}>{doctor.email}</Option>
+                                        )
+                                    }
+                                        )
+                                }
+                                        </Select>{" "}
+                                        {
+                                            doctors.map(doc =>{
+                                                const doc_id = doc.user_id
+                                                return(
+                                                    <input type = 'hidden'
+                                                    onChange={onChange} name = "doc_id" value = {doc_id} />
+                                                    // onChange ={{onChange}} name = "id" value = {doc_id} />
+                                                )
+                                                
+                                            })
+                                        }
+                                        {
+                                            user.map(p_user =>{
+                                                // const public_id = p_user.public_id
+                                                // console.log(p_user.public_id)
+                                                return(
+                                        <Button style = {{background: '#5cb85c', color: 'white'}}
+                                        onClick = {() =>{assignDoctor(p_user.public_id)}}>
+                                        <EditOutlined />Assign
+                                        </Button>
+                                                )
+                                            }
+                                            )
+                                        }
+                                    </Form>
+                                     
                 </Modal>
             </div>
         </div>

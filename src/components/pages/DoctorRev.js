@@ -3,7 +3,7 @@ import React, {useState, useEffect} from "react"
 import { Link } from 'react-router-dom'
 import axiosWithAuth from "../../utils/axiosWithAuth"
 import { EditOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons'
-import {Table, Button, Modal, Input, Form, message } from 'antd'
+import {Table, Button, Modal, Input, Form, message, Row, Col } from 'antd'
 
 
 const {Item} = Form;
@@ -22,7 +22,7 @@ const DoctorsReview = () => {
     const [user, setUse] = useState([]);
 
     const getUsers = async () => {
-        await axiosWithAuth().get('/users/doctors/rev')
+        await axiosWithAuth().get('/users/rev')
         .then(response=>{
             setUser(response.data);
             console.log(response.data);
@@ -44,11 +44,11 @@ const DoctorsReview = () => {
     }, []);
 
     function activateUser(public_id){
-            axiosWithAuth().put('/user/status/'+public_id, public_id)
+            axiosWithAuth().put('/user/status/'+public_id)
              .then(response => {
                 //  console.log(response)
                 message.success(response.data.message, 5);
-
+                window.location.reload();
              })
              .catch(error => {
                  console.log(error.data.warn_message)
@@ -82,33 +82,33 @@ const columns = [
     // sortable: false,
     // filterable: false,
     },
-    {
-    title: 'Public Id',
-    dataIndex: 'public_id',
-    align: 'center',
-    key: 'public_id',
-    // sortable: false,
-    // filterable: false,
-    // fixed: 'left',
-    },
-    {
-    title: 'Name',
-    dataIndex: 'fullname',
-    align: 'center',
-    key: 'fullname'
-    },
+    // {
+    // title: 'Public Id',
+    // dataIndex: 'public_id',
+    // align: 'center',
+    // key: 'public_id',
+    // // sortable: false,
+    // // filterable: false,
+    // // fixed: 'left',
+    // },
+    // {
+    // title: 'Name',
+    // dataIndex: 'fullname',
+    // align: 'center',
+    // key: 'fullname'
+    // },
     {
     title: 'Email',
     dataIndex: 'email',
     align: 'center',
     key: 'email'
     },
-    {
-    title: 'Role',
-    dataIndex: 'role_id',
-    align: 'center',
-    key: 'role_id'
-    },
+    // {
+    // title: 'Role',
+    // dataIndex: 'role_id',
+    // align: 'center',
+    // key: 'role_id'
+    // },
     {
     title: 'Status',
     align: 'center',
@@ -123,7 +123,7 @@ const columns = [
     title: 'Actions',
     key: 'actions',
     align: 'center',
-    fixed: 'right',
+    // fixed: 'right',
     render: (action) =>(
         <>
         <Button type = 'primary' onClick = {() => {setVisible(true, detailsUser(action.public_id))}}>
@@ -146,7 +146,10 @@ const columns = [
             <div className = "py-4">
                 <h1 style = {{textAlign: 'center'}}>Waiting Doctors Registration{users.public_id}</h1>
 
-                <Table columns = {columns} dataSource = {users} scroll={{ x: 1500, y: 300 }} />
+                <Table columns = {columns} dataSource = {users} scroll={{ x: 1500, y: 300 }} 
+                scroll={{ x: 1500, y: 300 }} 
+                rowClassName={(record, index) => index % 2 === 0 ? 'table-row-light' :  'table-row-dark'}
+                />
 
                 <Modal
                     title="User Details"
@@ -168,17 +171,57 @@ const columns = [
                             user.map(use => {
                                 return(
                             <>
+                            <Row gutter= {16}>
+                            <Col span={12}>
                                 <li><b>Public_id</b>: {use.public_id}</li>
+                            </Col>
+                            <Col span={12}>
                                 <li><b>Email</b>: {use.email}</li>
-                                <li><b>Fullname</b>: {use.fullname}</li>   
-                                <li><b>Residence</b>: {use.residence}</li>   <li></li>
-                                <li><b>Occupation</b>: {use.occupation}</li>   <li></li>
+                            </Col>
+                            </Row><br />
+                            <Row gutter= {16}>
+                            <Col span={12}>
+                                <li><b>Fullname</b>: {use.fullname}</li>
+                            </Col>
+                            <Col span={12}>
+                                <li><b>Residence</b>: {use.residence}</li>
+                            </Col>
+                            </Row><br />
+                            <Row gutter= {16}>
+                            <Col span={12}>
+                                <li><b>Occupation</b>: {use.occupation}</li>
+                            </Col>
+                            <Col span={12}>
                                 <li><b>Status</b>: {use.satus === true?'Activate':'Inactive'}</li>
+                            </Col>
+                            </Row><br />
+                            <Row gutter= {16}>
+                            <Col span={12}>
                                 <li><b>Birthday</b>: {use.date_birth}</li>
+                            </Col>
+                            <Col span={12}>
                                 <li><b>Phone</b>: {use.contact_phone}</li>
+                            </Col>
+                            </Row><br />
+                            <Row gutter= {16}>
+                            <Col span={12}>
                                 <li><b>Gender</b>: {use.sex === 'M'?'Male':'Female'}</li>
+                            </Col>
+                            <Col span={12}>
                                 <li><b>Blood Group</b>: {use.blood_group}</li>
+                            </Col>
+                            </Row><br />
+                            <Row gutter= {16}>
+                            <Col span={12}>
                                 <li><b>Marital Status</b>: {use.sex === 'S'?'Single':'Married'}</li>
+                            </Col>
+                            <Col span={12}>
+                                <li><Button style = {{background: '#5cb85c', color: 'white'}}
+                                        onClick = {() =>{activateUser(use.public_id)}}>
+                                        <EditOutlined />Activate
+                                        </Button></li>
+                            </Col>
+                            </Row>
                             </>
                                 )
                             }

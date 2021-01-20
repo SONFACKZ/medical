@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from "react"
 import axiosWithAuth from "../../utils/axiosWithAuth"
 import { EyeOutlined } from '@ant-design/icons'
-import {Table, Button, Modal, Tag, message } from 'antd'
+import {Table, Button, Modal, Tag, message, Row, Col } from 'antd'
 // import { useHistory } from "react-router-dom"
 
 const DoctorList = () => {
@@ -82,13 +82,13 @@ const columns = [
     width: 50,
     fixed: 'left'
     },
-    {
-    title: 'Public Id',
-    dataIndex: 'public_id',
-    align: 'center',
-    key: 'public_id',
-    // fixed: 'left',
-    },
+    // {
+    // title: 'Public Id',
+    // dataIndex: 'public_id',
+    // align: 'center',
+    // key: 'public_id',
+    // // fixed: 'left',
+    // },
     {
     title: 'Name',
     dataIndex: 'fullname',
@@ -101,12 +101,12 @@ const columns = [
     align: 'center',
     key: 'email'
     },
-    {
-    title: 'Role',
-    dataIndex: 'role_id',
-    align: 'center',
-    key: 'role_id'
-    },
+    // {
+    // title: 'Role',
+    // dataIndex: 'role_id',
+    // align: 'center',
+    // key: 'role_id'
+    // },
     {
     title: 'Status',
     align: 'center',
@@ -121,7 +121,7 @@ const columns = [
     title: 'Details',
     key: 'actions',
     align: 'center',
-    fixed: 'right',
+    // fixed: 'right',
     render: (action) =>(
         <>
         <Button type = 'primary' onClick = {() => {setVisible(true, detailsUser(action.public_id))}}>
@@ -163,17 +163,51 @@ const columns = [
                             user.map(use => {
                                 return(
                             <>
+                            <Row gutter= {16}>
+                            <Col span={12}>
                                 <li><b>Public_id</b>: {use.public_id}</li>
+                            </Col>
+                            <Col span={12}>
                                 <li><b>Email</b>: {use.email}</li>
-                                <li><b>Fullname</b>: {use.fullname}</li>   
-                                <li><b>Residence</b>: {use.residence}</li>   <li></li>
-                                <li><b>Occupation</b>: {use.occupation}</li>   <li></li>
+                            </Col>
+                            </Row><br />
+                            <Row gutter= {16}>
+                            <Col span={12}>
+                                <li><b>Fullname</b>: {use.fullname}</li> 
+                            </Col>
+                            <Col span={12}>
+                                <li><b>Residence</b>: {use.residence}</li>
+                            </Col>
+                            </Row><br />
+                            <Row gutter= {16}>
+                            <Col span={12}>
+                                <li><b>Occupation</b>: {use.occupation}</li>
+                            </Col>
+                            <Col span={12}>
                                 <li><b>Status</b>: {use.status === true?<Tag style = {{color: '#5cb85c'}}>Active</Tag>:<Tag style = {{color: '#f0ad4e'}}>Inactive</Tag>}</li>
+                            </Col>
+                            </Row><br />
+                            <Row gutter= {16}>
+                            <Col span={12}>
                                 <li><b>Birthday</b>: {use.date_birth}</li>
+                            </Col>
+                            <Col span={12}>
                                 <li><b>Phone</b>: {use.contact_phone}</li>
+                            </Col>
+                            </Row><br />
+                            <Row gutter= {16}>
+                            <Col span={12}>
                                 <li><b>Gender</b>: {use.sex === 'M'?'Male':'Female'}</li>
+                            </Col>
+                            <Col span={12}>
                                 <li><b>Blood Group</b>: {use.blood_group}</li>
+                            </Col>
+                            </Row><br />
+                            <Row gutter= {16}>
+                            <Col span={12}>
                                 <li><b>Marital Status</b>: {use.sex === 'S'?'Single':'Married'}</li>
+                            </Col>
+                            <Col span={12}>
                                 {use.status === true?
                                 <Button key="submit" type="link" style = {{background: '#f0ad4e', color: 'white'}}
                                     onClick={() => activateUser(use.public_id)}>
@@ -181,6 +215,8 @@ const columns = [
                                     <Button key="submit" type="primary" style = {{background: '#5cb85c', color: 'white'}}
                                     onClick={() => activateUser(use.public_id)}>
                                     Activate this user</Button>}
+                            </Col>
+                            </Row>
                             </>
                                 )
                             }

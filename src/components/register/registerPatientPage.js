@@ -194,6 +194,7 @@ class RegisterPatient extends React.Component {
              .then(response => {
                  console.log(response)
                 message.success(response.data.message, 5);
+                window.location.reload();
                 //  warn_message
              })
              .catch(error => {
@@ -343,15 +344,15 @@ class RegisterPatient extends React.Component {
                                             required: true, message: 'Please input your phone number!'
                                         }, 
                                         {
-                                         pattern: /[0-9]{3} [0-9]{3} [0-9]{3}/,
-                                         message: 'Please input a valid phone number format! (Ex: 000 000 000)',
+                                         pattern: /[0-9]{3}[0-9]{3}[0-9]{3}/,
+                                         message: 'Please input a valid phone number format! (Ex: 600000000)',
                                         }
                                          ]}
                                          >
                                         <Input addonBefore={+237}
                                          name = "phone_contact" value = {contact_phone}
                                          onChange = {this.handleContactphoneChange}
-                                         pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" placeholder="Contact Phone" 
+                                         pattern = "[0-9]{3}[0-9]{3}[0-9]{3}" placeholder="Contact Phone" 
                                          allowClear />
                                     </Form.Item>
                                         {/* <label>Contact Phone</label>
@@ -461,15 +462,15 @@ class RegisterPatient extends React.Component {
                                             required: true, message: 'Please input your phone number!'
                                         }, 
                                         {
-                                         pattern: /[0-9]{3} [0-9]{3} [0-9]{3}/,
-                                         message: 'Please input a valid phone number format! (Ex: 000 000 000)',
+                                         pattern: /[0-9]{3}[0-9]{3}[0-9]{3}/,
+                                         message: 'Please input a valid phone number format! (Ex: 600000000)',
                                         }
                                          ]}
                                     >
                                         <Input addonBefore={+237}
                                         name = "person_to_contact_phone" value = {person_to_contact_phone}
                                         onChange = {this.handlePersontophoneChange}
-                                         pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" placeholder="Person to contact Phone" 
+                                         pattern = "[0-9]{3}[0-9]{3}[0-9]{3}" placeholder="Person to contact Phone" 
                                          allowClear />
                                     </Form.Item>
                                         {/* <label>Person to contact Phone</label>

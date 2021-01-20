@@ -1,9 +1,9 @@
-import React, {useState, useEffect} from 'react'
+import React from 'react'
 import axios from 'axios'
 import doctorImg from "../../assets/images/doctor.svg"
-import { Form, Input, Button, Checkbox, Select, Row, Col, DatePicker} from 'antd'
+import { Form, Input, Button, Select, Row, Col } from 'antd'
 import { MailOutlined, UserOutlined, LockOutlined, 
-        LoginOutlined, QuestionCircleOutlined, HomeOutlined } from '@ant-design/icons'
+        LoginOutlined,  HomeOutlined } from '@ant-design/icons'
 import {Link} from "react-router-dom"
 
 
@@ -14,25 +14,13 @@ const initialState = {
             residence: '',
             sex: '',
             contact_phone: '',
-            nic_passport_path: '',
             occupation: '',
             date_birth: '',
             password: '',
-            cv_path: '',
-            diplomas_path: '',
-            marital_status: '',
-            fullnameError: '',
-            emailError: '',
-            residenceError: '',
-            sexError: '',
-            contact_phoneError: '',
-            nic_passport_pathError: '',
-            occupationError: '',
-            date_birthError: '',
-            passwordError: '',
-            cv_pathError: '',
-            diplomas_pathError: '',
-            marital_statusError: ''
+            nic_passport_path: null,
+            cv_path: null,
+            diplomas_path: null,
+            marital_status: ''
 }
 
 
@@ -44,11 +32,13 @@ const onFinish = (values) => {
 
 class RegisterPatient extends React.Component {
     constructor(props){
-        super(props)
+        super(props);
 
-        const handleFormChange = (inputValue) => {
-            // setAddPatient(inputValue)
-        }
+        this.handleSexOnChange = this.handleSexOnChange.bind(this);
+        this.handleMaritelOnChange = this.handleMaritalOnChange.bind(this);
+        // const handleFormChange = (inputValue) => {
+        //     // setAddPatient(inputValue)
+        // }
 
         this.state = initialState;
     }
@@ -71,21 +61,27 @@ class RegisterPatient extends React.Component {
             residence: event.target.value
         })
     }
-    handleSexChange = (event) => {
+
+    handleSexOnChange = (value, event) =>{
+        console.log('selected: '+ value);
         this.setState({
-            sex: event.target.value
+            sex: value
         })
     }
+
+    // handleSexChange = (event) => {
+    //     this.setState({
+    //         sex: event.target.value
+    //     })
+    // }
+
     handleContactphoneChange = (event) => {
         this.setState({
             contact_phone: event.target.value
         })
     }
-    handleNicPassportPathChange = (event) => {
-        this.setState({
-            nic_passport_path: event.target.value
-        })
-    }
+
+
     handleOccupationChange = (event) => {
         this.setState({
             occupation: event.target.value
@@ -101,83 +97,57 @@ class RegisterPatient extends React.Component {
             password: event.target.value
         })
     }
+    
+    handleNicPassportPathChange = (event) => {
+        this.setState({
+            nic_passport_path: event.target.files[0]
+        })
+        console.log(event.target.files[0]);
+    }
+
     handleCvPathChange = (event) => {
         this.setState({
-            cv_path: event.target.value
+            cv_path: event.target.files[0]
         })
+        console.log(event.target.files[0]);
     }
     handleDiplomasPathChange = (event) => {
         this.setState({
-            diplomas_path: event.target.value
+            diplomas_path: event.target.files[0]
         })
+        console.log(event.target.files[0]);
     }
 
-    handleMaritalStatusChange = (event) => {
+    handleMaritalOnChange = (value, event) =>{
+        console.log('selected: '+ value);
         this.setState({
-            marital_status: event.target.value
+            marital_status: value
         })
     }
 
-// Validation form
-    // valid(item, type)
-    // {
-    //     let itemValue = item.target.value;
-    //     switch(type)
-    //     {
-    //         case "fullname":{
-    //             if(itemValue.length<4)
-    //             {
-    //                 item.target.style.color='red';
-    //                 this.setState({fullname: itemValue})
-    //             }
-    //             else
-    //             {
-    //                 item.target.style.color='green';
-    //                 this.setState({fullname: itemValue})
-    //             }
-    //         }
-    //     }
-    // }
 
-// Validation form
-    validate = () => {
-        let fullnameError = '';
-        let emailError = '';
-        let residenceError = '';
-        let sexError = '';
-        let contact_phoneError = '';
-        let nic_passport_pathError = '';
-        let occupationError = '';
-        let date_birthError = '';
-        let passwordError = '';
-        let cv_pathError = '';
-        let diplomas_pathError = '';
-        let marital_statusError = '';
-
-        if(!this.state.fullname){
-            fullnameError = 'Name cannot be blank';
-        }
-        if(!this.state.email.includes("@")){
-            emailError = 'Invalid email';
-        }
-        if(emailError || fullnameError){
-            this.setState({emailError, fullnameError});
-            return false;
-        }
-
-        return true;
-    };
 
 
 // handle submit value
     handleSubmit = event => {
         event.preventDefault() //Avoid to lose data after submited
-        const isValid = this.validate();
-        if(isValid){
-            console.log(this.state);
-            this.setState(initialState); //Clearing Form
-        }
-        axios.post('/register/doctor', this.state)
+
+        const formData = new FormData();
+
+        formData.append('fullname', this.state.fullname)
+        formData.append('email', this.state.email)
+        formData.append('residence', this.state.residence)
+        formData.append('sex', this.state.sex)
+        formData.append('contact_phone', this.state.contact_phone)
+        formData.append('occupation', this.state.occupation)
+        formData.append('date_birth', this.state.date_birth)
+        formData.append('password', this.state.password)
+        formData.append('nic_passport_path', this.state.nic_passport_path)
+        formData.append('cv_path', this.state.cv_path)
+        formData.append('diplomas_path', this.state.diplomas_path)
+        formData.append('marital_status', this.state.marital_status)
+
+        axios.post('/auth/register/doctor', this.state)
              .then(response => {
                  console.log(response)
              })
@@ -277,20 +247,20 @@ class RegisterPatient extends React.Component {
                                     <Form.Item 
                                     name="sex"
                                     value = {sex}
-                                    onChange = {this.handleSexChange}
+                                    onChange={(value, event) => this.handleSexOnChange(value, event)}
                                     hasFeedback
-                                        rules={[{ required: true, message: 'Please select your gender!' }]}
+                                    rules={[{ required: true, message: 'Please select your gender!' }]}
                                     >
-                                        <Select size = 'large'
+                                        <Select size = "large"
                                         name="sex"
                                         value = {sex}
-                                        onChange = {this.handleSexChange}
+                                        onChange={(value, event) => this.handleSexOnChange(value, event)}
                                         placeholder="Gender">
                                         <Option value = "">Choose your Gender</Option>
                                         <Option value="F">Female</Option>
                                         <Option value="M">Male</Option>
                                         </Select>
-                                        {/* <span style = {{fontSize: 9, color: 'grey'}}>Select your gender</span> */}
+                                        {/* <span style = {{fontSize: 9, color: 'grey'}}>Choose your gender</span> */}
                                     </Form.Item>
                                      {/* <label>Marital Status</label> */}
                                     {/* <select class="form-control" value = {marital_status} name = "marital_status" onChange = {this.handleMaritalStatusChange} required>
@@ -308,8 +278,15 @@ class RegisterPatient extends React.Component {
                                     name = "phone_contact" value = {contact_phone}
                                     onChange = {this.handleContactphoneChange}
                                     hasFeedback
-                                        rules={[{ required: true, message: 'Please input your phone number!' }]}
-                                    >
+                                    rules={[
+                                        {
+                                            required: true, message: 'Please input your phone number!'
+                                        }, 
+                                        {
+                                         pattern: /[0-9]{3} [0-9]{3} [0-9]{3}/,
+                                         message: 'Please input a valid phone number format! (Ex: 000 000 000)',
+                                        }
+                                         ]}>
                                         <Input addonBefore={+237}
                                          name = "phone_contact" value = {contact_phone}
                                          onChange = {this.handleContactphoneChange}
@@ -322,6 +299,24 @@ class RegisterPatient extends React.Component {
                                 <Col span={12}>
                                     <div>
                                     <Form.Item 
+                                    // value = {nic_passport_path} 
+                                    name = "nic_passport_path" 
+                                    valuePropName="fileList"
+                                    // onChange = {this.handleNicPassportPathChange}
+                                    // getValueFromEvent={this.handleNicPassportPathChange}
+                                    extra="Nationale ID Card or Passport"
+                                >
+                                    <Input type = "file"
+                                        // value = {nic_passport_path} 
+                                        name = "nic_passport_path" 
+                                        onChange = {this.handleNicPassportPathChange}
+                                        placeholder = "ID Card / Passport"
+                                        />
+                                    {/* <Upload name="logo" action="/upload.do" listType="picture" size = 'large'>
+                                    <Button icon={<UploadOutlined />}>Click to upload</Button>
+                                    </Upload> */}
+                                </Form.Item>
+                                    {/* <Form.Item 
                                         value = {nic_passport_path} 
                                         name = "nic_passport_path" 
                                         onChange = {this.handleNicPassportPathChange}
@@ -343,7 +338,7 @@ class RegisterPatient extends React.Component {
                                         onChange = {this.handleNicPassportPathChange}
                                         placeholder = "ID Card / Passport"
                                         /><span style = {{fontSize: 9, color: 'grey'}}>Nationale ID Card or Passport</span>
-                                    </Form.Item>
+                                    </Form.Item> */}
                                         <span style = {{fontSize: 12, color: 'red'}}>{this.state.blood_groupError}</span>
                                     </div>
                                 </Col>
@@ -369,14 +364,14 @@ class RegisterPatient extends React.Component {
                                     <Form.Item
                                     value = {date_birth} name = "date_birth" 
                                     onChange = {this.handleDatebirthChange}
-                                    value = {date_birth} name = "date_birth"
+                                    // value = {date_birth} name = "date_birth"
                                     hasFeedback
                                         rules = {[{ required: true, message: 'Please input your Date of Birth!' }]}
                                     >
                                         <Input type = "date"
                                         value = {date_birth} name = "date_birth" 
                                         onChange = {this.handleDatebirthChange}
-                                        value = {date_birth} name = "date_birth"
+                                        // value = {date_birth} name = "date_birth"
                                         placeholder="Date of Birth" allowClear />
                                     </Form.Item>
                                     {/* <DatePicker  format={dateFormat} /> */}
@@ -390,6 +385,14 @@ class RegisterPatient extends React.Component {
                                 <Col span={12}>
                                     <div>
                                     <Form.Item 
+                                    name = "diplomas_path" 
+                                    // value = {diplomas_path} 
+                                    // onChange = {this.handleDiplomasPathChange}
+                                    valuePropName="fileList"
+                                    // getValueFromEvent={this.handleDiplomasPathChange}
+                                    extra="Upload your diploma to apply to this role"
+                                     >
+                                    {/* <Form.Item 
                                         name = "diplomas_path" 
                                         value = {diplomas_path} 
                                         onChange = {this.handleDiplomasPathChange}
@@ -404,20 +407,30 @@ class RegisterPatient extends React.Component {
                                               message: 'Please input your latest diploma!',
                                             },
                                           ]}
-                                    >
+                                    > */}
                                         <Input type = "file"
                                         name = "diplomas_path" 
-                                        value = {diplomas_path} 
+                                        // value = {diplomas_path} 
                                         onChange = {this.handleDiplomasPathChange}
                                         placeholder = "ID Card / Passport"
-                                        /><span style = {{fontSize: 9, color: 'grey'}}>Upload latest diploma to apply to this role</span>
+                                        />
                                     </Form.Item>
                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.diplomas_pathError}</span>
                                     </div>
                                 </Col>
                                 <Col span={12}>
                                     <div>
+
                                     <Form.Item 
+                                    name = "cv_path" 
+                                    // value = {cv_path}
+                                    // onChange = {this.handleCvPathChange}
+                                    valuePropName="fileList"
+                                    // getValueFromEvent={this.handleCvPathChange}
+                                    extra="Upload your CV"
+                                     >
+
+                                    {/* <Form.Item 
                                         name = "cv_path" 
                                         value = {cv_path}
                                         onChange = {this.handleCvPathChange}
@@ -432,13 +445,13 @@ class RegisterPatient extends React.Component {
                                               message: 'Please input your CV!',
                                             },
                                           ]}
-                                    >
+                                    > */}
                                         <Input type = "file"
                                         name = "cv_path" 
-                                        value = {cv_path}
+                                        // value = {cv_path}
                                         onChange = {this.handleCvPathChange}
                                         placeholder = "ID Card / Passport"
-                                        /><span style = {{fontSize: 9, color: 'grey'}}>Upload your CV</span>
+                                        />
                                     </Form.Item>
                                         <span style = {{fontSize: 12, color: 'red'}}>{this.state.cv_pathError}</span>
                                     </div>
@@ -496,15 +509,15 @@ class RegisterPatient extends React.Component {
                                     <Form.Item 
                                     value = {marital_status} 
                                     name = "marital_status" 
-                                    onChange = {this.handleMaritalStatusChange}
+                                    onChange={(value, event) => this.handleMaritalOnChange(value, event)} 
                                     hasFeedback
                                         rules={[{ required: true, message: 'Please select your gender!' }]}
                                     >
                                         <Select size = 'large'
                                         value = {marital_status} 
-                                        name = "marital_status" 
-                                        onChange = {this.handleMaritalStatusChange}
-                                        placeholder="Status">
+                                        name = "marital_status"
+                                        onChange={(value, event) => this.handleMaritalOnChange(value, event)} 
+                                        placeholder="Marital Status">
                                         <Option value = "">Choose your status</Option>
                                         <Option value="S">Single</Option>
                                         <Option value="M">Married</Option>

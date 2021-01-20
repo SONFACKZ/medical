@@ -103,7 +103,7 @@ class ManagerBoard extends React.Component {
             <SubMenu key="sub1" icon={<ArrowDownOutlined />} title="Members">
             <Menu.Item key = "2"><MedicineBoxOutlined />Doctors <Link to="/manager/doctors" /></Menu.Item>
             <Menu.Item key = "3"><HistoryOutlined />Patients <Link to="/manager/patients" /></Menu.Item>
-            <Menu.Item key = "4"><IssuesCloseOutlined />Doctor Review <Link to="/manager/doctorsreview" /></Menu.Item>
+            <Menu.Item key = "4"><IssuesCloseOutlined />Users Review <Link to="/manager/usersreview" /></Menu.Item>
             </SubMenu>
             <Menu.Item key = "5"><MessageOutlined />Live Chat <Link to="/manager/chat" /></Menu.Item>
             <Menu.Item key = "6"><UserOutlined />Profile <Link to="/manager/profile" /></Menu.Item>
@@ -119,7 +119,7 @@ class ManagerBoard extends React.Component {
             <Route exact path="/manager" component={UserStatistique} />
             <Route path="/manager/doctors" component={DoctorList} />
             <Route path="/manager/patients" component={PatientList} />
-            <Route exact path="/manager/doctorsreview" component={DoctorsReview} />
+            <Route exact path="/manager/usersreview" component={DoctorsReview} />
             <Route exact path="/manager/profile" component={Profile} />
             </div>
         </Content>
