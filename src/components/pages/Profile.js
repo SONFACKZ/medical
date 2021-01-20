@@ -10,7 +10,7 @@ import {Button, Modal, Input, Form, Select } from 'antd'
 
 import location from "../../assets/images/location.svg"
 import logo from "../../assets/images/logo.png"
-import sex from "../../assets/images/sex.png"
+import sexImg from "../../assets/images/sex.png"
 
 // const { Title } = Typography;
 // let user = localStorage.getItem('user')
@@ -173,40 +173,50 @@ handlePersontonameChange = (event) => {
                         description={profile.role}
                       />
                       <br />
-                      <Row gutter= {20}>
-                        <Col span={6}>
+                      <Row gutter= {16}>
+                        <Col span={12}>
                           <span><MailOutlined /> <b>Email</b>: {profile.email} </span><br />
                         </Col>
-                        <Col span={4}>
+                        <Col span={12}>
                         <span><UserOutlined /> <b>Full Name</b>: {profile.fullname} <CheckCircleTwoTone twoToneColor="#52c41a" /> </span><br />
                         </Col>
-                        <Col span={4}>
+                        </Row><br />
+                        <Row gutter= {16}>
+                        <Col span={12}>
                         <span><MedicineBoxOutlined key="setting" /> <b>Blood group</b>: {profile.blood_group} <HeartTwoTone twoToneColor="#eb2f94" /></span><br />
                         </Col>
-                        <Col span={4}>
+                        <Col span={12}>
                         <span><img className = 'image' style = {{width: 20}} alt = "location" src={location} />
                         <b>Address</b>: {profile.residence} </span><br />
                          </Col>
-                         <Col span={4}>
+                         </Row><br />
+                         <Row gutter= {16}>
+                         <Col span={12}>
                         <span><PhoneOutlined /> <b>Contact</b>: {profile.contact_phone} </span><br />
                         </Col>
-                        <Col span={4}>
+                        <Col span={12}>
                         <span><CalendarOutlined /> <b>Date of Birth</b>: {profile.date_birth} </span><br />
                         </Col>
-                        <Col span={4}>
+                        </Row><br />
+                        <Row gutter= {16}>
+                        <Col span={12}>
                         <span><PushpinOutlined /> <b>Marital Status</b>: {profile.marital_status} </span><br />
                         </Col>
-                        <Col span={4}>
+                        <Col span={12}>
                         <span><PushpinOutlined /> <b>Occupation</b>: {profile.occupation} </span><br />
                         </Col>
-                        <Col span={4}>
+                        </Row><br />
+                        <Row gutter= {16}>
+                        <Col span={12}>
                         <span><UserOutlined /> <b>Person to contact Name</b>: {profile.person_to_contact_name} </span><br />
                         </Col>
-                        <Col span={4}>
+                        <Col span={12}>
                         <span><PhoneOutlined /> <b>Person to contact phone</b>: {profile.person_to_contact_phone}</span><br />
                         </Col>
-                        <Col span={4}>
-                        <span><UserSwitchOutlined /> Sex: {profile.sex} <img className = 'image' style = {{width: 20}} alt = "sex" src={sex} /></span><br />
+                        </Row><br />
+                         <Row gutter= {16}>
+                        <Col span={12}>
+                        <span><UserSwitchOutlined /> Sex: {profile.sex} <img src = {sexImg} className = 'image' style = {{width: 20}} alt = "sex" /></span><br />
                         </Col>
                         {/* <StarOutlined />
                         <StarFilled />

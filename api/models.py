@@ -298,7 +298,7 @@ def get_patients_for_doctor():
 
 # Doctor Assignation
 @app.route('/patient/assign-doctor/<public_id>', methods = ['PUT'])
-# @jwt_required
+@jwt_required
 def assign_doctor(public_id):
     user = User.query.filter_by(public_id=public_id).first()
     print(user.email)
@@ -318,8 +318,28 @@ def assign_doctor(public_id):
         #         msg.attach("logo.png", "image/png", fp.read())
         #         mail.send(msg)
         db.session.commit()
-        return jsonify({'message': 'The user status has been updated from Inactive to Active'})
         return jsonify({"message": "Doctor assigned successfully"})
+
+
+#Getting Doctor assigned from Patient Dashboard
+def doct_serializer(doctor):
+    return{
+        'user_id': doctor.user_id,
+        'public_id': doctor.public_id,
+        'fullname': doctor.fullname,
+        'occupation': doctor.occupation,
+        'residence': doctor.residence,
+        'email': doctor.email,
+        'role_id': doctor.role_id,
+        'status': doctor.status
+    }
+
+@app.route('/doctor-assigned/<public_id>', methods = ['GET'])
+@jwt_required
+def doctor_assigned(public_id):
+    user = User.query.filter_by(public_id = public_id).first()
+    doctor = User.query.filter_by(user_id = user.parent_id)
+    return jsonify(*map[doct_serializer, doctor])
 
     # # if request.method == 'PUT':
     #     patient = User.query.filter_by(public_id=public_id).first()

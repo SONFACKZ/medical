@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from "react"
-// import axios from "axios"
 import { Link } from 'react-router-dom'
 import axiosWithAuth from "../../utils/axiosWithAuth"
 import { EditOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons'
@@ -80,9 +79,9 @@ function assignDoctor(public_id)
         doc_id: doc_id
     })
     .then(response => {
-        // console.log(response.data)
-        console.log("================> "+doc_id)
-        message.success(response.data.assign, 5);
+        console.log(response.data)
+        // console.log("================> "+doc_id)
+        message.success(response.data.message, 5);
         window.location.reload();
     })
     .catch(error => {

@@ -13,6 +13,7 @@ import { Link, Route, BrowserRouter as Router } from 'react-router-dom'
 import PastHistory from '../pages/PastHistory'
 import Profile from '../pages/Profile'
 import { message } from 'antd'
+import ReportDoctor from '../pages/ReportDoctor'
 // import Logout from './logout'
 
 // const SubMenu = Menu.SubMenu;
@@ -139,6 +140,7 @@ class PatientBoard extends React.Component {
           </Breadcrumb>
           <div style = {{ background: '#fff', padding:24, minHeight: 580 }}>
           <Route exact path="/patient" component={ConsultationList} />
+          <Route exact path="/patient/case-reporting" component={ReportDoctor } />
           <Route path="/patient/consultation" component={ConsultationForm} />
           <Route path="/patient/past-history" component={PastHistory} />
           <Route path="/patient/profile" component={Profile} />
