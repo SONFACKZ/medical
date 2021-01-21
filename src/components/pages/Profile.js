@@ -471,52 +471,6 @@ handlePersontonameChange = (event) => {
                         </div>
                     </Col>
                 </Row>
-            {/* <Row gutter= {16}>
-                <Col span={12}>
-                    <div>
-                        <Form.Item
-                            name="password" rules={[{required: true, message: 'Please input your password!',},]}
-                            hasFeedback
-                        >
-                        <Input.Password 
-                        name = "password"
-                        value = {password}
-                        onChange = {this.handlePasswordChange}
-                        prefix={<LockOutlined className="site-form-item-icon" />}
-                        type="password"
-                        placeholder="Password" />
-                        </Form.Item>
-                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.passwordError}</span>
-                    </div>
-                </Col>
-                <Col span = {12}>
-                    <div>
-                        <Form.Item
-                            name="confirm"
-                            dependencies={['password']}
-                            hasFeedback
-                            rules={[
-                            {
-                                required: true,
-                                message: 'Please confirm your password!',
-                            },
-                            ({ getFieldValue }) => ({
-                                validator(rule, value) {
-                                if (!value || getFieldValue('password') === value) {
-                                    return Promise.resolve();
-                                }
-                                return Promise.reject('The two passwords that you entered do not match!');
-                                },
-                            }),
-                            ]}
-                        >
-                            <Input.Password
-                            prefix={<LockOutlined className="site-form-item-icon" />}
-                            placeholder =" Confirm Password" />
-                        </Form.Item>
-                    </div>
-                </Col>
-            </Row> */}
                 <div>
                 </div>
         </Form>

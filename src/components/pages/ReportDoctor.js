@@ -1,5 +1,4 @@
 import React, {useState, useEffect} from "react"
-// import axios from "axios"
 import { Link } from 'react-router-dom'
 import axiosWithAuth from "../../utils/axiosWithAuth"
 import { EditOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons'
@@ -16,7 +15,6 @@ const onFinish = (values) => {
     console.log('Received values of form: ', values);
   };
 
-// const ReportDoctor = () => {
 class ReportDoctor extends React.Component {
         constructor(props){
             super(props);
@@ -31,13 +29,7 @@ handleReportonChange = (event) => {
         })
     }
 
-    // const [doc, setDoc] = useState([]);
-
-    // const [report, setReport] = useState({})
-
     
-
-    // let report_reason = '';
     componentDidMount() {
             axiosWithAuth().get('/doctor-assigned/'+email)
             .then(response=>{
@@ -52,11 +44,6 @@ handleReportonChange = (event) => {
 // handle submit value
 handleSubmit = event => {
     event.preventDefault() //Avoid to lose data after submited
-    // const isValid = this.validate();
-    // if(isValid){
-    //     console.log(this.state);
-    //     this.setState(initialState); //Clearing Form
-    // }
     axiosWithAuth().post('/case-reporting/add', this.state)
          .then(response => {
              console.log(response)
@@ -76,10 +63,6 @@ handleSubmit = event => {
                     message.error('Server Error !')
                  }
              }
-            //  console.log('registration error:',this.state.data.war_message)
-            //  alert(error)
-            //  console.log(error.data.warn_message)
-            // message.warning(error.data.warn_message, 15);
          })
 }
 
@@ -90,12 +73,19 @@ return (
             <div className = "py-4">
                 <h1 style = {{textAlign: 'center'}}>My Doctor</h1>
                      <Form  onFinish = {onFinish}>
-                        <Input type = "report_reason"
+                     <Form.Item
+                        name = "report_reason"
+                        value = {this.report_reason}
+                        onChange = {this.handleReportonChange}
+                        hasFeedback
+                            rules = {[{ required: true, message: 'Please input the reason!' }]}
+                        >
+                        <Input type = "text"
                             name = "report_reason"
                             value = {this.report_reason}
                             onChange = {this.handleReportonChange}
-                            // prefix={<UserOutlined className="site-form-item-icon" />} 
-                            placeholder="Type the reason" allowClear /><p></p>
+                            placeholder="Type the reason" allowClear />
+                            </Form.Item><p></p>
                             <Button size = 'large' 
                             onClick = {this.handleSubmit} 
                             fluid type="primary" htmlType="submit"

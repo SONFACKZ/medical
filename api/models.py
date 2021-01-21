@@ -599,9 +599,8 @@ def history():
     da = datetime.strptime(dat, '%Y-%m-%d')
     user = User.query.filter_by(email=get_jwt_identity()).first() # Filter DB by token (email)
     owner = user.user_id #assign the the user_id to owner variable
-    new_history = PastHistory(past_history_type='Allergy',
-                          past_history_particular_observation='Allergy past history particular observation',
-                        #   past_history_particular_observation=data['past_history_particular_observation'],
+    new_history = PastHistory(past_history_type=data['past_history_type'],
+                          past_history_particular_observation=data['particular_observation'],
                           past_history_year=da,
                           past_history_owner_id=owner)
     
@@ -641,6 +640,15 @@ def case_reporting():
     report_case_owner_id=owner
     # reported_user_id = 
     )
+    manager = User.query.filter_by(role_id=1).first()
+# Sending Email Notification
+    subject = 'New Case Reported'
+    mess = "<p>Hello <b>"+manager.fullname+"</b></p>,<p>The user "+user.email+"<br/>reported user</p>"
+    msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=manager.email.split())
+    msg.html = mess
+    with app.open_resource("../src/assets/images/logo.png") as fp:
+            msg.attach("logo.png", "image/png", fp.read())
+            mail.send(msg)
     db.session.add(new_case_report)
     db.session.commit()
     return jsonify({'message': 'Your case report has been saved successfully!'})
