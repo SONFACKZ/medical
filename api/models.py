@@ -379,11 +379,11 @@ def create_consultation():
     user = User.query.filter_by(email=get_jwt_identity()).first() # Filter DB by token (email)
     owner = user.user_id #assign the the user_id to owner variable
     consultation = Consultation(consultation_date=da,
-                                result1='jfkszjckdsuzhcsiocjhsdio',
-                                result2='result2azerty',
-                                result3='result3',
-                                syptoms='result1, result2, result3',
-                                other_observation='cdghcvhgvuyjgvuy',
+                                result1='obser',
+                                result2='2azertyresult',
+                                result3='res2azertyult3',
+                                syptoms='Other qwertyuioop[',
+                                other_observation='Other observation Other observation Other observation',
                                 consultation_owner_id=owner
                                 )
     db.session.add(consultation)
@@ -513,6 +513,7 @@ def user_profile(email):
 
 def user_update_serializer(useredit):
     return{
+    'user_id': useredit.user_id,
     'public_id': useredit.public_id,
     'fullname': useredit.fullname,
     'occupation': useredit.occupation,
@@ -654,9 +655,33 @@ def case_reporting():
     db.session.commit()
     return jsonify({'message': 'Your case report has been saved successfully!'})
 
-# @login_manager.user_loader
-# def load_user(user_id):
-#     return User.query.get(user_id)
+
+
+#Get all patients for a specific doctor
+def doc_pat_serializer(pat):
+    return{
+    'public_id': pat.public_id,
+    'user_id': pat.user_id,
+    'fullname': pat.fullname,
+    'occupation': pat.occupation,
+    'email': pat.email,
+    'sex': pat.sex,
+    'residence': pat.residence,
+    'contact_phone': pat.contact_phone,
+    'blood_group': pat.blood_group,
+    'marital_status': pat.marital_status,
+    'date_birth': pat.date_birth,
+    'person_to_contact_name': pat.person_to_contact_name,
+    'person_to_contact_phone': pat.person_to_contact_phone,
+    'status': pat.status,
+    }
+@app.route('/specific-patient-doctor', methods = ['GET'])
+@jwt_required
+def get_pat_doc():
+    doc = User.query.filter_by(email=get_jwt_identity()).first()
+    pat = User.query.filter_by(parent_id=doc.user_id)
+    return jsonify([*map(doc_pat_serializer, pat)])
+
 
 def allowed_file(filename):
     return '.' in filename and \

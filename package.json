@@ -16,6 +16,7 @@
     "pusher-js": "^7.0.2",
     "react": "^17.0.1",
     "react-bootstrap": "^1.4.0",
+    "react-datepicker": "^3.4.1",
     "react-dom": "^17.0.1",
     "react-mail-icon": "^1.0.6",
     "react-pusher": "^0.2.0",

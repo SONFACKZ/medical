@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { Menu, Switch, Layout, Avatar, Breadcrumb, Space, Typography, Tag } from 'antd'
 import { Link, Route, BrowserRouter as Router } from 'react-router-dom'
 import Title from 'antd/lib/typography/Title'
@@ -11,6 +11,7 @@ import { HomeOutlined, SettingOutlined, IssuesCloseOutlined,
    HistoryOutlined, UserOutlined } from '@ant-design/icons'
 import Profile from '../pages/Profile'
 import ReportPatient from '../pages/ReportPatient'
+import ConsultPatient from '../pages/ConsultPatient'
 
 const user = localStorage.getItem('user')
 const SubMenu = Menu.SubMenu;
@@ -49,7 +50,7 @@ class DoctorBoard extends React.Component {
       <div>
           <Layout>
           <Header
-            style = {{padding: 9, background: "linear-gradient(#217561, #d9534f)"}}>
+            style = {{padding: 9, background: "linear-gradient(#f0ad4e, #b9ceab)"}}>
           <Space align="center" style = {{float: 'right'}}>
             <Avatar shape = "circle" size={40}  src={ doctorImg } />
             <Text strong style = {{color: 'white'}}>{user}</Text>
@@ -74,7 +75,7 @@ class DoctorBoard extends React.Component {
             trigger={null}
             collapsible
             collapsed={this.state.collapsed}
-            collapsedWidth = {10}
+            collapsedWidth = {0}
             >
         <Menu
               theme={this.state.theme}
@@ -86,7 +87,7 @@ class DoctorBoard extends React.Component {
             >
           {/* <SubMenu key="sub1" title={<span><MailOutlined /><span>Navigation One</span></span>}> */}
             <Menu.Item key = '1'><HomeOutlined /><Link to="/doctor" />Dashboard</Menu.Item>
-            <Menu.Item key = "2"><MedicineBoxOutlined />Consultation</Menu.Item>
+            <Menu.Item key = "2"><MedicineBoxOutlined /><Link to="/doctor/Consult" />Consultation</Menu.Item>
             <Menu.Item key = "4"><IssuesCloseOutlined /><Link to="/doctor/case-reporting" />Case Reporting</Menu.Item>
             <Menu.Item key = "5"><MessageOutlined />Live Chat</Menu.Item>
             <Menu.Item key = "6"><UserOutlined /><Link to="/doctor/profile" />Profile</Menu.Item>
@@ -100,7 +101,7 @@ class DoctorBoard extends React.Component {
           </Breadcrumb>
           <div style = {{ background: '#fff', padding:24, minHeight: 580 }}>
             <Route exact path="/doctor" component="" />
-            {/* <Route path="/doctor/doctors" component={DoctorList} /> */}
+            <Route path="/doctor/Consult" component={ConsultPatient} />
             {/* <Route path="/doctor/patients" component={PatientList} /> */}
             {/* <Route exact path="/doctor/doctorsreview" component={DoctorsReview} /> */}
             <Route exact path="/doctor/case-reporting" component={ReportPatient} />

@@ -1,8 +1,8 @@
 import React, {useState, useEffect} from "react"
 import { Link } from 'react-router-dom'
 import axiosWithAuth from "../../utils/axiosWithAuth"
-import { EditOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons'
-import { Button, Drawer, Tag, Form, message, Input, Row, Col } from 'antd'
+import { EditOutlined, EyeOutlined, UserOutlined } from '@ant-design/icons'
+import { Button, Drawer, Card, Form, message, Input, Row, Col, Statistic } from 'antd'
 
 let email = localStorage.getItem('email')
 let userId = localStorage.getItem("user_id")
@@ -20,7 +20,7 @@ const onFinish = (values) => {
     console.log('Received values of form: ', values);
   };
 
-class ReportPatient extends React.Component {
+class ConsultPatient extends React.Component {
         constructor(props){
             super(props);
             this.state = initialState;
@@ -127,32 +127,32 @@ render(){
     let patients = this.state.Patients
     let patient = this.state.Patient
 return (
-    <div className = "container">
-            <div className = "py-4">
-                <h1 style = {{textAlign: 'center'}}>My Patients</h1><hr />
-                {
+    <div className="site-statistic-demo-card">
+          <h1 style = {{textAlign: 'center'}}>My Patients</h1><hr />
+                <Row gutter={16} className="text-center" type = 'flex'>
+                            {
                 patients.map(
                   patient =>{
                     return(
-                <Row gutter= {16}>
-                    <Col span={10}>
-                        <span><b>Patient Name</b>: {patient.fullname}</span>
-                    </Col>
-                    <Col span={10}>
-                    <span><b>Patient Phone</b>: {patient.contact_phone}</span>
-                    </Col>
-                    <Col span={4}>
-                    <Button type = 'link' onClick = {() => {this.showDrawer(true, this.detailsPatient(patient.public_id))}}>
-                        <Tag style = {{ color: 'white', background: '#0275d8'}}>Report</Tag></Button>
-                    </Col>{" "}
-                    </Row>
+                        <Col span={12} 
+                        style={{ color: '#0275d8' }} 
+                        onClick = {() => {this.showDrawer(true, this.detailsPatient(patient.public_id))}}
+                        >
+                           <div className = "border shadow p-5 mx-auto" style={{ background: '#ebe7bf' }} >
+                           <b><UserOutlined />{""} {patient.email}</b>
+                           </div>
+                            </Col>
+                            
                     )
-                }
+                  }
                 )
-                }<br /><br />
+            }
+                            </Row>
+   
 
                 <Drawer 
-                title="Report this Patient"
+                // Consult this Patient
+                title="Prediction Results"
                 width={500}
                 onClose={this.onClose}
                 visible={this.state.visible}
@@ -187,9 +187,33 @@ return (
                             )
                         }
                 </Drawer>
-            </div>
     </div>
 );
 }
 }
-export default ReportPatient
+export default ConsultPatient
+
+
+//  {/* </div> */}
+//     {/* <div className = "container">
+//            <div className = "py-4">
+//              <h1 style = {{textAlign: 'center'}}>My Patients</h1><hr /> */}
+//              {
+//                 //             patients.map(
+//                 //               patient =>{
+//                 //                 return(
+//                 //             <Row gutter= {16}>
+//                 //                 <Col span={10}>
+//                 //                     <span><b>Patient Name</b>: {patient.fullname}</span>
+//                 //                 </Col>
+//                 //                 <Col span={10}>
+//                 //                 <span><b>Patient Phone</b>: {patient.contact_phone}</span>
+//                 //                 </Col>
+//                 //                 <Col span={4}>
+//                 //                 <Button type = 'link' onClick = {() => {this.showDrawer(true, this.detailsPatient(patient.public_id))}}>
+//                 //                     <Tag style = {{ color: 'white', background: '#0275d8'}}>Report</Tag></Button>
+//                 //                 </Col>{" "}
+//                 //                 </Row>
+//                 //                 )
+//                 //             }
+//                 //             )

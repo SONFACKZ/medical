@@ -94,7 +94,6 @@ function assignDoctor(public_id)
          .then(response => {
             setUse(response.data);
              console.log(response)
-
          })
          .catch(error => {
             //  console.log(error.data.warn_message)
