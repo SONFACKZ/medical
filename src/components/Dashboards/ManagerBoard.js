@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import { Menu, Switch, Layout, Avatar, Breadcrumb, Space, Typography } from 'antd'
+import { Menu, Switch, Layout, Avatar, Breadcrumb, Space, Typography, Tag } from 'antd'
 import Title from 'antd/lib/typography/Title'
 import { Link, Route, BrowserRouter as Router, Redirect } from 'react-router-dom'
 import managerImg from "../../assets/images/manager.png"
@@ -61,12 +61,14 @@ class ManagerBoard extends React.Component {
       <Router>
         <div>
           <Layout>
-            <Header
-            style = {{padding: 9, background: '#34495E'}}>
+            <Header className = 'manager'
+            style = {{padding: 9, background: "linear-gradient(#217561, #a28393)"}}
+            // style = {{padding: 9, background: "#217561"}}
+            >
               <Space align="center" style = {{float: 'right'}}>
                 <Avatar shape = "circle" size={40}  src={ managerImg } />
                 <Text strong style = {{color: 'white'}}>{user}</Text>
-                <Logout />
+                <Tag style = {{background: '#f7f7f7'}}> <Logout /></Tag>
               </Space>
             
             

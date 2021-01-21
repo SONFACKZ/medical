@@ -231,8 +231,7 @@ handlePersontonameChange = (event) => {
               }
 
               {/* Edit profil Modal */}
-
-
+              
             <Modal
               title="Update my profile"
               centered

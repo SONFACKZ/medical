@@ -15,7 +15,7 @@ const onFinish = (values) => {
     console.log('Received values of form: ', values);
   };
 
-class ReportDoctor extends React.Component {
+class ReportPatient extends React.Component {
         constructor(props){
             super(props);
             this.state = initialState;
@@ -109,4 +109,4 @@ return (
 );
 }
 }
-export default ReportDoctor
+export default ReportPatient

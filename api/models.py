@@ -336,7 +336,8 @@ def doctor_assigned(email):
         'residence': doc_user.residence,
         'email': doc_user.email,
         'role_id': doc_user.role_id,
-        'status': doc_user.status
+        'status': doc_user.status,
+        'contact_phone': doc_user.contact_phone
     })
     # # if request.method == 'PUT':
     #     patient = User.query.filter_by(public_id=public_id).first()

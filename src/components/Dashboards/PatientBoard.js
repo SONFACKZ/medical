@@ -1,5 +1,5 @@
 import React, { Component, useState } from 'react'
-import { Menu, Switch, Layout, Avatar, Breadcrumb, Space, Typography } from 'antd'
+import { Menu, Switch, Layout, Avatar, Breadcrumb, Space, Typography, Tag } from 'antd'
 import Title from 'antd/lib/typography/Title'
 import patientImg from "../../assets/images/patient.png"
 import logo from "../../assets/images/logo.png"
@@ -61,11 +61,11 @@ class PatientBoard extends React.Component {
         <div>
           <Layout>
             <Header
-            style = {{padding: 9, background: '#34495E'}}>
+            style = {{padding: 9, background: "linear-gradient(#5bc0de, #9fa440)"}}>
             <Space align="center" style = {{float: 'right'}}>
                 <Avatar shape = "circle" size={40}  src={ patientImg } />
                 <Text strong style = {{color: 'white'}}>{user}</Text>
-                <Logout />
+                <Tag style = {{background: '#f7f7f7'}}> <Logout /></Tag>
               </Space>
             {/* <Avatar shape = "circle" size={50} style = {{float: 'right'}} src={ patientImg } /> */}
             
@@ -140,7 +140,7 @@ class PatientBoard extends React.Component {
           </Breadcrumb>
           <div style = {{ background: '#fff', padding:24, minHeight: 580 }}>
           <Route exact path="/patient" component={ConsultationList} />
-          <Route exact path="/patient/case-reporting" component={ReportDoctor } />
+          <Route exact path="/patient/case-reporting" component={ReportDoctor} />
           <Route path="/patient/consultation" component={ConsultationForm} />
           <Route path="/patient/past-history" component={PastHistory} />
           <Route path="/patient/profile" component={Profile} />
