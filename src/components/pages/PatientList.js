@@ -73,7 +73,6 @@ const PatientList = () => {
 
 function assignDoctor(public_id)
 {
-    // doc_id = this.state.doc_id
     axiosWithAuth().put('/patient/assign-doctor/'+public_id, 
     {
         doc_id: doc_id

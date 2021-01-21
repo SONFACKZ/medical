@@ -123,6 +123,7 @@ class ReportCase(db.Model):
     report_reason = db.Column(db.Text, nullable=False)
     report_date = db.Column(db.DateTime, default=datetime.utcnow())
     report_case_owner_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
+    # reported_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
     # def __init__(self, report_reason, report_case_owner_id):
     #     self.report_reason = report_reason
@@ -322,25 +323,21 @@ def assign_doctor(public_id):
 
 
 #Getting Doctor assigned from Patient Dashboard
-def doct_serializer(doctor):
-    return{
-        'user_id': doctor.user_id,
-        'public_id': doctor.public_id,
-        'fullname': doctor.fullname,
-        'occupation': doctor.occupation,
-        'residence': doctor.residence,
-        'email': doctor.email,
-        'role_id': doctor.role_id,
-        'status': doctor.status
-    }
-
-@app.route('/doctor-assigned/<public_id>', methods = ['GET'])
+@app.route('/doctor-assigned/<email>', methods = ['GET'])
 @jwt_required
-def doctor_assigned(public_id):
-    user = User.query.filter_by(public_id = public_id).first()
-    doctor = User.query.filter_by(user_id = user.parent_id)
-    return jsonify(*map[doct_serializer, doctor])
-
+def doctor_assigned(email):
+    user = User.query.filter_by(email = get_jwt_identity()).first()
+    doc_user = User.query.filter_by(user_id = user.parent_id, status = True).first()
+    return jsonify({
+        'user_id': doc_user.user_id,
+        'public_id': doc_user.public_id,
+        'fullname': doc_user.fullname,
+        'occupation': doc_user.occupation,
+        'residence': doc_user.residence,
+        'email': doc_user.email,
+        'role_id': doc_user.role_id,
+        'status': doc_user.status
+    })
     # # if request.method == 'PUT':
     #     patient = User.query.filter_by(public_id=public_id).first()
     #     patient.parent_id = id
@@ -631,6 +628,22 @@ def get_user_pasthistory():
 #     db.session.commit()
 #     return {'201': 'PastHistory created successfully'}
     
+#create past case Reporting
+@app.route('/case-reporting/add', methods=['POST'])
+@jwt_required
+def case_reporting():
+    data = request.get_json()
+    dat = date.today().strftime('%Y-%m-%d')
+    da = datetime.strptime(dat, '%Y-%m-%d')
+    user = User.query.filter_by(email=get_jwt_identity()).first() # Filter DB by token (email)
+    owner = user.user_id #assign the the user_id to owner variable
+    new_case_report = ReportCase(report_reason=data['report_case'], report_date=da, 
+    report_case_owner_id=owner
+    # reported_user_id = 
+    )
+    db.session.add(new_case_report)
+    db.session.commit()
+    return jsonify({'message': 'Your case report has been saved successfully!'})
 
 # @login_manager.user_loader
 # def load_user(user_id):
