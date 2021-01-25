@@ -15,6 +15,7 @@ import DoctorsReview from '../pages/DoctorRev'
 import Profile from '../pages/Profile'
 import PrivateRoute from '../../utils/PrivateRoute'
 import { message } from 'antd'
+import ManagerRoute from '../../utils/ManagerRoute'
 
 const user = localStorage.getItem('user')
 const role = localStorage.getItem('role_id')

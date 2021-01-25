@@ -14,6 +14,7 @@ import PastHistory from '../pages/PastHistory'
 import Profile from '../pages/Profile'
 import { message } from 'antd'
 import ReportDoctor from '../pages/ReportDoctor'
+import PatientRoute from '../../utils/PatientRoute'
 // import Logout from './logout'
 
 // const SubMenu = Menu.SubMenu;

@@ -12,6 +12,7 @@ import { HomeOutlined, SettingOutlined, IssuesCloseOutlined,
 import Profile from '../pages/Profile'
 import ReportPatient from '../pages/ReportPatient'
 import ConsultPatient from '../pages/ConsultPatient'
+import DoctorRoute from '../../utils/DoctorRoute'
 
 const user = localStorage.getItem('user')
 const SubMenu = Menu.SubMenu;

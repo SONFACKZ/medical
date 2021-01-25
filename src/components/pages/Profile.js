@@ -12,27 +12,35 @@ import location from "../../assets/images/location.svg"
 import logo from "../../assets/images/logo.png"
 import sexImg from "../../assets/images/sex.png"
 
-// const { Title } = Typography;
-// let user = localStorage.getItem('user')
-let email = localStorage.getItem('email')
-// let role = localStorage.getItem('role_name')
-// const [visible, setVisible] = useState(false);
+const email = localStorage.getItem('email')
+
+let initialState = {
+  Profil: [],
+  User: [],
+  loading: false,
+  visible: false,
+  fullname: '',
+  email: '',
+  residence: '',
+  sex: '',
+  contact_phone: '',
+  blood_group: '',
+  occupation: '',
+  date_birth: '',
+  password: '',
+  person_to_contact_phone: '',
+  person_to_contact_name: ''
+}
+
 class Profile extends Component {
-  state = {
-    Profil: [],
-    loading: false,
-    visible: false,
-    fullname: '',
-    email: '',
-    residence: '',
-    sex: '',
-    contact_phone: '',
-    blood_group: '',
-    occupation: '',
-    date_birth: '',
-    password: '',
-    person_to_contact_phone: '',
-    person_to_contact_name: ''
+
+  constructor(props){
+    super(props);
+
+    // this.handleSexOnChange = this.handleSexOnChange.bind(this);
+    // this.handleBloodOnChange = this.handleBloodOnChange.bind(this);
+
+    this.state = initialState;
   }
 
   // Enable fielling form
@@ -52,24 +60,41 @@ handleResidenceChange = (event) => {
         residence: event.target.value
     })
 }
-handleSexChange = (event) => {
-    this.setState({
-        sex: event.target.value
-    })
+// handleSexChange = (event) => {
+//     this.setState({
+//         sex: event.target.value
+//     })
+// }
+
+handleSexOnChange = (value, event) =>{
+  console.log('selected: '+ value);
+  this.setState({
+      sex: value
+  })
 }
+
 handleContactphoneChange = (event) => {
     this.setState({
         contact_phone: event.target.value
     })
 }
-handleBloodgroupChange = (event) => {
-    this.setState({
-        blood_group: event.target.value
-    })
-}
 
-handleBloodGroupChange = (value) =>{
-    console.log('selected: '+ value);
+// handleBloodgroupChange = (event) => {
+//     this.setState({
+//         blood_group: event.target.value
+//     })
+// }
+
+// handleBloodGroupChange = (value) =>{
+//     console.log('selected: '+ value);
+// }
+
+handleBloodOnChange = (value, event) =>{
+  console.log('selected: '+ value);
+  this.setState({
+      blood_group: value
+  })
+
 }
 
 handleOccupationChange = (event) => {
@@ -119,7 +144,7 @@ handlePersontonameChange = (event) => {
   componentDidMount(){
     axiosWithAuth().get(`/user/${email}/profile`)
     .then(response => {
-      // console.log(response.data)
+      console.log(response.data)
       this.setState({
         Profil: response.data
       })
@@ -129,14 +154,27 @@ handlePersontonameChange = (event) => {
     })
   }
 
+  detailsProfile = (email) => {
+    axiosWithAuth().get(`/user/${email}/profile`)
+    .then(response => {
+        this.setState({
+            User: response.data
+          })
+        console.log(response.data)
+    })
+    .catch(error => {
+       //  console.log(error.data.warn_message)
+    })
+}
+
     render() {
       const { Meta } = Card;
       let profil = this.state.Profil;
       const { Option } = Select;
       const { visible, loading } = this.state;
-
-      const{ fullname,email, residence, sex, contact_phone, blood_group, occupation, date_birth,
-                password, person_to_contact_phone, person_to_contact_name } = this.state
+      // let pro = this.state.User;
+      // let { fullname,email, residence, sex, contact_phone, blood_group, occupation, date_birth,
+      //           password, person_to_contact_phone, person_to_contact_name } = this.state
 
       const onFinish = (values) => {
         console.log('Received values of form: ', values);
@@ -145,7 +183,6 @@ handlePersontonameChange = (event) => {
             // );
         return (
             <div className = "">
-
               {
                 profil.map(
                   profile =>{
@@ -222,8 +259,12 @@ handlePersontonameChange = (event) => {
                         <StarFilled />
                         <StarTwoTone twoToneColor="#eb2f96" /> */}
                       </Row>
-                      <Button style = {{background: '#f0ad4e', color: 'white', float: 'right'}} onClick={this.showModal}><EditOutlined />Edit profil</Button>
-
+                      <Button 
+                      style = {{background: '#f0ad4e', color: 'white', float: 'right'}} 
+                      // onClick={this.showModal}
+                      onClick = {() => {this.showModal(true, this.detailsProfile(profile.email))}}
+                      >
+                      <EditOutlined />Edit profil</Button>
                     </Card>
                     )
                 
@@ -250,34 +291,32 @@ handlePersontonameChange = (event) => {
             >
                {
                 profil.map(
-                  edi =>{
+                  user =>{
                     return(
             <Form 
                 name = 'update' onFinish = {onFinish}>
                 <Row gutter= {16}>
                     <Col span={12}>
                         <div>
-                        <Form.Item
-                        name = "fullname"
-                        value = {edi.fullname}
+                        {/* <Form.Item
+                        value = {user.fullname}
                         onChange = {this.handleFullnameChange}
                         hasFeedback
                         rules = {[{ required: true, message: 'Please input your Full Name!' }]}
-                        >
-                          {console.log(edi.fullname)}
+                        > */}
+                           {/* {console.log(user.email)} */}
                             <Input type = "fullname"
                             name = "fullname"
-                            value = {edi.fullname}
+                            value = {user.fullname || this.state.fullname}
                             onChange = {this.handleFullnameChange}
                             prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Full Name" allowClear />
-                        </Form.Item>
+                        {/* </Form.Item> */}
                         </div>
                     </Col>
                     <Col span={12}>
                         <div>
                         <Form.Item
-                        name = "email"
-                        value = {edi.email}
+                        value = {user.email}
                         onChange = {this.handleEmailChange}
                         hasFeedback
                             rules={[
@@ -291,10 +330,10 @@ handlePersontonameChange = (event) => {
                                 },
                               ]}
                         >
-                           {console.log(edi.email)}
+                           {/* {console.log(user.email)} */}
                             <Input
                             name = "email"
-                            value = {edi.email}
+                            value = {user.email}
                             onChange = {this.handleEmailChange}
                             prefix={<MailOutlined className="site-form-item-icon" />} placeholder="Email" allowClear />
                         </Form.Item>
@@ -305,16 +344,15 @@ handlePersontonameChange = (event) => {
                     <Col span={12}>
                         <div>
                         <Form.Item
-                        name = "residence"
-                        value = {edi.residence}
+                        value = {user.residence}
                         onChange = {this.handleResidenceChange}
                         hasFeedback
                             rules = {[{ required: true, message: 'Please input your Residence!' }]}
                         >
-                          {console.log(edi.residence)}
+                          {/* {console.log(user.residence)} */}
                             <Input type = "residence"
                             name = "residence"
-                            value = {edi.residence}
+                            value = {user.residence}
                             onChange = {this.handleResidenceChange}
                             prefix={<HomeOutlined className="site-form-item-icon" />} placeholder="Residence" allowClear />
                         </Form.Item>
@@ -322,24 +360,24 @@ handlePersontonameChange = (event) => {
                     </Col>
                     <Col span={12}>
                         <div>
-                        <Form.Item 
-                        name="sex"
-                        value = {edi.sex}
-                        onChange = {this.handleSexChange}
+                        {/* <Form.Item 
+                        value = {user.sex}
+                        onChange={(value, event) => this.handleSexOnChange(value, event)}
                         hasFeedback
                             rules={[{ required: true, message: 'Please select your gender!' }]}
-                        >
-                          {console.log(edi.sex)}
+                        > */}
+                          {/* {console.log(user.sex)} */}
                             <Select size = "large"
                             name="sex"
-                            value = {edi.sex}
-                            onChange = {this.handleSexChange}
+                            value = {user.sex}
+                            onChange={(value, event) => this.handleSexOnChange(value, event)}
+                            // onChange = {this.handleSexChange}
                             placeholder="Gender">
                             <Option value = "">Choose your Gender</Option>
                             <Option value="F">Female</Option>
                             <Option value="M">Male</Option>
                             </Select>
-                        </Form.Item>
+                        {/* </Form.Item> */}
                         </div>
                     </Col>
                 </Row>
@@ -347,64 +385,66 @@ handlePersontonameChange = (event) => {
                     <Col span={12}>
                         <div>
                         <Form.Item
-                        name = "phone_contact"
-                         value = {edi.contact_phone}
+                        value = {user.contact_phone}
                         onChange = {this.handleContactphoneChange}
                         hasFeedback
                             rules={[{ required: true, message: 'Please input your phone number!' }]}
                         >
-                          {console.log(edi.contact_phone)}
+                          {/* {console.log(user.contact_phone)} */}
                             <Input addonBefore={+237}
-                              name = "phone_contact" 
-                             value = {edi.contact_phone}
-                             onChange = {this.handleContactphoneChange}
-                              pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" placeholder="Contact Phone" 
-                              allowClear />
+                            name = "phone_contact" 
+                            value = {user.contact_phone}
+                            onChange = {this.handleContactphoneChange}
+                            pattern = "[0-9]{3}[0-9]{3}[0-9]{3}" placeholder="Contact Phone" 
+                            allowClear />
                         </Form.Item>
                         </div>
                     </Col>
                     <Col span={12}>
+                      {
+                        user.role !== 'Patient'?'':
                         <div>
                         <Form.Item 
-                            name="blood_gooup"
-                            value = {edi.blood_group}
-                            onChange = {this.handleBloodgroupChange}
+                            value = {user.blood_group}
+                            onChange={(value, event) => this.handleBloodOnChange(value, event)}
+                            // onChange = {this.handleBloodgroupChange}
                             hasFeedback
                             rules={[{ required: true, message: 'Please select your Blood Group!' }]}
                         >
-                           {console.log(edi.blood_group)}
+                           {/* {console.log(user.blood_group)} */}
                             <Select size = "large"
                             name="blood_gooup"
-                            value = {edi.blood_group}
-                            onChange = {this.handleBloodgroupChange}
+                            value = {user.blood_group}
+                            onChange={(value, event) => this.handleBloodOnChange(value, event)}
+                            // onChange = {this.handleBloodgroupChange}
                             placeholder = "Blood Group">
                                 <Option value = "">Choose your Blood Group</Option>
-                                <Option value="A+">A RhD positive (A+)</Option>
-                                <Option value="A-">A RhD negative (A-)</Option>
-                                <Option value="B+" >B RhD positive (B+)</Option>
-                                <Option value="B-">B RhD negative (B-)</Option>
-                                <Option value="O+">O RhD positive (O+)</Option>
-                                <Option value="O-">O RhD negative (O-)</Option>
-                                <Option value="AB+" >AB RhD positive (AB+)</Option>
-                                <Option value="AB-">AB RhD negative (AB-)</Option>
+                                <Option value = "A+">A RhD positive (A+)</Option>
+                                <Option value = "A-">A RhD negative (A-)</Option>
+                                <Option value = "B+">B RhD positive (B+)</Option>
+                                <Option value = "B-">B RhD negative (B-)</Option>
+                                <Option value = "O+">O RhD positive (O+)</Option>
+                                <Option value = "O-">O RhD negative (O-)</Option>
+                                <Option value = "AB+">AB RhD positive (AB+)</Option>
+                                <Option value = "AB-">AB RhD negative (AB-)</Option>
                             </Select>
                         </Form.Item>
                         </div>
+                      }
                     </Col>
                 </Row>
                 <Row gutter= {16}>
                     <Col span={12}>
                         <div>
                         <Form.Item
-                        value = {edi.occupation} 
-                        name = "occupation" 
+                        value = {user.occupation} 
                         onChange = {this.handleOccupationChange}
                         hasFeedback
                             rules = {[{ required: true, message: 'Please input your Occupation!' }]}
                         >
-                           {console.log(edi.occupation)}
-                            <Input type = "email"
-                            value = {edi.occupation} 
+                           {/* {console.log(user.occupation)} */}
+                            <Input type = "text"
+                            value = {user.occupation} 
                             name = "occupation" 
                             onChange = {this.handleOccupationChange}
                             placeholder="Occupation" allowClear />
@@ -413,21 +453,20 @@ handlePersontonameChange = (event) => {
                     </Col>
                     <Col span={12}>
                         <div>
-                        {console.log(edi.date_birth)}
-                        <Form.Item
-                        name = "date_birth" 
+                        {/* {console.log(user.date_birth)} */}
+                        {/* <Form.Item
                         onChange = {this.handleDatebirthChange}
-                        value = {edi.date_birth} 
+                        value = {user.date_birth} 
                         hasFeedback
                             rules = {[{ required: true, message: 'Please input your Date of Birth!' }]}
-                        >
-                           {console.log(edi.date_birth)}
-                            <Input type = "date"
+                        > */}
+                           {/* {console.log(user.date_birth)} */}
+                            {/* <Input type = "date"
                             name = "date_birth" 
                             onChange = {this.handleDatebirthChange}
-                            value = {edi.date_birth} 
+                            value = {user.date_birth} 
                             placeholder="Date of Birth" allowClear />
-                        </Form.Item>
+                        </Form.Item> */}
                         </div>
                     </Col>
                 </Row>
@@ -435,16 +474,15 @@ handlePersontonameChange = (event) => {
                     <Col span={12}>
                         <div>
                         <Form.Item
-                        name = "person_to_contact_name" 
-                        value = {edi.person_to_contact_name} 
+                        value = {user.person_to_contact_name} 
                         onChange = {this.handlePersontonameChange}
                         hasFeedback
                         rules = {[{ required: true, message: 'Please the name!' }]}
                         >
-                           {console.log(edi.person_to_contact_name)}
+                           {/* {console.log(user.person_to_contact_name)} */}
                             <Input type = "fullname"
                             name = "person_to_contact_name" 
-                            value = {edi.person_to_contact_name} 
+                            value = {user.person_to_contact_name} 
                             onChange = {this.handlePersontonameChange}
                             prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Person to Contact Name" allowClear />
                         </Form.Item>
@@ -453,18 +491,17 @@ handlePersontonameChange = (event) => {
                     <Col span={12}>
                         <div>
                         <Form.Item
-                        name = "person_to_contact_phone" 
-                        value = {edi.person_to_contact_phone}
+                        value = {user.person_to_contact_phone}
                         onChange = {this.handlePersontophoneChange}
                         hasFeedback
-                        rules={[{ required: true, message: 'Please input your phone number!' }]}
+                        rules={[{ required: true, message: 'Please input phone number!' }]}
                         >
-                           {console.log(edi.person_to_contact_phone)}
+                           {/* {console.log(user.person_to_contact_phone)} */}
                             <Input addonBefore={+237}
                             name = "person_to_contact_phone" 
-                            value = {edi.person_to_contact_phone}
+                            value = {user.person_to_contact_phone}
                             onChange = {this.handlePersontophoneChange}
-                              pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" placeholder="Person to contact Phone" 
+                              pattern = "[0-9]{3}[0-9]{3}[0-9]{3}" placeholder="Person to contact Phone" 
                               allowClear />
                         </Form.Item>
                         </div>
@@ -473,8 +510,8 @@ handlePersontonameChange = (event) => {
                 <div>
                 </div>
         </Form>
-                        )})
-                      }
+                    )})
+                      } 
       </Modal>
             </div>
         )

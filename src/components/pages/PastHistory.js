@@ -44,22 +44,34 @@ handleSubmit = event => {
   axiosWithAuth().post('/pasthistory/add', this.state)
        .then(response => {
            console.log(response)
-          message.success(response.data.message, 5);
-          this.setState(initialState)
-          window.location.reload();
+          // message.success(response.data.message, 5);
+          // this.setState(initialState)
+          // window.location.reload();
+          if (response)
+             {
+                 if(response.status === 200)
+                 {
+                    message.success(response.data.message, 5);
+                    window.location.reload();
+                 }
+                 else if(response.status === 201)
+                 {
+                    message.warning(response.data.war_message, 5)
+                 }
+             }
           //  warn_message
        })
        .catch(error => {
-           if(error.response)
-           {
-               if(error.response.status === 202){
-                  message.warning('This user already exists')
-               }
-               else if(error.response.status === 500)
-               {
-                  message.error('Server Error !')
-               }
-           }
+          //  if(error.response)
+          //  {
+          //      if(error.response.status === 202){
+          //         message.warning('This user already exists')
+          //      }
+          //      else if(error.response.status === 500)
+          //      {
+          //         message.error('Server Error !')
+          //      }
+          //  }
        })
 }
     render() {

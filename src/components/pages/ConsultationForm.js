@@ -7,30 +7,67 @@ import { LoadingOutlined } from '@ant-design/icons'
 
 const { Title } = Typography;
 
-function handleChange(value) {
-  console.log(`Selected: ${value}`);
-}
+const onFinish = (values) => {
+  console.log('Received values of form: ', values);
+};
+
 
 class ConsultationForm extends Component {
   state = {
     Symptoms: [],
-    name: this.props.name,
+    symptomsform: '',
+    // name: this.props.name,
     buttonLoading: false,
   }
+
+// Enable fielling form
+  //  handleChange = (event) => {
+  //   // console.log(`Selected: ${value}`);
+  //   this.setState({
+  //     symptomsform: event.target.value
+  // })
+  // }
+
+  handleChange = (value, event) =>{
+    console.log('selected: '+ value);
+    this.setState({
+      symptomsform: value
+    })
+
+}
+
+// // Enable fielling form
+// handleReportonChange = (event) => {
+//   this.setState({
+//       observation: event.target.value
+//   })
+//   // console.log(event.target.value)
+// }
 
   // handle submit value
   handleSubmit = event => {
     event.preventDefault() //Avoid to lose data after submited
-    axiosWithAuth().post('create/consultation', this.state)
+    axiosWithAuth().post('/create/consultation', this.state.symptomsform)
          .then(response => {
              console.log(response)
+             if (response)
+             {
+                 if(response.status === 200)
+                 {
+                    message.success(response.data.message, 5);
+                 }
+                 else if(response.status === 201)
+                 {
+                    message.warning(response.data.war_message, 5)
+                 }
+             }
             // message.success(response.data.message, 5);
             //  warn_message
          })
          .catch(error => {
-             console.log('registration error:',this.state.data.war_message)
+             console.log(error)
             //  alert(error)
-             console.log(error.data.warn_message)
+            //  console.log(error)
             // message.warning(error.data.warn_message, 15);
          })
 }
@@ -68,7 +105,7 @@ class ConsultationForm extends Component {
             );
         return (
             <div className = "text-center">
-              <Form>
+              <Form onFinish = {onFinish}>
               <Row gutter= {16} justify = "center">
               <Title level={3}>Fill the form below
                    by selecting or by seraching
@@ -80,11 +117,13 @@ class ConsultationForm extends Component {
               <Select
                 mode="multiple"
                 size='large'
-                name = 'name'
+                onChange={(value, event) => this.handleChange(value, event)}
+                name = 'symptomsform'
+                value = {this.symptomsform}
                 placeholder="Please search or select your symptoms"
                 allowClear
-                // defaultValue={['a10', 'c12']}
-                onChange={handleChange}
+                // defaultValue={['headache', 'fever']}
+                // onChange={this.handleChange}
                 style={{ width: '100%' }}
               >
               {symptomsItems}
@@ -97,7 +136,7 @@ class ConsultationForm extends Component {
             <Row gutter= {10} justify = "center">
             <Col span={5}>
                 <Form.Item className = "text-center">
-                    <Button onClick = {this.handleSubmit}fluid type="primary" htmlType="submit" 
+                    <Button onClick = {this.handleSubmit} fluid type="primary" htmlType="submit" 
                     // loading={this.state.buttonLoading}
                      className="login-form-button"  style = {{width: '100%'}}>
                     Predict

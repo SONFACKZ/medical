@@ -38,8 +38,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_COMMIT_ON_TEARDOWN'] = True
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 465
-app.config['MAIL_USERNAME'] = "elfridsonfack@gmail.com"
-app.config['MAIL_PASSWORD'] = 'Zane091262'
+app.config['MAIL_USERNAME'] = "example@gmail.com"
+app.config['MAIL_PASSWORD'] = 'your Gmail Password'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
@@ -309,7 +309,6 @@ def assign_doctor(public_id):
         data = json.loads(request.data)
         doc_id = data['doc_id']
         user.parent_id = doc_id
-
         #Sending Email Notification
         # subject = 'Account Activated'
         # mess = "Hello <b>"+user.fullname+"</b>, Your account has been activated<br>Login <a href = 'http://localhost:3000/login'>here</a>"
@@ -370,26 +369,29 @@ def doctor_assigned(email):
 
 
 #Consultation
-@app.route('/create/consultation', methods=['GET', 'POST'])
+@app.route('/create/consultation', methods=['POST'])
 @jwt_required
 def create_consultation():
-    request_data = json.loads(request.data)
+    data = request.get_json()
+    symplen = len(data)
     dat = date.today().strftime('%Y-%m-%d')
     da = datetime.strptime(dat, '%Y-%m-%d')
     user = User.query.filter_by(email=get_jwt_identity()).first() # Filter DB by token (email)
     owner = user.user_id #assign the the user_id to owner variable
-    consultation = Consultation(consultation_date=da,
-                                result1='obser',
-                                result2='2azertyresult',
-                                result3='res2azertyult3',
-                                syptoms='Other qwertyuioop[',
-                                other_observation='Other observation Other observation Other observation',
-                                consultation_owner_id=owner
-                                )
-    db.session.add(consultation)
-    db.session.commit()
-    
-    return {'201': 'Consultation created successfully'}
+    if symplen == 0:
+        return({"war_message": "Field the form first"}), 201
+    else:
+        symptoms = ", ".join(data)
+        consultation = Consultation(consultation_date=da,
+                                    result1='I am a patient too',
+                                    result2='Another I am a patient too',
+                                    result3='I am a patient too Another',
+                                    syptoms=symptoms,
+                                    consultation_owner_id=owner
+                                    )
+        db.session.add(consultation)
+        db.session.commit()
+        return jsonify({'message': 'Consultation created successfully'})
 
 def consultation_serializer(consult):
     return{
@@ -409,6 +411,52 @@ def get_use_consultation():
     user = User.query.filter_by(email=get_jwt_identity()).first() # Filter DB by token (email)
     consultations = Consultation.query.filter_by(consultation_owner_id = user.user_id)
     return jsonify([*map(consultation_serializer, consultations)])
+
+#Getting specific user consultations/Predictions
+@app.route('/consultations/user/<public_id>', methods = ['GET'])
+@jwt_required
+def get_user_consultations(public_id):
+    user = User.query.filter_by(public_id=public_id).first()
+    print("===========================> "+str(user.user_id))
+    consultations = Consultation.query.filter_by(consultation_owner_id = user.user_id)
+    return jsonify([*map(consultation_serializer, consultations)])
+
+#Getting specific user consultations/Predictions passing through consulation_id
+@app.route('/user/consultation/<consultation_id>', methods = ['GET'])
+@jwt_required
+def get_user_consultation(consultation_id):
+    consult = Consultation.query.filter_by(consultation_id=consultation_id).first()
+    print("===========================> "+str(consult.consultation_id))
+    return jsonify(
+        {
+        'consultation_id': consult.consultation_id,
+        'consultation_date': consult.consultation_date,
+        'result1': consult.result1,
+        'result2': consult.result2,
+        'result3': consult.result3,
+        'other_observation': consult.other_observation,
+        'symptoms': consult.syptoms,
+        'consultation_owner_id': consult.consultation_owner_id,
+        }
+    )
+
+#Update consultation by inserting doctor observation
+@app.route('/user/consultation/<consultation_id>', methods = ['PUT'])
+@jwt_required
+def make_observation(consultation_id):
+    consult = Consultation.query.filter_by(consultation_id=consultation_id).first()
+    print("====================================> "+str(consult.consultation_id))
+    if not consult:
+        return jsonify({"message": "This consultation doesn't exist"})
+    else:
+        data = json.loads(request.data)
+        if data['observation'] != '':
+            consult.other_observation = data['observation']
+            db.session.commit()
+            return jsonify({'message': 'Recommendations added successfully!'})
+        else:
+            return jsonify({'war_message': "Recommendation / Observation can't be empty"}), 201
+            
 
 #Doctors
 def doctor_serializer(doctor):
@@ -563,7 +611,6 @@ def updrole(public_id):
     user.role_id = 1
     # user.parent_id = 4
     db.session.commit()
-
     return jsonify({'message': 'The user role has been updated!'})
 
 #Create Symptoms
@@ -588,7 +635,6 @@ def updsymptom(id):
     
     sympt.name = "anosmia"
     db.session.commit()
-
     return jsonify({'message': 'Sypmtom has been updated!'})
 
 
@@ -601,14 +647,19 @@ def history():
     da = datetime.strptime(dat, '%Y-%m-%d')
     user = User.query.filter_by(email=get_jwt_identity()).first() # Filter DB by token (email)
     owner = user.user_id #assign the the user_id to owner variable
-    new_history = PastHistory(past_history_type=data['past_history_type'],
-                          past_history_particular_observation=data['particular_observation'],
-                          past_history_year=da,
-                          past_history_owner_id=owner)
-    
-    db.session.add(new_history)
-    db.session.commit()
-    return jsonify({'message': 'Your Past History has been created successfully!'})
+    if data['past_history_type'] == '':
+        return jsonify({"war_message": "Past history type required"}), 201
+    elif data['particular_observation'] == '':
+        return jsonify({"war_message": "Observation required"}), 201
+    else:
+        new_history = PastHistory(past_history_type=data['past_history_type'],
+                            past_history_particular_observation=data['particular_observation'],
+                            past_history_year=da,
+                            past_history_owner_id=owner)
+        
+        db.session.add(new_history)
+        db.session.commit()
+        return jsonify({'message': 'Your Past History has been created successfully!'})
 
 def pasthistory_serializer(history):
     return{
@@ -638,22 +689,25 @@ def case_reporting():
     da = datetime.strptime(dat, '%Y-%m-%d')
     user = User.query.filter_by(email=get_jwt_identity()).first() # Filter DB by token (email)
     owner = user.user_id #assign the the user_id to owner variable
-    new_case_report = ReportCase(report_reason=data['report_case'], report_date=da, 
-    report_case_owner_id=owner
-    # reported_user_id = 
-    )
-    manager = User.query.filter_by(role_id=1).first()
-# Sending Email Notification
-    subject = 'New Case Reported'
-    mess = "<p>Hello <b>"+manager.fullname+"</b></p>,<p>The user "+user.email+"<br/>reported user</p>"
-    msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=manager.email.split())
-    msg.html = mess
-    with app.open_resource("../src/assets/images/logo.png") as fp:
-            msg.attach("logo.png", "image/png", fp.read())
-            mail.send(msg)
-    db.session.add(new_case_report)
-    db.session.commit()
-    return jsonify({'message': 'Your case report has been saved successfully!'})
+    if data['report_case'] == '':
+        return jsonify({"war_message": "This form can'y be empty"}), 201
+    else:
+        new_case_report = ReportCase(report_reason=data['report_case'], report_date=da, 
+        report_case_owner_id=owner
+        # reported_user_id = 
+        )
+        manager = User.query.filter_by(role_id=1).first()
+    # Sending Email Notification
+        subject = 'New Case Reported'
+        mess = "<p>Hello <b>"+manager.fullname+"</b></p>,<p>The user "+user.email+"<br/>reported user</p>"
+        msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=manager.email.split())
+        msg.html = mess
+        with app.open_resource("../src/assets/images/logo.png") as fp:
+                msg.attach("logo.png", "image/png", fp.read())
+                mail.send(msg)
+        db.session.add(new_case_report)
+        db.session.commit()
+        return jsonify({'message': 'Your case report has been saved successfully!'})
 
 
 
@@ -767,37 +821,60 @@ def reg_patient():
     new_patient = User.query.filter_by(email=data['email']).first()
     manager = User.query.filter_by(role_id = 1).first() #Getting the manager
     if not new_patient:
-    # gets inputs
-        new_patient = User(public_id=str(uuid.uuid4()),
-                            fullname=data['fullname'], password=hashed_password, role_id=3,
-                            email=data['email'], residence=data['residence'],
-                            sex=data['sex'], contact_phone=data['contact_phone'],
-                            blood_group=data['blood_group'], occupation=data['occupation'],
-                            date_birth=dateB,
-                            status=1,
-                            person_to_contact_name=data['person_to_contact_name'],
-                            person_to_contact_phone=data['person_to_contact_phone']
-                            )
-        subject = 'Welcome to Mediagnostic'
-        mess = "Hello <b>"+data['fullname']+"</b>, welcome to Mediagnostic. You registered successfully<br>Login <a href = 'http://localhost:3000/login'>here</a>"
-        msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=data['email'].split())
-        msg.html = mess
-        with app.open_resource("../src/assets/images/logo.png") as fp:
-            msg.attach("logo.png", "image/png", fp.read())
-            mail.send(msg)
+        # gets inputs
+        if data['fullname'] == '':
+            return jsonify({"warn_message": "Fullname required"}), 201
+        elif data['email'] == '':
+            return jsonify({"warn_message": "Email required"}), 201
+        elif data['residence'] == '':
+            return jsonify({"warn_message": "Residence required"}), 201
+        elif data['sex'] == '':
+            return jsonify({"warn_message": "Gender required"}), 201
+        elif data['contact_phone'] == '':
+            return jsonify({"warn_message": "Contact phone required"}), 201
+        elif data['blood_group'] == '':
+            return jsonify({"warn_message": "Blood group required"}), 201
+        elif data['occupation'] == '':
+            return jsonify({"warn_message": "Occupation required"}), 201
+        elif data['person_to_contact_name'] == '':
+            return jsonify({"warn_message": "Person to contact name required"}), 201
+        elif data['person_to_contact_phone'] == '':
+            return jsonify({"warn_message": "Person to contact phone required"}), 201
+        elif dateB == '':
+            return jsonify({"warn_message": "Date of birth required"}), 201
+        elif hashed_password == '':
+            return jsonify({"warn_message": "Password required"}), 201
+        else:
+            new_patient = User(public_id=str(uuid.uuid4()),
+                                fullname=data['fullname'], password=hashed_password, role_id=3,
+                                email=data['email'], residence=data['residence'],
+                                sex=data['sex'], contact_phone=data['contact_phone'],
+                                blood_group=data['blood_group'], occupation=data['occupation'],
+                                date_birth=dateB,
+                                status=1,
+                                person_to_contact_name=data['person_to_contact_name'],
+                                person_to_contact_phone=data['person_to_contact_phone']
+                                )
+            # subject = 'Welcome to Mediagnostic'
+            # mess = "Hello <b>"+data['fullname']+"</b>, welcome to Mediagnostic. You registered successfully<br>Login <a href = 'http://localhost:3000/login'>here</a>"
+            # msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=data['email'].split())
+            # msg.html = mess
+            # with app.open_resource("../src/assets/images/logo.png") as fp:
+            #     msg.attach("logo.png", "image/png", fp.read())
+            #     mail.send(msg)
 
-        subject = 'New Account created'
-        mess = "New patient account created in your application.<br> Email: <b>"+data['email']+"</b>"
-        msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=manager.email.split())
-        msg.html = mess
-        with app.open_resource("../src/assets/images/logo.png") as fp:
-            msg.attach("logo.png", "image/png", fp.read())
-            mail.send(msg)
+            # subject = 'New Account created'
+            # mess = "New patient account created in your application.<br> Email: <b>"+data['email']+"</b>"
+            # msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=manager.email.split())
+            # msg.html = mess
+            # with app.open_resource("../src/assets/images/logo.png") as fp:
+            #     msg.attach("logo.png", "image/png", fp.read())
+            #     mail.send(msg)
 
-        #Insert Patient
-        db.session.add(new_patient)
-        db.session.commit()
-        return jsonify({'message': 'Your account has been created successfully!'}), 200
+            #Insert Patient
+            db.session.add(new_patient)
+            db.session.commit()
+            return jsonify({'message': 'Your account has been created successfully!'}), 200
     else:
         # returns 202 if user already exists 
         return jsonify({'warn_message': 'This email already exists. Please Log in.'}), 202
@@ -906,6 +983,7 @@ def delete_user(public_id):
     return jsonify({'message': 'User has been deleted'})
 
 @app.route('/symptoms', methods=['GET'])
+@jwt_required
 def get_symptoms():
     data = pd.read_csv('DataSetSymptoms.csv')
     df = pd.DataFrame(data)

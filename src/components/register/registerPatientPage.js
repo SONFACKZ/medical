@@ -154,48 +154,64 @@ class RegisterPatient extends React.Component {
     
 
 // Validation form
-    validate = () => {
-        let fullnameError = '';
-        let emailError = '';
-        let residenceError = '';
-        let sexError = '';
-        let contact_phoneError = '';
-        let blood_groupError = '';
-        let occupationError = '';
-        let date_birthError = '';
-        let passwordError = '';
-        let person_to_contact_phoneError = '';
-        let person_to_contact_nameError = '';
+    // validate = () => {
+    //     let fullnameError = '';
+    //     let emailError = '';
+    //     let residenceError = '';
+    //     let sexError = '';
+    //     let contact_phoneError = '';
+    //     let blood_groupError = '';
+    //     let occupationError = '';
+    //     let date_birthError = '';
+    //     let passwordError = '';
+    //     let person_to_contact_phoneError = '';
+    //     let person_to_contact_nameError = '';
 
-        if(!this.state.fullname){
-            fullnameError = 'Name cannot be blank';
-        }
-        if(!this.state.email.includes("@")){
-            emailError = 'Invalid email';
-        }
-        if(emailError || fullnameError){
-            this.setState({emailError, fullnameError});
-            return false;
-        }
+    //     if(!this.state.fullname){
+    //         fullnameError = 'Name cannot be blank';
+    //     }
+    //     if(!this.state.email.includes("@")){
+    //         emailError = 'Invalid email';
+    //     }
+    //     if(emailError || fullnameError){
+    //         this.setState({emailError, fullnameError});
+    //         return false;
+    //     }
 
-        return true;
-    };
+    //     return true;
+    // };
     
 
 // handle submit value
     handleSubmit = event => {
         event.preventDefault() //Avoid to lose data after submited
-        const isValid = this.validate();
-        if(isValid){
-            console.log(this.state);
-            this.setState(initialState); //Clearing Form
-        }
+        // const isValid = this.validate();
+        // if(isValid){
+        //     console.log(this.state);
+        //     this.setState(initialState); //Clearing Form
+        // }
         axios.post('auth/register/patient', this.state)
              .then(response => {
-                 console.log(response)
-                message.success(response.data.message, 5);
-                window.location.reload();
+                console.log(response)
+                // message.success(response.data.message, 5);
+                // window.location.reload();
                 //  warn_message
+                if (response)
+             {
+                 if(response.status === 200)
+                 {
+                    message.success(response.data.message, 5);
+                    window.location.reload();
+                 }
+                 else if(response.status === 201)
+                 {
+                    message.warning(response.data.warn_message, 5)
+                 }
+                 else if(response.status === 202)
+                 {
+                    message.warning(response.data.warn_message, 5)
+                 }
+             }
              })
              .catch(error => {
                  if(error.response)
@@ -208,7 +224,7 @@ class RegisterPatient extends React.Component {
                         message.error('Server Error !')
                      }
                  }
-                //  console.log('registration error:',this.state.data.war_message)
+                //  console.log('registration error'+ this.state.data.war_message)
                 //  alert(error)
                 //  console.log(error.data.warn_message)
                 // message.warning(error.data.warn_message, 15);
@@ -249,7 +265,7 @@ class RegisterPatient extends React.Component {
                                         onChange = {this.handleFullnameChange}
                                         prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Full Name" allowClear />
                                     </Form.Item>
-                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.fullnameError}</span>
+                                        {/* <span style = {{fontSize: 12, color: 'red'}}>{this.state.fullnameError}</span> */}
                                     </div>
                                 </Col>
                                 <Col span={12}>
@@ -277,7 +293,7 @@ class RegisterPatient extends React.Component {
                                         prefix={<MailOutlined className="site-form-item-icon" />} placeholder="Email" allowClear />
                                     </Form.Item>
                                         
-                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.emailError}</span>
+                                        {/* <span style = {{fontSize: 12, color: 'red'}}>{this.state.emailError}</span> */}
                                     </div>
                                 </Col>
                             </Row>
@@ -298,7 +314,7 @@ class RegisterPatient extends React.Component {
                                         prefix={<HomeOutlined className="site-form-item-icon" />} placeholder="Residence" allowClear />
                                     </Form.Item>
 
-                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.residenceError}</span>
+                                        {/* <span style = {{fontSize: 12, color: 'red'}}>{this.state.residenceError}</span> */}
                                     </div>
                                 </Col>
                                 <Col span={12}>
@@ -328,7 +344,7 @@ class RegisterPatient extends React.Component {
                                             <option value = "F">Female</option>
                                             <option value = "M">Male</option>
                                         </select> */}
-                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.sexError}</span>
+                                        {/* <span style = {{fontSize: 12, color: 'red'}}>{this.state.sexError}</span> */}
                                     </div>
                                 </Col>
                             </Row>
@@ -358,7 +374,7 @@ class RegisterPatient extends React.Component {
                                         {/* <label>Contact Phone</label>
                                         <input class="form-control" type = "tel" name = "phone_contact" value = {contact_phone} placeholder = "Ex: 123 456 789"
                                         onChange = {this.handleContactphoneChange} pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" required /> */}
-                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.contact_phoneError}</span>
+                                        {/* <span style = {{fontSize: 12, color: 'red'}}>{this.state.contact_phoneError}</span> */}
                                     </div>
                                 </Col>
                                 <Col span={12}>
@@ -388,7 +404,7 @@ class RegisterPatient extends React.Component {
                                         {/* <span style = {{fontSize: 9, color: 'grey'}}>Choose your Blood Group</span> */}
                                     </Form.Item>
 
-                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.blood_groupError}</span>
+                                        {/* <span style = {{fontSize: 12, color: 'red'}}>{this.state.blood_groupError}</span> */}
                                     </div>
                                 </Col>
                             </Row>
@@ -407,7 +423,7 @@ class RegisterPatient extends React.Component {
                                     </Form.Item>
                                         {/* <label>Occupation</label>
                                         <input class="form-control" type = "text" value = {occupation} name = "occupation" onChange = {this.handleOccupationChange} required /> */}
-                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.occupationError}</span>
+                                        {/* <span style = {{fontSize: 12, color: 'red'}}>{this.state.occupationError}</span> */}
                                     </div>
                                 </Col>
                                 <Col span={12}>
@@ -426,7 +442,7 @@ class RegisterPatient extends React.Component {
                                     {/* <DatePicker  format={dateFormat} /> */}
                                         {/* <label>Date of Birth</label>
                                         <input class="form-control" type="date" value = {date_birth} name = "date_birth" onChange = {this.handleDatebirthChange} required /> */}
-                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.data_birthError}</span>
+                                        {/* <span style = {{fontSize: 12, color: 'red'}}>{this.state.data_birthError}</span> */}
                                     </div>
                                 </Col>
                             </Row>
@@ -448,7 +464,7 @@ class RegisterPatient extends React.Component {
                                     </Form.Item>
                                         {/* <label>Person to Contact Name</label>
                                         <input class="form-control" type = "text" name = "person_to_contact_name" value = {person_to_contact_name} onChange = {this.handlePersontonameChange} required /> */}
-                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.person_to_contact_nameError}</span>
+                                        {/* <span style = {{fontSize: 12, color: 'red'}}>{this.state.person_to_contact_nameError}</span> */}
                                     </div>
                                 </Col>
                                 <Col span={12}>
@@ -476,7 +492,7 @@ class RegisterPatient extends React.Component {
                                         {/* <label>Person to contact Phone</label>
                                         <input class="form-control" type = "text" name = "person_to_contact_phone" value = {person_to_contact_phone} placeholder = "Ex: 123 456 789"
                                         onChange = {this.handlePersontophoneChange} pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" required /> */}
-                                        <span style = {{fontSize: 12, color: 'red'}}>{this.state.person_to_contact_phoneError}</span>
+                                        {/* <span style = {{fontSize: 12, color: 'red'}}>{this.state.person_to_contact_phoneError}</span> */}
                                     </div>
                                 </Col>
                             </Row>
@@ -495,7 +511,7 @@ class RegisterPatient extends React.Component {
                                     type="password"
                                     placeholder="Password" />
                                     </Form.Item>
-                                    <span style = {{fontSize: 12, color: 'red'}}>{this.state.passwordError}</span>
+                                    {/* <span style = {{fontSize: 12, color: 'red'}}>{this.state.passwordError}</span> */}
                                 </div>
                             </Col>
                             <Col span = {12}>
