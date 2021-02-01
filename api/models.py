@@ -11,6 +11,8 @@ from flask_mail import Mail, Message
 from random import randint
 
 from flask_socketio import SocketIO, send
+import os
+# from os.path import join, dirname, realpath
 
 import jwt
 from werkzeug.utils import secure_filename
@@ -43,8 +45,10 @@ app.config['MAIL_PASSWORD'] = 'your Gmail Password'
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = True
 
-app.config["UPLOAD_FOLDER"] = '/static/files'
-ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
+app.config["UPLOAD_FOLDER"] = './static/files'
+# UPLOADS_PATH = join(dirname(realpath(__file__)), 'static/uploads/..')
+
+ALLOWED_EXTENSIONS = {'pdf'}
 
 db = SQLAlchemy(app)
 tok = JWTManager(app)
@@ -64,9 +68,6 @@ class Role(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), unique=True)
     users = db.relationship('User', backref='role', lazy='dynamic')
-
-    # def __str__(self):
-    #     return f'{self.id} {self.name}'
 
 
 class User(UserMixin, db.Model):
@@ -99,12 +100,6 @@ class User(UserMixin, db.Model):
     repot_cases = db.relationship('ReportCase', backref='owner')
     past_history = db.relationship('PastHistory', backref='owner')
 
-    # def set_password (self, password):
-    #     self.password = generate_password_hash(password)
-    
-    # def check_password(self, password):
-    #     return check_password_hash(self.password, password)
-
 
 class Consultation(db.Model):
     __tablename__ = "consultation"
@@ -125,13 +120,6 @@ class ReportCase(db.Model):
     report_case_owner_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
     # reported_user_id = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
-    # def __init__(self, report_reason, report_case_owner_id):
-    #     self.report_reason = report_reason
-    #     self.report_case_owner_id = report_case_owner_id
-
-    # def __repr__(self):
-    #     return 'The report_reason is {}, report_case_owner_id{}'.format(self.report_reason, self.report_date, self.report_case_owner_id)
-
 
 class PastHistory(db.Model):
     past_history_id = db.Column(db.Integer, primary_key=True)
@@ -144,30 +132,6 @@ class PastHistory(db.Model):
 db.create_all()
 
 
-# # decorator for verifying the JWT 
-# def token_required(f): 
-#     @wraps(f) 
-#     def decorated(*args, **kwargs): 
-#         token = None
-#         # jwt is passed in the request header 
-#         if 'x-access-token' in request.headers: 
-#             token = request.headers['x-access-token'] 
-#         # return 401 if token is not passed 
-#         if not token: 
-#             return jsonify({'message' : 'Token is missing !!'}), 401
-   
-#         try: 
-#             # decoding the payload to fetch the stored details 
-#             data = jwt.decode(token, app.config['SECRET_KEY']) 
-#             current_user = User.query.filter_by(public_id = data['public_id']).first() 
-#         except: 
-#             return jsonify({ 
-#                 'message' : 'Token is invalid !!'
-#             }), 401
-#         # returns the current logged in users contex to the routes 
-#         return  f(current_user, *args, **kwargs) 
-   
-#     return decorated 
 
 
 # # Here is a custom decorator that verifies the JWT is present in
@@ -196,20 +160,6 @@ db.create_all()
 def index():
     return render_template("index.html")
 
-
-#Test protected route
-@app.route('/pro', methods=['GET'])
-@jwt_required
-def pro():
- return jsonify({'message': 'Page protected!'})
-
-# db.session.query(Post).select_from(Follow).filter_by(follower_id=self.id)
-# .join(Post, Follow.followed_id == Post.author_id)
-
-# Post.query.join(Follow, Follow.followed_id == Post.author_id)
-# .filter(Follow.follower_id == self.id)
-
-# User.query.join(Role, role.id == User.user_id).filter(Role, role_id == self.id)
 
 # USers
 def user_serializer(usersall):
@@ -469,7 +419,10 @@ def doctor_serializer(doctor):
         'email': doctor.email,
         'role_id': doctor.role_id,
         'status': doctor.status,
-        'pending': 'Pending ...'
+        'pending': 'Pending ...',
+        'nic': doctor.nic_passport_path,
+        'cv': doctor.cv_path,
+        'diploma': doctor.diplomas_path
     }
 
 @app.route('/users/doctors', methods = ['GET'])
@@ -539,24 +492,6 @@ def user_profile(email):
         return jsonify([*map(profile_serializer, user)])
 
 
-# #User Profil Edit
-# @app.route('/edit-profile', methods=['GET', 'POST'])
-# @login_required
-# def edit_profile():
-#     form = EditProfileForm()
-#     if form.validate_on_submit():
-#         current_user.name = form.name.data
-#         current_user.location = form.location.data
-#         current_user.about_me = form.about_me.data
-#         db.session.add(user)
-#         flash('Your profile has been updated.')
-#         return redirect(url_for('.user', username=current_user.username))
-# form.name.data = current_user.name
-# form.location.data = current_user.location
-# form.about_me.data = current_user.about_me
-# return render_template('edit_profile.html', form=form)
-
-
 #Get and Edit individual user
 
 def user_update_serializer(useredit):
@@ -575,6 +510,9 @@ def user_update_serializer(useredit):
     'person_to_contact_name': useredit.person_to_contact_name,
     'person_to_contact_phone': useredit.person_to_contact_phone,
     'status': useredit.status,
+    'nic': useredit.nic_passport_path,
+    'cv': useredit.cv_path,
+    'diploma': useredit.diplomas_path
     }
 
 @app.route('/users/<public_id>', methods=['GET', 'POST'])
@@ -737,78 +675,85 @@ def get_pat_doc():
     return jsonify([*map(doc_pat_serializer, pat)])
 
 
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-# @app.route('/upload', methods=['GET', 'POST'])
-# def upload_file():
-#     if request.method == 'POST':
-#         # check if the post request has the file part
-#         if 'file' not in request.files:
-#             return jsonify({'msg': 'No file part1'})
-#             # return redirect(request.url)
-#         file = request.files['file']
-#         # if user does not select file, browser also
-#         # submit an empty part without filename
-#         if file.filename == '':
-#             return jsonify({'msg': 'No selected file 2'})
-#             # return redirect(request.url)
-#         if file and allowed_file(file.filename):
-#             filename = secure_filename(file.filename)
-#             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-#             filename = filename
-#             return jsonify({'uploaded_file': filename})
-
 #Register a Doctor
 @app.route('/auth/register/doctor', methods=["POST"])
 def reg_doctor():
-    data = request.get_json()
-    
+    data = request.form
 
+    nic = request.files['nic_passport_path']
+    nic_filename = secure_filename(nic.filename)
+    nic.save(os.path.join(app.config['UPLOAD_FOLDER'], nic_filename))
+    nic_path = 'static/files/'+nic_filename
+
+    cv = request.files['cv_path']
+    cv_filename = secure_filename(cv.filename)
+    cv.save(os.path.join(app.config['UPLOAD_FOLDER'], cv_filename))
+    cv_filepath = 'static/files/'+cv_filename
+
+    diploma = request.files['diplomas_path']
+    diploma_filename = secure_filename(diploma.filename)
+    diploma.save(os.path.join(app.config['UPLOAD_FOLDER'], diploma_filename))
+    diploma_filepath = 'static/files/'+diploma_filename
+
+    hashed_password = generate_password_hash(data['password'], method ='sha256')
     dateB = datetime.strptime(data['date_birth'], '%Y-%m-%d').date()
+    new_doctor = User.query.filter_by(email=data['email']).first()
+    if not new_doctor:
+        # gets inputs
+        if data['fullname'] == '':
+            return jsonify({"warn_message": "Fullname required"}), 201
+        elif len(data['fullname']) < 4:
+            return jsonify({"warn_message": "Fullname should be at least 4 characters"}), 201
+        elif data['email'] == '':
+            return jsonify({"warn_message": "Email required"}), 201
+        elif data['residence'] == '':
+            return jsonify({"warn_message": "Residence required"}), 201
+        elif data['sex'] == '':
+            return jsonify({"warn_message": "Gender required"}), 201
+        elif data['contact_phone'] == '':
+            return jsonify({"warn_message": "Contact phone required"}), 201
+        elif request.files['diplomas_path'] == '':
+            return jsonify({"warn_message": "Diploma required"}), 201
+        elif data['occupation'] == '':
+            return jsonify({"warn_message": "Occupation required"}), 201
+        elif request.files['nic_passport_path'] == '':
+            return jsonify({"warn_message": "Passport or ID Card required"}), 201
+        elif request.files['cv_path'] == '':
+            return jsonify({"warn_message": "CV required"}), 201
+        elif data['date_birth'] == '':
+            return jsonify({"warn_message": "Date of birth required"}), 201
+        elif data['password'] == '':
+            return jsonify({"warn_message": "Password required"}), 201
+        elif len(data['password']) < 8:
+            return jsonify({"warn_message": "Password should be at least 8 characters"}), 201
+        elif data['marital_status'] == '':
+            return jsonify({"warn_message": "Marital status required"}), 201
+        else:
+            new_doctor = User(public_id = str(uuid.uuid4()),
+                            fullname = data['fullname'], password = hashed_password, role_id = 2,
+                            email = data['email'], residence = data['residence'],
+                            sex = data['sex'], contact_phone = data['contact_phone'],
+                            occupation = data['occupation'],
+                            nic_passport_path = nic_path,
+                            cv_path = cv_filepath,
+                            diplomas_path = diploma_filepath,
+                            marital_status = data['marital_status'], date_birth = dateB
+                        )
+            subject = 'Welcome to Mediagnostic'
+            mess = "Hello <b>"+request.files['fullname']+"</b>, welcome to Mediagnostic. Your registered successfully<br>Login <a href = 'http://localhost:3000/login'>here</a>"
+            msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=request.files['email'].split())
+            msg.html = mess
+            with app.open_resource("../src/assets/images/logo.png") as fp:
+                    msg.attach("logo.png", "image/png", fp.read())
+                    mail.send(msg)
+            #Insert Doctor
+            db.session.add(new_doctor)
+            db.session.commit()
 
-    # id_passport = data['nic_passport_path']
-    # id_passport_filename = secure_filename(id_passport.filename)
-    # id_passport.save(os.path.join(app.config['UPLOAD_FOLDER'], id_passport_filename))
-    # id_pass_filepath = 'static/files/'+id_passport_filename
-
-    # cv = data['cv_path']
-    # cv_filename = secure_filename(cv.filename)
-    # cv.save(os.path.join(app.config['UPLOAD_FOLDER'], cv_filename))
-    # cv_filepath = 'static/files/'+cv_filename
-
-    # diploma = data['diplomas_path']
-    # diploma_filename = secure_filename(diploma.filename)
-    # diploma.save(os.path.join(app.config['UPLOAD_FOLDER'], diploma_filename))
-    # diploma_filepath = 'static/files/'+diploma_filename
-
-    hashed_password = generate_password_hash(data['password'], method='sha256')
-    dateB = datetime.strptime(data['date_birth'], '%Y-%m-%d').date()
-    new_doctor = User(public_id=str(uuid.uuid4()),
-                        fullname=data['fullname'], password=hashed_password, role_id=2,
-                        email=data['email'], residence=data['residence'],
-                        sex=data['sex'], contact_phone=data['contact_phone'],
-                        occupation=data['occupation'],
-                        # data['nic_passport_path']
-                        # nic_passport_path=id_pass_filepath,
-                        # data['cv_path']
-                        # data['diplomas_path']
-                        # cv_path=cv_filepath, diplomas_path=diploma_filepath,
-                        marital_status=data['marital_status'], date_birth=dateB
-                       )
-    subject = 'Welcome to Mediagnostic'
-    mess = "Hello <b>"+data['fullname']+"</b>, welcome to Mediagnostic. Your registered successfully<br>Login <a href = 'http://localhost:3000/login'>here</a>"
-    msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=data['email'].split())
-    msg.html = mess
-    with app.open_resource("../src/assets/images/logo.png") as fp:
-            msg.attach("logo.png", "image/png", fp.read())
-            mail.send(msg)
-    #Insert Doctor
-    db.session.add(new_doctor)
-    db.session.commit()
-
-    return jsonify({'message': 'Your new doctor account has been created!'})
+            return jsonify({'message': 'Your account has been created!'})
+    else:
+        # returns 202 if user already exists 
+        return jsonify({'warn_message': 'This email already exists. Please Log in.'}), 202
 
 #Register a patient
 @app.route('/auth/register/patient', methods=["POST"])
@@ -817,13 +762,16 @@ def reg_patient():
     hashed_password = generate_password_hash(data['password'], method='sha256')
     dateB = datetime.strptime(data['date_birth'], '%Y-%m-%d').date()
 
+
+    manager = User.query.filter_by(role_id = 1).first() #Getting the manager
     # checking for existing user
     new_patient = User.query.filter_by(email=data['email']).first()
-    manager = User.query.filter_by(role_id = 1).first() #Getting the manager
     if not new_patient:
         # gets inputs
         if data['fullname'] == '':
             return jsonify({"warn_message": "Fullname required"}), 201
+        elif len(data['fullname']) < 4:
+            return jsonify({"warn_message": "Fullname should be at least 4 characters"}), 201
         elif data['email'] == '':
             return jsonify({"warn_message": "Email required"}), 201
         elif data['residence'] == '':
@@ -844,6 +792,8 @@ def reg_patient():
             return jsonify({"warn_message": "Date of birth required"}), 201
         elif hashed_password == '':
             return jsonify({"warn_message": "Password required"}), 201
+        elif len(data['password']) < 8:
+            return jsonify({"warn_message": "Password should be at least 8 characters"}), 201
         else:
             new_patient = User(public_id=str(uuid.uuid4()),
                                 fullname=data['fullname'], password=hashed_password, role_id=3,
@@ -855,21 +805,21 @@ def reg_patient():
                                 person_to_contact_name=data['person_to_contact_name'],
                                 person_to_contact_phone=data['person_to_contact_phone']
                                 )
-            # subject = 'Welcome to Mediagnostic'
-            # mess = "Hello <b>"+data['fullname']+"</b>, welcome to Mediagnostic. You registered successfully<br>Login <a href = 'http://localhost:3000/login'>here</a>"
-            # msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=data['email'].split())
-            # msg.html = mess
-            # with app.open_resource("../src/assets/images/logo.png") as fp:
-            #     msg.attach("logo.png", "image/png", fp.read())
-            #     mail.send(msg)
+            subject = 'Welcome to Mediagnostic'
+            mess = "Hello <b>"+data['fullname']+"</b>, welcome to Mediagnostic. You registered successfully<br>Login <a href = 'http://localhost:3000/login'>here</a>"
+            msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=data['email'].split())
+            msg.html = mess
+            with app.open_resource("../src/assets/images/logo.png") as fp:
+                msg.attach("logo.png", "image/png", fp.read())
+                mail.send(msg)
 
-            # subject = 'New Account created'
-            # mess = "New patient account created in your application.<br> Email: <b>"+data['email']+"</b>"
-            # msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=manager.email.split())
-            # msg.html = mess
-            # with app.open_resource("../src/assets/images/logo.png") as fp:
-            #     msg.attach("logo.png", "image/png", fp.read())
-            #     mail.send(msg)
+            subject = 'New Account created'
+            mess = "New patient account created in your application.<br> Email: <b>"+data['email']+"</b>"
+            msg = Message(subject, sender="mediagnostic@ubuea.cm", recipients=manager.email.split())
+            msg.html = mess
+            with app.open_resource("../src/assets/images/logo.png") as fp:
+                msg.attach("logo.png", "image/png", fp.read())
+                mail.send(msg)
 
             #Insert Patient
             db.session.add(new_patient)
@@ -998,21 +948,7 @@ def get_symptoms():
     return jsonify({"symptoms": output})
 
 
-# @app.route('chat', methods = ['GET', 'POST'])
-# def chat():
-#     if not current_user.is_authenticate:
-#         flsh('Pleade login.', 'danger')
-#         return redirect(url_for('login'))
-#     return "Chat with me"
 
-
-# #Socket decorator
-# @socketio.on('message')
-# def message(data):
-#     print(f"\n\n{data}\n\n"
-#     send(data)
 
 if __name__ ==  '__main__':
-    # db.create_all()
     app.run(debug=True)
-    # socketio.run(app, debug=True)

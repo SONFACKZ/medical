@@ -2,6 +2,8 @@ import React, {useState, useEffect} from "react"
 import axiosWithAuth from "../../utils/axiosWithAuth"
 import { EyeOutlined } from '@ant-design/icons'
 import {Table, Button, Modal, Tag, message, Row, Col } from 'antd'
+import PDFViewer from 'pdf-viewer-reactjs'
+import { Document, Page } from 'react-pdf'
 // import { useHistory } from "react-router-dom"
 
 const DoctorList = () => {
@@ -13,6 +15,14 @@ const DoctorList = () => {
     const [users, setUser] = useState([]);
 
     const [user, setUse] = useState([]);
+
+    const [numPages, setNumPages] = useState(null);
+    
+    const [pageNumber, setPageNumber] = useState(1);
+
+  function onDocumentLoadSuccess({ numPages }) {
+    setNumPages(numPages);
+  }
 
     const getUsers = async () => {
         await axiosWithAuth().get('/users/doctors')
@@ -216,7 +226,45 @@ const columns = [
                                     onClick={() => activateUser(use.public_id)}>
                                     Activate this user</Button>}
                             </Col>
-                            </Row>
+                            </Row><br />
+                            <Row gutter= {16}>
+                            <Col span={8}>
+                                <li><b>Passport | ID Card</b>:{use.nic}
+                                <div className="model">
+                                <Document
+                                    file={use.nic}
+                                    onLoadSuccess={onDocumentLoadSuccess}
+                                >
+                                <Page pageNumber={pageNumber} />
+                                </Document>
+                            {/* <div className="modelContent">
+                                <iframe src = 'localhost:5000/api/'{use.nic} style="width:600px; height:500px;" frameborder="0"></iframe>
+                            </div> */}
+                        </div>
+                                {/* <PDFViewer
+                                        document={{
+                                            url: 'localhost:5000/api/'+use.nic,
+                                        }}
+                                    /> */}
+                                </li>
+                            </Col>
+                            <Col span={8}>
+                                <li><b>CV</b>: {use.cv}
+                                <PDFViewer
+                                        document={{
+                                            url: 'localhost:5000/api/'+use.cv,
+                                        }}
+                                    /></li>
+                            </Col>
+                            <Col span={8}>
+                                <li><b>Diploma</b>: {use.diploma}
+                                <PDFViewer
+                                        document={{
+                                            url: 'localhost:5000/api/'+use.diploma,
+                                        }}
+                                    /></li>
+                            </Col>
+                            </Row><br />
                             </>
                                 )
                             }

@@ -229,7 +229,7 @@ const columns = [
                                 <li><b>Occupation</b>: {use.occupation}</li>
                             </Col>
                             <Col span={12}>   
-                                <li><b>Status</b>: {use.satus === true?<Tag style = {{color: '#5cb85c'}}>Active</Tag>:<Tag style = {{color: '#f0ad4e'}}>Inactive</Tag>}</li>
+                                <li><b>Status</b>: {use.status === true?<Tag style = {{color: '#5cb85c'}}>Active</Tag>:<Tag style = {{color: '#f0ad4e'}}>Inactive</Tag>}</li>
                             </Col>
                             </Row><br />
                             <Row gutter= {16}>

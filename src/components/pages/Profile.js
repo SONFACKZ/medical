@@ -243,6 +243,8 @@ handlePersontonameChange = (event) => {
                         <span><PushpinOutlined /> <b>Occupation</b>: {profile.occupation} </span><br />
                         </Col>
                         </Row><br />
+                        {
+                        profile.role_id === 3?
                         <Row gutter= {16}>
                         <Col span={12}>
                         <span><UserOutlined /> <b>Person to contact Name</b>: {profile.person_to_contact_name} </span><br />
@@ -250,7 +252,8 @@ handlePersontonameChange = (event) => {
                         <Col span={12}>
                         <span><PhoneOutlined /> <b>Person to contact phone</b>: {profile.person_to_contact_phone}</span><br />
                         </Col>
-                        </Row><br />
+                        </Row>:''}
+                        <br />
                          <Row gutter= {16}>
                         <Col span={12}>
                         <span><UserSwitchOutlined /> Sex: {profile.sex} <img src = {sexImg} className = 'image' style = {{width: 20}} alt = "sex" /></span><br />
@@ -472,6 +475,8 @@ handlePersontonameChange = (event) => {
                 </Row>
                 <Row gutter= {16}>
                     <Col span={12}>
+                    {
+                        user.role !== 'Patient'?'':
                         <div>
                         <Form.Item
                         value = {user.person_to_contact_name} 
@@ -487,8 +492,11 @@ handlePersontonameChange = (event) => {
                             prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Person to Contact Name" allowClear />
                         </Form.Item>
                         </div>
+                  }
                     </Col>
                     <Col span={12}>
+                    {
+                        user.role !== 'Patient'?'':
                         <div>
                         <Form.Item
                         value = {user.person_to_contact_phone}
@@ -505,6 +513,7 @@ handlePersontonameChange = (event) => {
                               allowClear />
                         </Form.Item>
                         </div>
+                  }
                     </Col>
                 </Row>
                 <div>

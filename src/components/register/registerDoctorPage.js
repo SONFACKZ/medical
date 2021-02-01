@@ -1,7 +1,7 @@
 import React from 'react'
 import axios from 'axios'
 import doctorImg from "../../assets/images/doctor.svg"
-import { Form, Input, Button, Select, Row, Col } from 'antd'
+import { Form, Input, Button, Select, Row, Col, message } from 'antd'
 import { MailOutlined, UserOutlined, LockOutlined, 
         LoginOutlined,  HomeOutlined } from '@ant-design/icons'
 import {Link} from "react-router-dom"
@@ -147,9 +147,25 @@ class RegisterPatient extends React.Component {
         formData.append('diplomas_path', this.state.diplomas_path)
         formData.append('marital_status', this.state.marital_status)
 
-        axios.post('/auth/register/doctor', this.state)
+        axios.post('/auth/register/doctor', formData)
              .then(response => {
                  console.log(response)
+                 if (response)
+                 {
+                     if(response.status === 200)
+                     {
+                        message.success(response.data.message, 5);
+                        window.location.reload();
+                     }
+                     else if(response.status === 201)
+                     {
+                        message.warning(response.data.warn_message, 5)
+                     }
+                     else if(response.status === 202)
+                     {
+                        message.warning(response.data.warn_message, 5)
+                     }
+                 }
              })
              .catch(error => {
                  console.log(error)
@@ -172,7 +188,7 @@ class RegisterPatient extends React.Component {
                     <div><br /></div>
                         {/* <form onSubmit = {this.handleSubmit}> */}
                         <Form 
-                            name = 'regiter' onFinish = {onFinish}>
+                            name = 'regiter' onFinish = {onFinish} enctype = "multipart/form-data">
                             <Row gutter= {16}>
                                 <Col span={12}>
                                     <div>
@@ -283,14 +299,14 @@ class RegisterPatient extends React.Component {
                                             required: true, message: 'Please input your phone number!'
                                         }, 
                                         {
-                                         pattern: /[0-9]{3} [0-9]{3} [0-9]{3}/,
-                                         message: 'Please input a valid phone number format! (Ex: 000 000 000)',
+                                         pattern: /[0-9]{3}[0-9]{3}[0-9]{3}/,
+                                         message: 'Please input a valid phone number format! (Ex: 600000000)',
                                         }
                                          ]}>
                                         <Input addonBefore={+237}
                                          name = "phone_contact" value = {contact_phone}
                                          onChange = {this.handleContactphoneChange}
-                                         pattern = "[0-9]{3} [0-9]{3} [0-9]{3}" placeholder="Contact Phone" 
+                                         pattern = "[0-9]{3}[0-9]{3}[0-9]{3}" placeholder="Contact Phone" 
                                          allowClear />
                                     </Form.Item>
                                      <span style = {{fontSize: 12, color: 'red'}}>{this.state.contact_phoneError}</span>
