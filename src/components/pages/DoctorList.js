@@ -10,6 +10,7 @@ const DoctorList = () => {
 
     // const history = useHistory();
 
+    let fileUrl = 'localhost:5000/'
     const [visible, setVisible] = useState(false);
   
     const [users, setUser] = useState([]);
@@ -17,12 +18,11 @@ const DoctorList = () => {
     const [user, setUse] = useState([]);
 
     const [numPages, setNumPages] = useState(null);
-    
     const [pageNumber, setPageNumber] = useState(1);
-
-  function onDocumentLoadSuccess({ numPages }) {
-    setNumPages(numPages);
-  }
+  
+    function onDocumentLoadSuccess({ numPages }) {
+      setNumPages(numPages);
+    }
 
     const getUsers = async () => {
         await axiosWithAuth().get('/users/doctors')
@@ -230,29 +230,36 @@ const columns = [
                             <Row gutter= {16}>
                             <Col span={8}>
                                 <li><b>Passport | ID Card</b>:{use.nic}
-                                <div className="model">
-                                <Document
-                                    file={use.nic}
-                                    onLoadSuccess={onDocumentLoadSuccess}
-                                >
+                                <embed
+    src={fileUrl+use.nic}
+    type="application/pdf"
+    frameBorder="0"
+    scrolling="auto"
+    height="100%"
+    width="100%"
+></embed>
+                        {/* <div>
+                            <Document
+                                file={fileUrl+use.nic}
+                                onLoadSuccess={onDocumentLoadSuccess}
+                            >
                                 <Page pageNumber={pageNumber} />
-                                </Document>
-                            {/* <div className="modelContent">
-                                <iframe src = 'localhost:5000/api/'{use.nic} style="width:600px; height:500px;" frameborder="0"></iframe>
-                            </div> */}
-                        </div>
-                                {/* <PDFViewer
+                            </Document>
+                            <p>Page {pageNumber} of {numPages}</p>
+                        </div> */}
+
+                                <PDFViewer
                                         document={{
-                                            url: 'localhost:5000/api/'+use.nic,
+                                            url: fileUrl+use.nic,
                                         }}
-                                    /> */}
+                                    />
                                 </li>
                             </Col>
                             <Col span={8}>
                                 <li><b>CV</b>: {use.cv}
                                 <PDFViewer
                                         document={{
-                                            url: 'localhost:5000/api/'+use.cv,
+                                            url: fileUrl+use.cv,
                                         }}
                                     /></li>
                             </Col>
@@ -260,7 +267,7 @@ const columns = [
                                 <li><b>Diploma</b>: {use.diploma}
                                 <PDFViewer
                                         document={{
-                                            url: 'localhost:5000/api/'+use.diploma,
+                                            url: fileUrl+use.diploma,
                                         }}
                                     /></li>
                             </Col>
