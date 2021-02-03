@@ -31,7 +31,7 @@ import pandas as pd
 
 # from faker import Faker
 
-# fake = Faker()
+# fake = Faker()jjd
 
 app = Flask(__name__)
 
