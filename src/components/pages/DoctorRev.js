@@ -6,9 +6,6 @@ import {Table, Button, Modal, Form, message, Row, Col, Tabs } from 'antd'
 
 const DoctorsReview = () => {
 
-    // Create new plugin instance
-const defaultLayoutPluginInstance = defaultLayoutPlugin();
-
 let fileUrl = '../../../'
 const { TabPane } = Tabs;
 
