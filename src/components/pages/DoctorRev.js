@@ -1,15 +1,16 @@
 import React, {useState, useEffect} from "react"
 // import axios from "axios"
-import { Link } from 'react-router-dom'
 import axiosWithAuth from "../../utils/axiosWithAuth"
-import { EditOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons'
-import {Table, Button, Modal, Input, Form, message, Row, Col } from 'antd'
-
-
-const {Item} = Form;
-
+import { EditOutlined, EyeOutlined } from '@ant-design/icons'
+import {Table, Button, Modal, Form, message, Row, Col, Tabs } from 'antd'
 
 const DoctorsReview = () => {
+
+    // Create new plugin instance
+const defaultLayoutPluginInstance = defaultLayoutPlugin();
+
+let fileUrl = '../../../'
+const { TabPane } = Tabs;
 
     const [visible, setVisible] = useState(false);
     // const [useredit, setUserEdit] = useState({
@@ -221,7 +222,28 @@ const columns = [
                                         <EditOutlined />Activate
                                         </Button></li>
                             </Col>
-                            </Row>
+                            </Row><br />
+                            {
+                            use.role_id === 2 ? 
+                            <>
+                            <Row gutter= {16}>
+                            <Col span={24}>
+                            <Tabs defaultActiveKey="1" centered>
+                                <TabPane tab="ID Card | Passport" key="1">
+                                <object width="100%" height="500px" data={fileUrl+use.nic} />
+                                </TabPane>
+                                <TabPane tab="CV" key="2">
+                                <object width="100%" height="500px" data={fileUrl+use.cv} />
+                                </TabPane>
+                                <TabPane tab="Diploma" key="3">
+                                <object width="100%" height="500px" data={fileUrl+use.diploma} />
+                                </TabPane>
+                            </Tabs>
+                            </Col>
+                            </Row><br />
+                            </> : ''
+                            }
+                            
                             </>
                                 )
                             }

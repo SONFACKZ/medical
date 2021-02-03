@@ -1,28 +1,18 @@
 import React, {useState, useEffect} from "react"
 import axiosWithAuth from "../../utils/axiosWithAuth"
 import { EyeOutlined } from '@ant-design/icons'
-import {Table, Button, Modal, Tag, message, Row, Col } from 'antd'
-import PDFViewer from 'pdf-viewer-reactjs'
-import { Document, Page } from 'react-pdf'
-// import { useHistory } from "react-router-dom"
+import {Table, Button, Modal, Tag, message, Row, Col, Tabs } from 'antd'
 
 const DoctorList = () => {
 
-    // const history = useHistory();
+    let fileUrl = '../../../'
+    const { TabPane } = Tabs;
 
-    let fileUrl = 'localhost:5000/'
     const [visible, setVisible] = useState(false);
   
     const [users, setUser] = useState([]);
 
     const [user, setUse] = useState([]);
-
-    const [numPages, setNumPages] = useState(null);
-    const [pageNumber, setPageNumber] = useState(1);
-  
-    function onDocumentLoadSuccess({ numPages }) {
-      setNumPages(numPages);
-    }
 
     const getUsers = async () => {
         await axiosWithAuth().get('/users/doctors')
@@ -48,12 +38,6 @@ const DoctorList = () => {
     useEffect(()=>{
         // alert('reload!')
     },[])
-
-    // function reload()
-    // {
-    //     window.location.reload();
-    // }
-
 
     function activateUser(public_id){
         axiosWithAuth().put('/user/status/'+public_id, public_id)
@@ -228,48 +212,18 @@ const columns = [
                             </Col>
                             </Row><br />
                             <Row gutter= {16}>
-                            <Col span={8}>
-                                <li><b>Passport | ID Card</b>:{use.nic}
-                                <embed
-    src={fileUrl+use.nic}
-    type="application/pdf"
-    frameBorder="0"
-    scrolling="auto"
-    height="100%"
-    width="100%"
-></embed>
-                        {/* <div>
-                            <Document
-                                file={fileUrl+use.nic}
-                                onLoadSuccess={onDocumentLoadSuccess}
-                            >
-                                <Page pageNumber={pageNumber} />
-                            </Document>
-                            <p>Page {pageNumber} of {numPages}</p>
-                        </div> */}
-
-                                <PDFViewer
-                                        document={{
-                                            url: fileUrl+use.nic,
-                                        }}
-                                    />
-                                </li>
-                            </Col>
-                            <Col span={8}>
-                                <li><b>CV</b>: {use.cv}
-                                <PDFViewer
-                                        document={{
-                                            url: fileUrl+use.cv,
-                                        }}
-                                    /></li>
-                            </Col>
-                            <Col span={8}>
-                                <li><b>Diploma</b>: {use.diploma}
-                                <PDFViewer
-                                        document={{
-                                            url: fileUrl+use.diploma,
-                                        }}
-                                    /></li>
+                            <Col span={24}>
+                            <Tabs defaultActiveKey="1" centered>
+                                <TabPane tab="ID Card | Passport" key="1">
+                                <object width="100%" height="500px" data={fileUrl+use.nic} />
+                                </TabPane>
+                                <TabPane tab="CV" key="2">
+                                <object width="100%" height="500px" data={fileUrl+use.cv} />
+                                </TabPane>
+                                <TabPane tab="Diploma" key="3">
+                                <object width="100%" height="500px" data={fileUrl+use.diploma} />
+                                </TabPane>
+                            </Tabs>
                             </Col>
                             </Row><br />
                             </>

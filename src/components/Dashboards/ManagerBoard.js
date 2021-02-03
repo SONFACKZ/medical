@@ -120,8 +120,8 @@ class ManagerBoard extends React.Component {
           </Breadcrumb>
           <div style = {{ background: '#fff', padding:24, minHeight: 580 }}>
             <Route exact path="/manager" component={UserStatistique} />
-            <Route path="/manager/doctors" component={DoctorList} />
-            <Route path="/manager/patients" component={PatientList} />
+            <Route exact path="/manager/doctors" component={DoctorList} />
+            <Route exact path="/manager/patients" component={PatientList} />
             <Route exact path="/manager/usersreview" component={DoctorsReview} />
             <Route exact path="/manager/profile" component={Profile} />
             </div>

@@ -7,9 +7,6 @@ from flask_jwt_extended import (JWTManager, jwt_required, create_access_token,
     jwt_refresh_token_required, create_refresh_token,
     get_jwt_identity, verify_jwt_in_request, get_jwt_claims)
 
-
-from flask_cors import CORS
-
 from flask_mail import Mail, Message
 from random import randint
 
@@ -57,13 +54,6 @@ db = SQLAlchemy(app)
 tok = JWTManager(app)
 mail = Mail(app)
 
-CORS(app)
-cors = CORS(app, resources={
-    r"/*": {
-        "origins": "*"
-    }
-})
-
 #Initialization of Flask-SocketIo
 socketio = SocketIO(app)
 
@@ -80,7 +70,7 @@ class Role(db.Model):
     users = db.relationship('User', backref='role', lazy='dynamic')
 
 
-class User(db.Model):
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
     user_id = db.Column(db.Integer, primary_key=True)
     public_id = db.Column(db.String(50), unique=True)
@@ -144,9 +134,9 @@ db.create_all()
 
 
 
-# Here is a custom decorator that verifies the JWT is present in
-# the request, as well as insuring that this user has a role of
-# `admin` in the access token
+# # Here is a custom decorator that verifies the JWT is present in
+# # the request, as well as insuring that this user has a role of
+# # `admin` in the access token
 # def admin_required(fn):
 #     @wraps(fn)
 #     def wrapper(*args, **kwargs):
@@ -522,8 +512,7 @@ def user_update_serializer(useredit):
     'status': useredit.status,
     'nic': useredit.nic_passport_path,
     'cv': useredit.cv_path,
-    'diploma': useredit.diplomas_path,
-    'role_id': useredit.role_id
+    'diploma': useredit.diplomas_path
     }
 
 @app.route('/users/<public_id>', methods=['GET', 'POST'])
@@ -957,6 +946,8 @@ def get_symptoms():
         symp_data['symptom_name'] = sym
         output.append(symp_data)
     return jsonify({"symptoms": output})
+
+
 
 
 if __name__ ==  '__main__':
