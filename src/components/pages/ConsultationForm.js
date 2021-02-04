@@ -2,7 +2,7 @@ import React, { Component, useState, useEffect } from 'react'
 import { Form, Button, Select } from 'antd'
 // import { MinusCircleOutlined, PlusOutlined } from '@ant-design/icons'
 import axiosWithAuth from "../../utils/axiosWithAuth"
-import { message, Alert, Row, Col, Typography } from 'antd'
+import { message, Alert, Row, Col, Typography, Tag } from 'antd'
 import { LoadingOutlined } from '@ant-design/icons'
 
 const { Title } = Typography;
@@ -16,17 +16,9 @@ class ConsultationForm extends Component {
   state = {
     Symptoms: [],
     symptomsform: '',
-    // name: this.props.name,
-    buttonLoading: false,
+    Result:'',
   }
 
-// Enable fielling form
-  //  handleChange = (event) => {
-  //   // console.log(`Selected: ${value}`);
-  //   this.setState({
-  //     symptomsform: event.target.value
-  // })
-  // }
 
   handleChange = (value, event) =>{
     console.log('selected: '+ value);
@@ -36,19 +28,15 @@ class ConsultationForm extends Component {
 
 }
 
-// // Enable fielling form
-// handleReportonChange = (event) => {
-//   this.setState({
-//       observation: event.target.value
-//   })
-//   // console.log(event.target.value)
-// }
 
   // handle submit value
   handleSubmit = event => {
     event.preventDefault() //Avoid to lose data after submited
     axiosWithAuth().post('/create/consultation', this.state.symptomsform)
          .then(response => {
+          this.setState({
+            Result: response.data.prediction
+          })
              console.log(response)
              if (response)
              {
@@ -72,17 +60,6 @@ class ConsultationForm extends Component {
          })
 }
 
-  // // state = {
-  // //   name: this.props.name,
-  // //   buttonLoading: false,
-  // // }
-
-  // handleFormSubmit = event => {
-  //   event.preventDefault();
-  //   const name = event.target.elements.name.value;
-  //   this.setState({buttonLoading: true});
-  // }
-
   componentDidMount(){
     axiosWithAuth().get('/symptoms')
     .then(response => {
@@ -99,9 +76,9 @@ class ConsultationForm extends Component {
     render() {
       const { Option } = Select;
       let symptoms = this.state.Symptoms;
+      let result = this.state.Result;
       let symptomsItems = symptoms.map((symptom) =>
       <Option value = {symptom.symptom_name} key = {symptom.symptom_name}>{symptom.symptom_name}</Option>
-          // symptomsItems.push(<Option key = {symptom.symptom_name}>{symptom.symptom_name}</Option>)
             );
         return (
             <div className = "text-center">
@@ -129,15 +106,18 @@ class ConsultationForm extends Component {
               {symptomsItems}
               </Select>
               </Title>
-              <div><Title level={4}>Result:</Title></div>
+              { result === '' || null?'':
+                <div><Title level={4}>Result:</Title>
+              <p>According to your symptoms, you have <Tag style = {{color: '#5bc0de'}}>{result}</Tag></p>
+              </div>
+              }
               </Form.Item>
               </Col>
             </Row>
             <Row gutter= {10} justify = "center">
             <Col span={5}>
                 <Form.Item className = "text-center">
-                    <Button onClick = {this.handleSubmit} fluid type="primary" htmlType="submit" 
-                    // loading={this.state.buttonLoading}
+                    <Button onClick = {this.handleSubmit} fluid type="primary" htmlType="submit"  
                      className="login-form-button"  style = {{width: '100%'}}>
                     Predict
                     </Button>

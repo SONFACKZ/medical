@@ -12,7 +12,7 @@ import DoctorBoard from './components/Dashboards/DoctorBoard'
 import ManagerBoard from './components/Dashboards/ManagerBoard'
 import PastHistory from './components/pages/PastHistory'
 import {QuoteContext} from "./contexts/QuoteContext"
-import QuotesList from "./components/QuotesList"
+// import QuotesList from "./components/QuotesList"
 import PrivateRoute from "./utils/PrivateRoute"
 // import { message } from 'antd'
 

@@ -5,6 +5,7 @@ import axiosWithAuth from "../../utils/axiosWithAuth"
 import { EditOutlined, EyeOutlined, DeleteOutlined } from '@ant-design/icons'
 import { Table } from 'antd'
 import PastHistoryList from "./PastHistoryList"
+import { Tabs } from 'antd'
 
 
 const ConsultationList = () => {
@@ -13,6 +14,7 @@ const ConsultationList = () => {
     // const [useredit, setConsultationListEdit] = useState({
     //     status: ''
     // })
+    const { TabPane } = Tabs;
 
     const consultationModalEdit = ()=>{
         setModalEdit(!modalEdit);
@@ -95,15 +97,16 @@ const columns = [
 
     return (
         <div className = "container">
-            <div className = "py-4">
-                <PastHistoryList />
-                <hr />
-                <h1 style = {{textAlign: 'center'}}>Latest predictions</h1>
-
-                <Table columns = {columns} dataSource = {consultation}
+            <Tabs defaultActiveKey="1" centered>
+            <TabPane tab="Past History List" key="1">
+            <PastHistoryList />
+            </TabPane>
+            <TabPane tab="Predictions History" key="2">
+            <Table columns = {columns} dataSource = {consultation}
                  scroll={{ x: 1500, y: 300 }}
                  rowClassName={(record, index) => index % 2 === 0 ? 'table-row-light' :  'table-row-dark'} />
-            </div>
+            </TabPane>
+        </Tabs>
         </div>
     );
 };

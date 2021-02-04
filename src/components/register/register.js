@@ -1,6 +1,5 @@
 import React from "react"
 import { Tabs } from 'antd'
-import TabNav from '../TabNav'
 import RegisterPatient from '../register/registerPatientPage'
 import RegisterDoctor from '../register/registerDoctorPage'
 
