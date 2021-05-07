@@ -71,14 +71,16 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 
 # Flask API setting
-If python already installed in your computer, open the api folder and create your vitual environment by run the command python3 -n venv <<virtual_environment_name>> (Here we are on linux OS).
+If python already installed in your computer, open the api folder and create your vitual environment by run the command << python3 -m venv <virtual_environment_name> >> (Here we are on linux OS).
 Then you activate your virtual environment by running <<virtual_environment_name>>/bin/activate.
 Next you install Flask by running <<pip install Flask>>.
 You can now install the requirement libaries by running <<pip install -r requirements.txt>>
 Now our Flask application is ready to launch.
 Now we are running the database migrations:
-For it, we will do the following
+For it, we will do the following:
 >flask db init
 >flask db migrate -m "Initial migration"
 >flask db upgrade
 Now that our database has been migrated successfully, we can now launch the application by running the command <<flask run>>
+
+As a DBMS I used Postgrsql
