@@ -1,3 +1,19 @@
+# Health Diseases Prediction and Monitoring Platform (Prediction based on Patient Symptoms Analysis)
+
+In this web application, I am doing health diseases prediction based on patient symptoms analysis.
+The application is builded using ReactJs library for the web client, Postgresql as DBMS, Flask as Framework and SqlAlchemy as ORM.
+
+The application has three type of profiles which are the general manager, the Medical Doctor, and the Patient.
+
+When the application is launched, we access the Login page. Here the login page can be used for the different types of profiles we have and depending on their role, they are redirected to their respectively dashboard.
+
+To be able to access the dashborad, all the users have to be registered, for this the medical doctor and patient have the form where the can register while the General manager information are saved in the database already.
+
+When the medical doctor register, he cannot yet able to access his dashboard until the general manager has check his profil (Documents, information) and validate it.
+When the patient register, he can directly access his dashboard and start to use the application.
+
+Concerning the general manager, he will be in charge to manage the application. So he will be able to link patient and medical doctor, validate medical doctor account, deactivate both patients and medical doctors in case they don't respect the policy of the application, etc.
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
@@ -72,15 +88,23 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
 
 # Flask API setting
 If python already installed in your computer, open the api folder and create your vitual environment by run the command << python3 -m venv <virtual_environment_name> >> (Here we are on linux OS).
+
 Then you activate your virtual environment by running <<virtual_environment_name>>/bin/activate.
+
 Next you install Flask by running <<pip install Flask>>.
+  
 You can now install the requirement libaries by running <<pip install -r requirements.txt>>
+  
 Now our Flask application is ready to launch.
-Now we are running the database migrations:
-For it, we will do the following:
+
+Now we are running the database migrations, for it, we will do the following:
+
 >flask db init
+
 >flask db migrate -m "Initial migration"
+
 >flask db upgrade
+
 Now that our database has been migrated successfully, we can now launch the application by running the command <<flask run>>
 
 As a DBMS I used Postgrsql
