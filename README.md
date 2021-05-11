@@ -94,6 +94,8 @@ Then you activate your virtual environment by running <<virtual_environment_name
 Next you install Flask by running <<pip install Flask>>.
   
 You can now install the requirement libaries by running <<pip install -r requirements.txt>>
+
+For mails setting, you have to go through the api/models.py and replace the email (line 46) and password (line 47) by yours 
   
 Now our Flask application is ready to launch.
 
