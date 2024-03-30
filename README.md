@@ -110,3 +110,13 @@ Now we are running the database migrations, for it, we will do the following:
 Now that our database has been migrated successfully, we can now launch the application by running the command <<flask run>>
 
 As a DBMS I used Postgrsql
+
+
+<img width="452" alt="Login" src="https://github.com/Sonelf-San/medical/assets/40425107/5d134e1f-300f-4421-a076-983cd46ccda5">
+<img width="452" alt="Dashboard" src="https://github.com/Sonelf-San/medical/assets/40425107/34e5f09f-b7ff-47e7-a569-bb946ca9beac">
+<img width="452" alt="DrList" src="https://github.com/Sonelf-San/medical/assets/40425107/6a53f52d-7ea9-414c-b65b-1a4d1f023a73"><img width="452" alt="PatientDashboard" src="https://github.com/Sonelf-San/medical/assets/40425107/0163232f-6732-42cf-b708-3cdb53318fa5">
+
+
+
+
+
